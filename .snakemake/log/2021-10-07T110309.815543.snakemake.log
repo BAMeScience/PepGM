@@ -1,0 +1,38 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 1 (use --cores to define parallelism)
+Rules claiming more threads will be scaled down.
+Conda environments: ignored
+Job stats:
+job                  count    min threads    max threads
+-----------------  -------  -------------  -------------
+BarPlotResults           1              1              1
+RunPepGM                 1              1              1
+RunPeptideShaker         1              1              1
+SearchSpectra            1              1              1
+SimplePeptideList        1              1              1
+total                    5              1              1
+
+Select jobs to execute...
+
+[Thu Oct  7 11:03:10 2021]
+rule SearchSpectra:
+    input: resources/SampleData/PXD002936_avian_bronchitis/PXD002936_avian_bronchitis.mgf, resources/Databases/chicken+crap+refseq_viral_concatenated_target_decoy.fasta, resources/SampleData/PXD002936_avian_bronchitis/PXD002936_avian_bronchitis.par
+    output: resources/SampleData/PXD002936_avian_bronchitis/chicken_refseq_searchgui_out.zip
+    jobid: 4
+    wildcards: samplename=PXD002936_avian_bronchitis, hostname=chicken, DBname=refseq
+    resources: tmpdir=/tmp
+
+[Thu Oct  7 11:05:48 2021]
+Finished job 4.
+1 of 5 steps (20%) done
+Select jobs to execute...
+
+[Thu Oct  7 11:05:48 2021]
+rule RunPeptideShaker:
+    input: resources/SampleData/PXD002936_avian_bronchitis/chicken_refseq_searchgui_out.zip, resources/SampleData/PXD002936_avian_bronchitis/PXD002936_avian_bronchitis.mgf, resources/Databases/chicken+crap+refseq_viral_concatenated_target_decoy.fasta
+    output: resources/SampleData/PXD002936_avian_bronchitis/chicken_refseq.psdb
+    jobid: 3
+    wildcards: samplename=PXD002936_avian_bronchitis, hostname=chicken, DBname=refseq
+    resources: tmpdir=/tmp
+

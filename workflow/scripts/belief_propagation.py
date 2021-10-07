@@ -224,7 +224,7 @@ class TaxonGraph(nx.Graph):
             
             for AAsequence in AAsequences:
 
-                    cpdt = subprocess.check_output(['./bin/cp-dt --sequence ' +AAsequence+ ' --peptides'], shell = True).decode('utf-8')
+                    cpdt = subprocess.check_output(['/home/tholstei/repos/PepGM_all/bin/cp-dt --sequence ' +AAsequence+ ' --peptides'], shell = True).decode('utf-8')
                     peptideList = cpdt.split('\n')
                     peptideList.pop(0)
                     peptideList = [str[9:].split(': ') for str in peptideList]

@@ -1,0 +1,30 @@
+#paths to directories
+
+DataDir: 'resources/SampleData/'
+DatabaseDir: 'resources/Databases/'
+
+
+#PeptideShaker and SearchGUI directories
+PeptideShakerDir : '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.1.1/'
+SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.1-mac_and_linux/SearchGUI-4.1.1/'
+
+#parameters for SearchGUI Search
+searchengines: '-xtandem'
+peptideFDR: '5'
+proteinFDR: '5'
+psmFDR: '5'
+
+#sample specific parameters
+
+SpectraFileType: '.mgf' #'.mgf' or 'mzML'
+SampleName: 'PXD025130_Sars_CoV_2'
+HostName: 'chlorocebus'
+ReferenceDBName: 'refseq'
+
+
+#PepGM parameters
+TaxaInPlot: 15       #how many taxa should appear in the final results barplot
+TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
+TargetTaxa: '"coronaviridae" "chlorocebus"'
+FirstTarget: 'coronaviridae'
+

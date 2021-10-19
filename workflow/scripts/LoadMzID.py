@@ -1,37 +1,21 @@
-import re
-import linecache
 import pandas as pd
 
 
-def loadPepsMzID(filepath):
+def loadfoundProteins(filepath):
+    '''take PeptideShaker default PSM results and retrieve all identified protein accessions into list'''
+    pepIDs= pd.read_csv (filepath, sep = '\t', error_bad_lines=False) #error bad lines should be remove when development is done
+    proteins_all = pepIDs['Protein(s)'].tolist()
+    proteins = []
+    for protein in proteins_all:
+        protein.split(',')
+        proteins.append(protein)
+    proteins.extend()
 
-    pepshaker_substr1 = r'PeptideShaker PSM confidence" value='        # Substring to search for any pepshaker match
-    pepshaker_peptidesubstr = r'SpectrumIdentificationItem passThreshold=' # Substring to search for
-
-
-    pepShakerName = []
-    pepShakerScore =[] 
-
-    with open (filepath, 'rt') as pepshaker_lines:
-        for line_num, line in enumerate(pepshaker_lines):
-            if line.find(pepshaker_peptidesubstr) != -1:    # if case-sensitive match
-                pepshaker_peptideline = line_num+1
-                #print(peptideline)
-        if line.find(pepshaker_substr1) != -1:    # if case-sensitive match,
-                print('match2')
-                pepshaker_start_pepname = linecache.getline(pepshaker_searchfile, pepshaker_peptideline).index('peptide_ref=')+13                           # find the index of the substring befor the Pepname
-                pepshaker_end_pepname = linecache.getline(pepshaker_searchfile, pepshaker_peptideline).index('calculatedMassToCharge=')-2
-                pepShakerName.append(linecache.getline(pepshaker_searchfile, pepshaker_peptideline)[pepshaker_start_pepname:pepshaker_end_pepname])    # and use it to cut everything from the line except the pepname
+    return proteins
     
-                pepshaker_start_confidence = line.index('value=') + 7 # find the index of the substring befor the Pepname
-                pepshaker_end_confidence = line.index('/>') - 1
-                pepShakerScore.append(line[pepshaker_start_confidence:pepshaker_end_confidence])  # and use it to cut everything from the line except
-
-    return pepShakerName,pepShakerScore
-
-
 
 def loadSimplePepScore(filepath):
+    '''returns confidence value and peptide names from PeptideShaker default PSm results'''
     pepIDs= pd.read_csv (filepath, sep = '\t', error_bad_lines=False) #error bad lines should be remove when development is done
     pepnames = pepIDs['Sequence'].tolist()
     pepscores = pepIDs['Confidence [%]'].tolist()

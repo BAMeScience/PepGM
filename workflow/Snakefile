@@ -1,15 +1,8 @@
-#configfile: 'envs/graphenv.yml'
-datadir = 'resources/SampleData/'
-DBdir = 'resources/Databases/'
-#pepGMdir = inputdir
-SearchGUIdir = '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.1-mac_and_linux/SearchGUI-4.1.1/'
-PeptideShakerdir = '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.1.1/'
 
-#peprameters for SeachrGUI search
-searchengines = '-xtandem'
-peptideFDR = '5'
-proteinFDR = '5'
-psmFDR ='5'
+#configuration
+WorkflowPath = os.path.dirname(os.path.realpath(workflow.snakefile))
+include: WorkflowPath +'/snakefiles/config.snakefile'
+
 
 
 #wildcard_constraints:
@@ -23,67 +16,84 @@ psmFDR ='5'
 #     output:'{samplename}.mgf'
 #     shell:
 
+rule all:
+     input:
+          DataDirectory + SampleName + '/' + HostName + '_' + ReferenceDBName +'_PepGM_Results.png',
+          DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
+
 rule AddContaminantsandHost:
      input:
-          DBdir+'crap.fasta',
-          DBdir+'{hostname}.fasta',
-          DBdir+'{DBname}_viral.fasta'
+          DatabaseDirectory+'crap.fasta',
+          DatabaseDirectory+'{hostname}.fasta',
+          DatabaseDirectory+'{DBname}_viral.fasta'
 
-     output: DBdir + '{hostname}+crap+{DBname}_viral.fasta'
+     output: DatabaseDirectory+ '{hostname}+crap+{DBname}_viral.fasta'
      shell:'cat {input} > {output}'
 
 rule AddDecoys:
-     input: DBdir+'{hostname}+crap+{DBname}_viral.fasta'
-     output:DBdir+'{hostname}+crap+{DBname}_viral_concatenated_target_decoy.fasta'
-     shell:'java -cp '+SearchGUIdir+'SearchGUI-4.1.1.jar eu.isas.searchgui.cmd.FastaCLI -in {input} -decoy' 
+     input: DatabaseDirectory+'{hostname}+crap+{DBname}_viral.fasta'
+     output: DatabaseDirectory+'{hostname}+crap+{DBname}_viral_concatenated_target_decoy.fasta'
+     shell: 'java -cp '+SearchGUIDir+'SearchGUI-4.1.1.jar eu.isas.searchgui.cmd.FastaCLI -in {input} -decoy' 
 
 rule SearchSpectra:
      input:
-          [datadir+'{samplename}/{samplename}.mgf', 
-          DBdir+'{hostname}+crap+{DBname}_viral_concatenated_target_decoy.fasta',
-          datadir+'{samplename}/{samplename}.par']
+          DataDirectory+'{samplename}/{samplename}.mgf', 
+          DatabaseDirectory+'{hostname}+crap+{DBname}_viral_concatenated_target_decoy.fasta',
+          DataDirectory+'{samplename}/{samplename}.par'
      params:
-          samplename = '{samplename}',
-          hostname = '{hostname}',
-          DBname = '{DBname}'
-     output:datadir+'{samplename}/{hostname}_{DBname}_searchgui_out.zip'
-     shell:'java -cp '+SearchGUIdir+'SearchGUI-4.1.1.jar eu.isas.searchgui.cmd.SearchCLI -spectrum_files {input[0]} -fasta_file {input[1]} -output_folder '+ datadir +'{params.samplename} -id_params {input[2]} -output_default_name {params.hostname}_{params.DBname}_searchgui_out -psm_fdr '+psmFDR+' -peptide_fdr '+peptideFDR+' -protein_fdr '+proteinFDR+' '+searchengines+' 1'
+          samplename = SampleName,
+          hostname = HostName,
+          DBname = ReferenceDBName
+     output:  DataDirectory+'{samplename}/{hostname}_{DBname}_searchgui_out.zip'
+     shell: 'java -cp '+SearchGUIDir+'SearchGUI-4.1.1.jar eu.isas.searchgui.cmd.SearchCLI -spectrum_files {input[0]} -fasta_file {input[1]} -output_folder '+ DataDirectory +'{params.samplename} -id_params {input[2]} -output_default_name {params.hostname}_{params.DBname}_searchgui_out -psm_fdr '+psmFDR+' -peptide_fdr '+peptideFDR+' -protein_fdr '+proteinFDR+' '+searchengines+' 1'
 
 rule RunPeptideShaker:
      input:
-          datadir+'{samplename}/{hostname}_{DBname}_searchgui_out.zip',
-          datadir+'{samplename}/{samplename}.mgf', 
-          DBdir+'{hostname}+crap+{DBname}_viral_concatenated_target_decoy.fasta',
+          DataDirectory+'{samplename}/{hostname}_{DBname}_searchgui_out.zip',
+          DataDirectory+'{samplename}/{samplename}.mgf', 
+          DatabaseDirectory+'{hostname}+crap+{DBname}_viral_concatenated_target_decoy.fasta',
      params:
-          samplename = '{samplename}',
-          hostname = '{hostname}',
-          DBname = '{DBname}'
-     output:datadir+'{samplename}/{hostname}_{DBname}.psdb'
-     shell:'java -cp '+PeptideShakerdir+'PeptideShaker-2.1.1.jar eu.isas.peptideshaker.cmd.PeptideShakerCLI -reference {params.hostname}_{params.DBname} -fasta_file {input[2]} -identification_files {input[0]} -spectrum_files {input[1]} -out {output}'
+          samplename = SampleName,
+          hostname = HostName,
+          DBname = ReferenceDBName
+     output: DataDirectory+'{samplename}/{hostname}_{DBname}.psdb'
+     shell: 'java -cp '+PeptideShakerDir+'PeptideShaker-2.1.1.jar eu.isas.peptideshaker.cmd.PeptideShakerCLI -reference {params.hostname}_{params.DBname} -fasta_file {input[2]} -identification_files {input[0]} -spectrum_files {input[1]} -out {output}'
 
 rule SimplePeptideList:
-     input:datadir+'{samplename}/{hostname}_{DBname}.psdb'
-     output: datadir +'{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt'
+     input:  DataDirectory+'{samplename}/{hostname}_{DBname}.psdb'
+     output: DataDirectory +'{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt'
      params:
-          samplename = '{samplename}',
-          hostname = '{hostname}',
-          DBname = '{DBname}'
-     shell:'java -cp '+PeptideShakerdir+'PeptideShaker-2.1.1.jar eu.isas.peptideshaker.cmd.ReportCLI -in {input} -out_reports '+datadir +'{params.samplename} -reports 3'
+          samplename = SampleName,
+          hostname = HostName,
+          DBname = ReferenceDBName
+     shell: 'java -cp '+PeptideShakerDir+'PeptideShaker-2.1.1.jar eu.isas.peptideshaker.cmd.ReportCLI -in {input} -out_reports '+DataDirectory +'{params.samplename} -reports 3'
 
 rule RunPepGM:
-     input: datadir +'{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt'
-     output: datadir +'{samplename}/{hostname}_{DBname}_PepGM_Results.csv'
+     input: DataDirectory +'{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt'
+     output: DataDirectory +'{samplename}/{hostname}_{DBname}_PepGM_Results.csv'
      conda: 'envs/graphenv.yml'
      params:
-          samplename = '{samplename}',
-          hostname = '{hostname}',
-          DBname = '{DBname}',
-          targetTaxa = '"igacovirus" "gallus gallus"'
-     shell: 'python3  virus-graph/PepGM.py --targetTaxa {params.targetTaxa} --PeptideMapPath '+datadir+'{params.samplename}/igacovirus.json --PSM_Report {input} --out {output}'
+          samplename = SampleName,
+          hostname = HostName,
+          DBname = ReferenceDBName,
+          targetTaxa = TargetTaxa,
+          firstTarget = firstTarget
+     shell: 'python3  workflow/scripts/PepGM.py --targetTaxa {params.targetTaxa} --PeptideMapPath '+DataDirectory+'{params.samplename}/{params.firstTarget}.json --PSM_Report {input} --out {output}'
 
 rule BarPlotResults:
-     input: datadir +'{samplename}/{hostname}_{DBname}_PepGM_Results.csv'
-     output: datadir +'{samplename}/{hostname}_{DBname}_PepGM_Results.png'
+     input: DataDirectory +'{samplename}/{hostname}_{DBname}_PepGM_Results.csv'
+     output: DataDirectory +'{samplename}/{hostname}_{DBname}_PepGM_Results.png'
      conda: 'envs/graphenv.yml'
-     params: NumberofResults = 15
-     shell: 'python3 virus-graph/BarPlotResults.py --ResultsFile {input} --NumberofResults {params.NumberofResults} --out {output}'
+     params: NumberofResults = TaxaInPlot
+     shell: 'python3 workflow/scripts/BarPlotResults.py --ResultsFile {input} --NumberofResults {params.NumberofResults} --out {output}'
+
+rule CountProteinsInJson:
+     input: DataDirectory +'{samplename}/{taxonname}.json'
+     output : DataDirectory + '{samplename}/{taxonname}_proteinCount.png'
+     params : NumberofResults = TaxaInProteinCount
+     conda: 'envs/graphenv.yml'
+     shell: 'python3 workflow/scripts/CountProteins.py --ResultsFile {input} --NumberofResults {params.NumberofResults} --out {output}'
+     
+
+
+     

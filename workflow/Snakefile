@@ -68,8 +68,20 @@ rule SimplePeptideList:
           DBname = ReferenceDBName
      shell: 'java -cp '+PeptideShakerDir+'PeptideShaker-2.1.1.jar eu.isas.peptideshaker.cmd.ReportCLI -in {input} -out_reports '+DataDirectory +'{params.samplename} -reports 3'
 
-rule RunPepGM:
+rule CreateFactorGraph:
      input: DataDirectory +'{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt'
+     output: DataDirectory +'{samplename}/{hostname}_{DBname}_PepGM_graph.graphml'
+     conda: 'envs/graphenv.yml'
+     params:
+          samplename = SampleName,
+          hostname = HostName,
+          DBname = ReferenceDBName,
+          targetTaxa = TargetTaxa,
+          firstTarget = firstTarget
+     shell: 'python3 workflow/scripts/CreatePepGMGraph.py --targetTaxa {params.targetTaxa} --PSM_Report {input} --PeptideMapPath '+DataDirectory+'{params.samplename}/{params.firstTarget}.json --out {output}'
+
+rule RunPepGM:
+     input: DataDirectory +'{samplename}/{hostname}_{DBname}_PepGM_graph.graphml'
      output: DataDirectory +'{samplename}/{hostname}_{DBname}_PepGM_Results.csv'
      conda: 'envs/graphenv.yml'
      params:
@@ -78,7 +90,7 @@ rule RunPepGM:
           DBname = ReferenceDBName,
           targetTaxa = TargetTaxa,
           firstTarget = firstTarget
-     shell: 'python3  workflow/scripts/PepGM.py --targetTaxa {params.targetTaxa} --PeptideMapPath '+DataDirectory+'{params.samplename}/{params.firstTarget}.json --PSM_Report {input} --out {output}'
+     shell: 'python3  workflow/scripts/PepGM.py --targetTaxa {params.targetTaxa} --GraphMLPath {input} --alpha --beta --out {output}'
 
 rule BarPlotResults:
      input: DataDirectory +'{samplename}/{hostname}_{DBname}_PepGM_Results.csv'

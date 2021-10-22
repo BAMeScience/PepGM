@@ -5,3 +5,5 @@ resources/*
 !resources/.gitkeep
 
 .snakemake/*
+
+scripts/belief_propagation_old.py

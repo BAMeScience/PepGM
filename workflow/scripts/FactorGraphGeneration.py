@@ -31,24 +31,22 @@ Entrez.email = 'tanja.holstein@bam.de'
 Entrez.tool = 'PepGM'
 
 #noisyOR methods
-pRandomEmission = 0.4
-pDetection = 0.8
-pProteinprior = 0.5
+
 Taxonprior = 0.5
 
 #peptides from cp-dt need to have minimum lenngth <peplength> to be included in the graph
 peplength = 3
 
-#messagelog = [] #list of triples with from (node, to node, message) that logs all messages sent before the message class is initialized
+
 def normalize(Array):
     normalizedArray = Array/np.sum(Array)
     return normalizedArray
 
 class ProteinPeptideGraph(nx.Graph):
-    #TODO put everything into init?
+    
     #class for stroing the protein-peptide graph with scores and priors but no factors, e.g for visual representation
     
-    def ProteinsFromStringData(self,StringDirectory):
+    def ProteinsFromStringData(self,StringDirectory,pProteinprior):
         StringDirectory = StringDirectory
     
         StringDataFile = open(StringDirectory)
@@ -101,7 +99,7 @@ class TaxonGraph(nx.Graph):
         nx.Graph.__init__(self)
         self.TaxidList = []
 
-    def GetAllLeafTaxa(self,TargetTaxa,StrainResolution = True):
+    def GetAllLeafTaxa(self,TargetTaxa,Taxonprior,StrainResolution = True):
         '''Gets all leaf Taxa of the TargetTaxa list. Make sure the taxons in the TargetTaxa list aren't conflicting, i.e no parent/child relationships between them.'''
 
         self.HighestTaxa = TargetTaxa
@@ -137,8 +135,8 @@ class TaxonGraph(nx.Graph):
 
     def FetchTaxonData(self, PeptideMapPath, *sourceDB):
         '''
-        gets the proteins corresponding to the target taxa from entrez and saves them in a json document Later no intermediate saving necessary or use local DB.
-        necessary as otherwise entrez blocks to many repeat requests
+        gets the proteins corresponding to the target taxa from entrez and saves them in a json document (Later no intermediate saving necessary or use local DB).
+    
         '''
         #TODO add multiple options to query proteins from entrez
         #TODO get rid of entrez and use locally saved DB
@@ -425,20 +423,6 @@ class CTFactorGraph(FactorGraph):
 
     
     def SaveToGraphML(self,Filename):
-        #for node in self.nodes(data=True):
-        #    for keys in node[1].keys() :
-        #        if type(keys) == list:
-        #            print(node)
-        #    for values in node[1].values():
-        #        if type(values) == list:
-        #            print(node)
-        #for edge in self.edges(data=True):
-        #        for keys in edge[2].keys() :
-        #            if type(keys) == list:
-        #                print(edge)
-        #        for values in edge[2].values():
-        #            if type(values) == list:
-        #                print(edge)
         nx.write_graphml(self,Filename)
 
 

@@ -34,7 +34,8 @@ rule CreateFactorGraph:
           DBname = ReferenceDBName,
           targetTaxa = TargetTaxa,
           firstTarget = firstTarget
-     shell: 'python3 workflow/scripts/CreatePepGMGraph.py --targetTaxa {params.targetTaxa} --PSM_Report {input} --PeptideMapPath '+DataDirectory+'{params.samplename}/{params.firstTarget}.json --out {output}'
+          prior = Prior
+     shell: 'python3 workflow/scripts/CreatePepGMGraph.py --targetTaxa {params.targetTaxa} --prior {params.prior} --PSM_Report {input} --PeptideMapPath '+DataDirectory+'{params.samplename}/{params.firstTarget}.json --out {output}'
 
 rule RunPepGM:
      input: DataDirectory +'{samplename}/{hostname}_{DBname}_PepGM_graph.graphml'

@@ -10,21 +10,6 @@ from Bio import Entrez
 
 import time
 
-#TODO add methods that check the network/Factor graph
-
-
-#e-mail for fetching viral protein sequences from entrez 
-Entrez.email = 'tanja.holstein@bam.de'
-Entrez.tool = 'PepGM'
-
-#noisyOR methods
-pRandomEmission = 0.4
-pDetection = 0.8
-pProteinprior = 0.5
-Taxonprior = 0.5
-
-#peptides from cp-dt need to have minimum lenngth <peplength> to be included in the graph
-peplength = 3
 
 #messagelog = [] #list of triples with from (node, to node, message) that logs all messages sent before the message class is initialized
 def normalize(Array):

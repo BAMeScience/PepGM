@@ -15,22 +15,22 @@ parser.add_argument('--beta',type = float, required = True, help = 'probability 
 
 args = parser.parse_args()
 
-
-#targetTaxa = ['igacovirus','gallus gallus']
-#PeptideMapPath = '/home/tholstei/repos/VirusGraph/Data/SampleData/PXD002936_avian_bronchitis/igacovirus.json'
-#PSM_Report = '/home/tholstei/repos/VirusGraph/Data/SampleData/PXD002936_avian_bronchitis/chicken_refseq_Default_PSM_Report.txt'
-#out = '/home/tholstei/repos/VirusGraph/Data/SampleData/PXD002936_avian_bronchitis/chicken_refseq_PepGMresults.csv'
-#max_iter=1000
-#tol=0.006
-
+#graphMLPath = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/human_refseq_PepGM_graph.graphml'
+#alpha = 0.9
+#beta = 0.3
+#out =  'resources/SampleData/PXD005104_Herpessimplex_1/human_refseq_PepGM_Results_0.8_0.4.csv'
+#max_iter = 1000
+#tol = 0.003
 
 
-CTFactorgraph = nx.read_graphml(args.GraphMLPath)
+
+CTFactorgraph = CTFactorGraph(args.GraphMLPath)
 CTFactorgraph.FillInFactors(args.alpha,args.beta)
 
-CTFactorgraphs = SeparateSubgraphs(CTFactorGraph)
 
-#TODO introduce the grid search here
+
+CTFactorgraphs = [SeparateSubgraphs(CTFactorgraph,filternodes) for filternodes in nx.connected_components(CTFactorgraph)]
+
 Resultlist,Resultsdict,Nodetypes = CalibrateAllSubgraphs(CTFactorgraphs,args.max_iter,args.tol)
 save = SaveResultsToCsv(Resultsdict,Nodetypes,args.out)
 #VisualizeResults(Nodetypes,Resultsdict,'taxon',Taxongraph)

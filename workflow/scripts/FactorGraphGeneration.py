@@ -19,6 +19,7 @@ from ete3 import NCBITaxa
 from Bio import Entrez
 import requests
 from LoadMzID import loadSimplePepScore
+import inspect
 
 import time
 
@@ -87,7 +88,7 @@ class ProteinPeptideGraph(nx.Graph):
                           self.add_node(str(Line[2]),InitialBelief = [1-float(Line[4]),float(Line[4])], category = 'peptide')       #if not, add node & score
                        else: 
                           score = np.maximum(float(Line[4]),self.nodes[str(Line[2])]['InitialBelief'][1])     #if yes, update score to max(score(already existing node),score( new node))
-                          nx.set_node_attributes(self,{str(Line[2]):{'InitialBelief':np.asarray([1-score,score])}})
+                          nx.set_node_attributes(self,{str(Line[2]):{'InitialBelief_0':1-score,'InitialBelief_1':score}})
                        self.add_edge(Line[2],ParentProt, category = 'protein-peptide')     
         return self
 
@@ -117,7 +118,7 @@ class TaxonGraph(nx.Graph):
             ncbi = NCBITaxa()
 
             HighestTaxid = ncbi.get_name_translator([TargetTaxon])[TargetTaxon][0]
-            self.add_node(str(HighestTaxid),name = TargetTaxon, rank = ncbi.get_rank([HighestTaxid])[HighestTaxid], InitialBelief = [1-Taxonprior,Taxonprior], category = 'taxon')
+            self.add_node(str(HighestTaxid),name = TargetTaxon, rank = ncbi.get_rank([HighestTaxid])[HighestTaxid], InitialBelief_0=1-Taxonprior,InitialBelief_1= Taxonprior, category = 'taxon')
             
             if StrainResolution:
                 TaxidList = ncbi.get_descendant_taxa(TargetTaxon)
@@ -300,7 +301,7 @@ class FactorGraph(nx.Graph):
                 #FactorToAdd = Factor(cpdArray,[neighbors,[node[0]+'0',node[0]+'1']])
                
                 #add factor & its edges to network as an extra node
-                self.add_node(node[0]+' CPD', category = 'factor')
+                self.add_node(node[0]+' CPD', category = 'factor', ParentNumber = degree)
                 self.add_edges_from([(node[0]+' CPD',x) for x in neighbors])
                 self.add_edge(node[0]+' CPD',node[0])
                
@@ -331,14 +332,27 @@ class FactorGraph(nx.Graph):
                 #FactorToAdd = Factor(cpdArray,[neighbors,[node[0]+'0',node[0]+'1']])
                
                 #add factor & its edges to network as an extra node
-                self.add_node(node[0]+' CPD', category = 'factor')
+                self.add_node(node[0]+' CPD', category = 'factor',ParentNumber = degree)
                 self.add_edges_from([(node[0]+' CPD',x) for x in neighbors])
                 self.add_edge(node[0]+' CPD',node[0])
 
 #separate the connected components in the subgraph
-def SeparateSubgraphs(graph):
-    ListOfFactorGraphs = [graph.subgraph(c).copy() for c in nx.connected_components(graph)]
-    return ListOfFactorGraphs
+def SeparateSubgraphs(graphIN,NodesToKeep):
+    '''
+    separations of subgraphs (create news graphs for each subgraph)
+    
+    '''
+    newG = CTFactorGraph(nx.Graph())
+
+    # add nodes to keep
+    newG.add_nodes_from((n,graphIN.nodes[n]) for n in NodesToKeep)
+    #add edges if they are present in original graph
+    newG.add_edges_from((n,nbr,d) 
+        for n, nbrs in graphIN.adj.items() if n in NodesToKeep
+        for nbr, d in nbrs.items() if nbr in NodesToKeep) 
+    #ListOfFactorGraphs = [graph.subgraph(c) for c in nx.connected_components(graph)]
+
+    return newG #ListOfFactorGraphs
 
 
 
@@ -348,6 +362,10 @@ class CTFactorGraph(FactorGraph):
     '''
     
     def __init__(self,GraphIn,GraphType = 'Taxons'):
+        '''
+        takes either a graph or a path to a graphML file as input
+        
+        '''
         super().__init__()
 
         GraphTypes = ['Proteins','Taxons']
@@ -358,10 +376,13 @@ class CTFactorGraph(FactorGraph):
             self.category = 'taxon'
         elif GraphType == 'Protein':
             self.category = 'protein'
+        
+        if type(GraphIn) == str:
+            GraphIn = nx.read_graphml(GraphIn)
           
 
         # need these to create a new instance of a CT fractorgraph and not overwrite the previous graph....are there more elegant solutions?
-        self.add_edges_from(GraphIn.edges)
+        self.add_edges_from(GraphIn.edges(data =True))
         self.add_nodes_from(GraphIn.nodes(data=True))
         
     
@@ -396,7 +417,7 @@ class CTFactorGraph(FactorGraph):
                     
         #Fill all info into graph structure, should probably do this inside the loop before, so that i can initialize the messages
         for i in range(len(ListOfCTs)):
-            self.add_node('CTree ' + ' '.join(str(ListOfProtLists[i])), ConvolutionTree = ListOfCTs[i][0], category = 'Convolution Tree', NumberOfParents = len(ListOfProtLists[i]))
+            self.add_node('CTree ' + ' '.join(str(ListOfProtLists[i])), ConvolutionTree = str(ListOfCTs[i][0]), category = 'Convolution Tree', NumberOfParents = len(ListOfProtLists[i]))
             self.add_edge('CTree ' + ' '.join(str(ListOfProtLists[i])),ListOfFactors[i], MessageLength = len(ListOfProtLists[i])+1)
             self.add_edges_from(ListOfEdgeAddList[i])
             self.remove_edges_from(ListOfEdgeRemoveList[i])
@@ -404,7 +425,22 @@ class CTFactorGraph(FactorGraph):
 
     
     def SaveToGraphML(self,Filename):
+        #for node in self.nodes(data=True):
+        #    for keys in node[1].keys() :
+        #        if type(keys) == list:
+        #            print(node)
+        #    for values in node[1].values():
+        #        if type(values) == list:
+        #            print(node)
+        #for edge in self.edges(data=True):
+        #        for keys in edge[2].keys() :
+        #            if type(keys) == list:
+        #                print(edge)
+        #        for values in edge[2].values():
+        #            if type(values) == list:
+        #                print(edge)
         nx.write_graphml(self,Filename)
+
 
     def ComputeNetworkAttributes(self):
         '''
@@ -423,20 +459,19 @@ class CTFactorGraph(FactorGraph):
 
         for node in self.nodes(data=True):                   
             #create noisy OR cpd per peptide
-            if node[1]['category']=='peptide':                        
-                degree = self.degree(node[0])                                  
-                neighbors = list(self.neighbors(node[0]))
-                # add niosyOR factors
-                cpdArray = np.full([2,degree+1],1-pDetection)         #pre-define the CPD array and fill it with the noisyOR values
+            if node[1]['category']=='factor':                        
+                # add noisyOR factors
+                degree = node[1]['ParentNumber']
+                cpdArray = np.full([2,degree+1],1-alpha)         #pre-define the CPD array and fill it with the noisyOR values
                 ExponentArray = np.arange(0,degree+1)
-                cpdArray[0,:] = np.power(cpdArray[0,:],ExponentArray)
+                cpdArray[0,:] = np.power(cpdArray[0,:],ExponentArray)*(1-beta)
                 cpdArray[1,:] = np.add(-cpdArray[0,:],1)
                 cpdArray = np.transpose(normalize(cpdArray))
 
-                FactorToAdd = Factor(cpdArray,[neighbors,[node[0]+'0',node[0]+'1']])
+                FactorToAdd = Factor(cpdArray,['placeholder',[node[0]+'0',node[0]+'1']])
                
                 #add factor & its edges to network as an extra node  
-                nx.set_node_attributes(self.graph,{node[0]:FactorToAdd},'InitialBelief')   
+                nx.set_node_attributes(self,{node[0]:FactorToAdd},'InitialBelief')   
 
 
 

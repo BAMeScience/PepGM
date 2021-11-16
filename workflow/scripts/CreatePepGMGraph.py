@@ -1,5 +1,6 @@
 
 import argparse
+from os.path import exists
 from FactorGraphGeneration import *
 
 
@@ -13,10 +14,23 @@ parser.add_argument('--out', type = str, required = True, help = 'path to where 
 
 args = parser.parse_args()
 
+#targetTaxa = ['coronaviridae','chlorocebus']
+#PeptideMapPath = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD025130_Sars_CoV_2/coronaviridae.json'
+#PSM_Report = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD025130_Sars_CoV_2/chlorocebus_refseq_Default_PSM_Report.txt'
+#out = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD025130_Sars_CoV_2/chlorocebus_refseq_PepGM_graph.graphml'
+
+#targetTaxa = ['herpesviridae','homo sapiens']
+#PeptideMapPath = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/herpesviridae.json'
+#PSM_Report = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/human_refseq_Default_PSM_Report.txt'
+#out = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/human_refseq_PepGM_graph.graphml'
+
+
+
 Taxongraph = TaxonGraph()
 Taxongraph.GetAllLeafTaxa(args.targetTaxa)
 #only fetch TaxonData if the PeptideMap File doesn't exist yet:
 if not exists(args.PeptideMapPath):
+    print(exists(args.PeptideMapPath))
     Taxongraph.FetchTaxonData(args.PeptideMapPath)
 Taxongraph.CreateTaxonPeptidegraphFromMzID(args.PSM_Report,args.PeptideMapPath,0.001)
 #Taxongraph.CreateExample()

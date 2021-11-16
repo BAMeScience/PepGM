@@ -11,7 +11,7 @@ peptideFDR = config['peptideFDR']
 proteinFDR = config['proteinFDR']
 psmFDR = config['psmFDR']
 
-SpetraFileType = config['SpectraFileType']
+SpectraFileType = config['SpectraFileType']
 SampleName = config['SampleName']
 HostName = config['HostName']
 ReferenceDBName = config['ReferenceDBName']
@@ -21,3 +21,6 @@ TaxaInProteinCount = config['TaxaInProteinCount']
 
 TargetTaxa = config['TargetTaxa']
 firstTarget = config['FirstTarget']
+
+AlphaRange = config['Alpha']
+BetaRange = config['Beta']

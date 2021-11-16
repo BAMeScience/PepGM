@@ -170,8 +170,8 @@ class Messages():
 
     def __init__(self,CTGraphIn):
 
-        if not isinstance(CTGraphIn,CTFactorGraph):
-            raise TypeError("Input graph needs to be a CT FactorGraph)")
+        #if not isinstance(CTGraphIn,FactorGraphGeneration.CTFactorGraph):
+            #raise TypeError("Input graph needs to be a CT FactorGraph)")
 
         self.Msg = {}
         self.MsgNew = {}

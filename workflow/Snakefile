@@ -31,7 +31,7 @@ rule CreateFactorGraph:
      shell: 'python3 workflow/scripts/CreatePepGMGraph.py --targetTaxa {params.targetTaxa} --PSM_Report {input} --PeptideMapPath '+DataDirectory+'{params.samplename}/{params.firstTarget}.json --out {output}'
 
 rule RunPepGM:
-     input: ResultsDir +'{samplename}/Prior'+str(Prior)+'/'+'{hostname}_{DBname}_PepGM_graph_p'+str(Prior)+'.graphml'
+     input: ResultsDir +'{samplename}/{hostname}_{DBname}_PepGM_graph.graphml'
      output: ResultsDir +'{samplename}/Prior'+str(Prior)+'/'+'{hostname}_{DBname}_PepGM_Results_a{alpha}_b{beta}_p'+str(Prior)+'.csv'
      conda: 'envs/graphenv.yml'
      params:
@@ -41,7 +41,7 @@ rule RunPepGM:
           targetTaxa = TargetTaxa,
           firstTarget = firstTarget,
           prior = Prior
-     shell: 'python3  workflow/scripts/PepGM.py --GraphMLPath {input} --prior{params.prior} --alpha {wildcards.alpha} --beta {wildcards.beta} --out {output}'
+     shell: 'python3  workflow/scripts/PepGM.py --GraphMLPath {input} --prior {params.prior} --alpha {wildcards.alpha} --beta {wildcards.beta} --out {output}'
 
 rule BarPlotResults:
      input: ResultsDir +'{samplename}/Prior'+str(Prior)+'/'+'{hostname}_{DBname}_PepGM_Results_a{alpha}_b{beta}_p'+str(Prior)+'.csv'

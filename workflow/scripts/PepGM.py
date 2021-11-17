@@ -27,7 +27,7 @@ args = parser.parse_args()
 
 CTFactorgraph = CTFactorGraph(args.GraphMLPath)
 CTFactorgraph.FillInFactors(args.alpha,args.beta)
-CTFactorGraph.FillInPriors(args.prior)
+CTFactorgraph.FillInPriors(args.prior)
 
 
 

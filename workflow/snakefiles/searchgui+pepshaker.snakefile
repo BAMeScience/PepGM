@@ -23,26 +23,26 @@ rule SearchSpectra:
           samplename = SampleName,
           hostname = HostName,
           DBname = ReferenceDBName
-     output:  DataDirectory+'{samplename}/{hostname}_{DBname}_searchgui_out.zip'
-     shell: 'java -cp '+SearchGUIDir+'SearchGUI-4.1.1.jar eu.isas.searchgui.cmd.SearchCLI -spectrum_files {input[0]} -fasta_file {input[1]} -output_folder '+ DataDirectory +'{params.samplename} -id_params {input[2]} -output_default_name {params.hostname}_{params.DBname}_searchgui_out -psm_fdr '+psmFDR+' -peptide_fdr '+peptideFDR+' -protein_fdr '+proteinFDR+' '+searchengines+' 1'
+     output:  ResultsDir+'{samplename}/{hostname}_{DBname}_searchgui_out.zip'
+     shell: 'java -cp '+SearchGUIDir+'SearchGUI-4.1.1.jar eu.isas.searchgui.cmd.SearchCLI -spectrum_files {input[0]} -fasta_file {input[1]} -output_folder '+ ResultsDir +'{params.samplename} -id_params {input[2]} -output_default_name {params.hostname}_{params.DBname}_searchgui_out -psm_fdr '+psmFDR+' -peptide_fdr '+peptideFDR+' -protein_fdr '+proteinFDR+' '+searchengines+' 1'
 
 rule RunPeptideShaker:
      input:
-          DataDirectory+'{samplename}/{hostname}_{DBname}_searchgui_out.zip',
+          ResultsDir+'{samplename}/{hostname}_{DBname}_searchgui_out.zip',
           DataDirectory+'{samplename}/{samplename}'+SpectraFileType, 
           DatabaseDirectory+'{hostname}+crap+{DBname}_viral_concatenated_target_decoy.fasta',
      params:
           samplename = SampleName,
           hostname = HostName,
           DBname = ReferenceDBName
-     output: DataDirectory+'{samplename}/{hostname}_{DBname}.psdb'
+     output: ResultsDir+'{samplename}/{hostname}_{DBname}.psdb'
      shell: 'java -cp '+PeptideShakerDir+'PeptideShaker-2.1.1.jar eu.isas.peptideshaker.cmd.PeptideShakerCLI -reference {params.hostname}_{params.DBname} -fasta_file {input[2]} -identification_files {input[0]} -spectrum_files {input[1]} -out {output}'
 
 rule SimplePeptideList:
-     input:  DataDirectory+'{samplename}/{hostname}_{DBname}.psdb'
-     output: DataDirectory +'{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt'
+     input:  ResultsDir+'{samplename}/{hostname}_{DBname}.psdb'
+     output: ResultsDir +'{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt'
      params:
           samplename = SampleName,
           hostname = HostName,
           DBname = ReferenceDBName
-     shell: 'java -cp '+PeptideShakerDir+'PeptideShaker-2.1.1.jar eu.isas.peptideshaker.cmd.ReportCLI -in {input} -out_reports '+DataDirectory +'{params.samplename} -reports 3'
+     shell: 'java -cp '+PeptideShakerDir+'PeptideShaker-2.1.1.jar eu.isas.peptideshaker.cmd.ReportCLI -in {input} -out_reports '+ResultsDir +'{params.samplename} -reports 3'

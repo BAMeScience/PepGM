@@ -11,7 +11,6 @@ parser.add_argument('--targetTaxa', nargs = '*', help ='enter a list of taxa to 
 parser.add_argument('--PSM_Report', type =str, required =True, help = 'path to your PSM report txt file (output from peptideshaker)')
 parser.add_argument('--PeptideMapPath',type=str, required =True, help = 'path to where you want to save you taxon-peptide map .json file')#make it so that this works as argument for both functions
 parser.add_argument('--out', type = str, required = True, help = 'path to where you want to save the GraphML file of the factorgraph')
-parser.add_argument('--prior', type = float, required = True , help = 'prior probability assigned to all taxa' )
 
 args = parser.parse_args()
 
@@ -28,7 +27,7 @@ args = parser.parse_args()
 
 
 Taxongraph = TaxonGraph()
-Taxongraph.GetAllLeafTaxa(args.targetTaxa, args.prior)
+Taxongraph.GetAllLeafTaxa(args.targetTaxa)
 #only fetch TaxonData if the PeptideMap File doesn't exist yet:
 if not exists(args.PeptideMapPath):
     print(exists(args.PeptideMapPath))

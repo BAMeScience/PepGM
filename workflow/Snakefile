@@ -6,12 +6,6 @@ include : WorkflowPath + '/snakefiles/searchgui+pepshaker.snakefile'
 #include: WorkflowPath + '/snakefiles/pepGM.snakefile'
 
 
-
-#wildcard_constraints:
-#     hostname = '[a-zA-Z]',
-#     DBname = '[a-zA-Z]',
-#     samplename = '[a-zA-Z]'
-
 #need to install mono for this to work
 #rule ConvertSpectratoMGF:
 #     input:'{samplename}.raw' or '{samplename}.mzml'
@@ -20,13 +14,13 @@ include : WorkflowPath + '/snakefiles/searchgui+pepshaker.snakefile'
 
 rule all:
      input:
-          expand(DataDirectory + SampleName + '/' + HostName + '_' + ReferenceDBName +'_PepGM_Results_{alpha}_{beta}.png',alpha = AlphaRange, beta = BetaRange)
+          expand(ResultsDir + SampleName + '/Prior' +str(Prior)+'/'+ HostName + '_' + ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p'+str(Prior)+'.png',alpha = AlphaRange, beta = BetaRange)
           #DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
 
 
 rule CreateFactorGraph:
-     input: DataDirectory +'{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt'
-     output: DataDirectory +'{samplename}/{hostname}_{DBname}_PepGM_graph.graphml'
+     input: ResultsDir +'{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt'
+     output: ResultsDir +'{samplename}/{hostname}_{DBname}_PepGM_graph_p.graphml'
      conda: 'envs/graphenv.yml'
      params:
           samplename = SampleName,
@@ -34,32 +28,32 @@ rule CreateFactorGraph:
           DBname = ReferenceDBName,
           targetTaxa = TargetTaxa,
           firstTarget = firstTarget
-          prior = Prior
-     shell: 'python3 workflow/scripts/CreatePepGMGraph.py --targetTaxa {params.targetTaxa} --prior {params.prior} --PSM_Report {input} --PeptideMapPath '+DataDirectory+'{params.samplename}/{params.firstTarget}.json --out {output}'
+     shell: 'python3 workflow/scripts/CreatePepGMGraph.py --targetTaxa {params.targetTaxa} --PSM_Report {input} --PeptideMapPath '+DataDirectory+'{params.samplename}/{params.firstTarget}.json --out {output}'
 
 rule RunPepGM:
-     input: DataDirectory +'{samplename}/{hostname}_{DBname}_PepGM_graph.graphml'
-     output: DataDirectory +'{samplename}/{hostname}_{DBname}_PepGM_Results_{alpha}_{beta}.csv'
+     input: ResultsDir +'{samplename}/Prior'+str(Prior)+'/'+'{hostname}_{DBname}_PepGM_graph_p'+str(Prior)+'.graphml'
+     output: ResultsDir +'{samplename}/Prior'+str(Prior)+'/'+'{hostname}_{DBname}_PepGM_Results_a{alpha}_b{beta}_p'+str(Prior)+'.csv'
      conda: 'envs/graphenv.yml'
      params:
           samplename = SampleName,
           hostname = HostName,
           DBname = ReferenceDBName,
           targetTaxa = TargetTaxa,
-          firstTarget = firstTarget
-     shell: 'python3  workflow/scripts/PepGM.py --GraphMLPath {input} --alpha {wildcards.alpha} --beta {wildcards.beta} --out {output}'
+          firstTarget = firstTarget,
+          prior = Prior
+     shell: 'python3  workflow/scripts/PepGM.py --GraphMLPath {input} --prior{params.prior} --alpha {wildcards.alpha} --beta {wildcards.beta} --out {output}'
 
 rule BarPlotResults:
-     input: DataDirectory +'{samplename}/{hostname}_{DBname}_PepGM_Results_{alpha}_{beta}.csv'
-     output: DataDirectory +'{samplename}/{hostname}_{DBname}_PepGM_Results_{alpha}_{beta}.png'
+     input: ResultsDir +'{samplename}/Prior'+str(Prior)+'/'+'{hostname}_{DBname}_PepGM_Results_a{alpha}_b{beta}_p'+str(Prior)+'.csv'
+     output: ResultsDir +'{samplename}/Prior'+str(Prior)+'/'+'{hostname}_{DBname}_PepGM_Results_a{alpha}_b{beta}_p'+str(Prior)+'.png'
      conda: 'envs/graphenv.yml'
      params: NumberofResults = TaxaInPlot
      shell: 'python3 workflow/scripts/BarPlotResults.py --ResultsFile {input} --NumberofResults {params.NumberofResults} --out {output}'
 
 #rules only needed for debugging/checking results
 rule CountProteinsInJson:
-     input: DataDirectory +'{samplename}/{taxonname}.json'
-     output : DataDirectory + '{samplename}/{taxonname}_proteinCount.png'
+     input: ResultsDir +'{samplename}/{taxonname}.json'
+     output : ResultsDir + '{samplename}/{taxonname}_proteinCount.png'
      params : NumberofResults = TaxaInProteinCount
      conda: 'envs/graphenv.yml'
      shell: 'python3 workflow/scripts/CountProteins.py --ResultsFile {input} --NumberofResults {params.NumberofResults} --out {output}'

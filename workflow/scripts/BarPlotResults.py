@@ -1,9 +1,12 @@
 import pandas as pd 
 import numpy as np 
 import matplotlib.pyplot as plt 
+import matplotlib
 from ete3 import NCBITaxa
 import os
 import argparse
+
+matplotlib.use('Agg')
 
 parser = argparse.ArgumentParser(description = 'generate BarPlot of PepGM results')
 
@@ -20,7 +23,7 @@ print(args.ResultsFile)
      
 IDs = pd.read_csv(args.ResultsFile, names = ['ID','score','type'])
 TaxIDS = IDs.loc[IDs['type']=='taxon']
-TaxIDS['score'] = pd.to_numeric(TaxIDS['score'],downcast = 'float')
+TaxIDS.loc['score'] = pd.to_numeric(TaxIDS['score'],downcast = 'float')
 TaxIDS = TaxIDS.sort_values('score')
         
        
@@ -38,7 +41,8 @@ ax.set_yticks(range(len(TaxaNames[-args.NumberofResults:])))
 ax.set_yticklabels(TaxaNames[-args.NumberofResults:], fontsize = 35)
 plt.xlim((0,1))
 plt.xlabel('Posterior probability',fontsize=35)
-ax.set_xticklabels([0,0.2,0.4,0.6,0.8,1.0], fontsize =35)
+ax.xaxis.set_ticks(np.arange(0,1.2,0.2))
+ax.axis.set_ticklabels([0,0.2,0.4,0.6,0.8,1.0], fontsize =35)
 ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 ax.spines['bottom'].set_visible(False)

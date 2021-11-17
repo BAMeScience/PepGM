@@ -2,6 +2,7 @@ configfile: 'config/config.yaml'
 
 DataDirectory = config['DataDir']
 DatabaseDirectory = config ['DatabaseDir']
+ResultsDir = config['ResultsDir']
 
 PeptideShakerDir = config['PeptideShakerDir']
 SearchGUIDir = config['SearchGUIDir']

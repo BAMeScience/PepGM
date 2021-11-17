@@ -32,7 +32,6 @@ Entrez.tool = 'PepGM'
 
 #noisyOR methods
 
-Taxonprior = 0.5
 
 #peptides from cp-dt need to have minimum lenngth <peplength> to be included in the graph
 peplength = 3
@@ -99,7 +98,7 @@ class TaxonGraph(nx.Graph):
         nx.Graph.__init__(self)
         self.TaxidList = []
 
-    def GetAllLeafTaxa(self,TargetTaxa,Taxonprior,StrainResolution = True):
+    def GetAllLeafTaxa(self,TargetTaxa,StrainResolution = True):
         '''Gets all leaf Taxa of the TargetTaxa list. Make sure the taxons in the TargetTaxa list aren't conflicting, i.e no parent/child relationships between them.'''
 
         self.HighestTaxa = TargetTaxa
@@ -116,17 +115,17 @@ class TaxonGraph(nx.Graph):
             ncbi = NCBITaxa()
 
             HighestTaxid = ncbi.get_name_translator([TargetTaxon])[TargetTaxon][0]
-            self.add_node(str(HighestTaxid),name = TargetTaxon, rank = ncbi.get_rank([HighestTaxid])[HighestTaxid], InitialBelief_0=1-Taxonprior,InitialBelief_1= Taxonprior, category = 'taxon')
+            self.add_node(str(HighestTaxid),name = TargetTaxon, rank = ncbi.get_rank([HighestTaxid])[HighestTaxid],category = 'taxon')
             
             if StrainResolution:
                 TaxidList = ncbi.get_descendant_taxa(TargetTaxon)
                 TaxidNames= ncbi.translate_to_names(TaxidList)
-                TaxidNodeTuples = tuple((str(TaxidList[i]),{'name':TaxidNames[i],'rank':ncbi.get_rank([TaxidList[i]])[TaxidList[i]],'InitialBelief_0':1-Taxonprior,'InitialBelief_1':Taxonprior, 'category':'taxon'}) for i in range(len(TaxidList)))
+                TaxidNodeTuples = tuple((str(TaxidList[i]),{'name':TaxidNames[i],'rank':ncbi.get_rank([TaxidList[i]])[TaxidList[i]], 'category':'taxon'}) for i in range(len(TaxidList)))
                 self.add_nodes_from(TaxidNodeTuples)
             else:
                 TaxidList = list(ncbi.get_descendant_taxa(TargetTaxon, collapse_subspecies=True))
                 TaxidNames= ncbi.translate_to_names(TaxidList)
-                TaxidNodeTuples = tuple((str(TaxidList[i]),{'name':TaxidNames[i],'rank':ncbi.get_rank([TaxidList[i]])[TaxidList[i]],'InitialBelief_0':1-Taxonprior,'InitialBelief_1':Taxonprior, 'category':'taxon'}) for i in range(len(TaxidList)))
+                TaxidNodeTuples = tuple((str(TaxidList[i]),{'name':TaxidNames[i],'rank':ncbi.get_rank([TaxidList[i]])[TaxidList[i]],'category':'taxon'}) for i in range(len(TaxidList)))
                 self.add_nodes_from(TaxidNodeTuples)
 
 
@@ -214,7 +213,7 @@ class TaxonGraph(nx.Graph):
 
         for Taxid,AAsequences in ProteinTaxidDict.items():
 
-            self.add_node(Taxid, InitialBelief_0 = 1-Taxonprior,InitialBelief_1 = Taxonprior, category='taxon')
+            self.add_node(Taxid, category='taxon')
 
             for AAsequence in AAsequences:
 
@@ -320,16 +319,6 @@ class FactorGraph(nx.Graph):
             if node[1]['category']=='peptide':                        
                 degree = TaxonPeptideGraph.degree(node[0])                                  
                 neighbors = list(TaxonPeptideGraph.neighbors(node[0]))
-                # add niosyOR factors
-                #cpdArray = np.full([2,degree+1],1-pDetection)         #pre-define the CPD array and fill it with the noisyOR values
-                #ExponentArray = np.arange(0,degree+1)
-                #cpdArray[0,:] = np.power(cpdArray[0,:],ExponentArray)
-                #cpdArray[1,:] = np.add(-cpdArray[0,:],1)
-                #cpdArray = np.transpose(normalize(cpdArray))
-
-                #FactorToAdd = Factor(cpdArray,[neighbors,[node[0]+'0',node[0]+'1']])
-               
-                #add factor & its edges to network as an extra node
                 self.add_node(node[0]+' CPD', category = 'factor',ParentNumber = degree)
                 self.add_edges_from([(node[0]+' CPD',x) for x in neighbors])
                 self.add_edge(node[0]+' CPD',node[0])
@@ -348,7 +337,7 @@ def SeparateSubgraphs(graphIN,NodesToKeep):
     newG.add_edges_from((n,nbr,d) 
         for n, nbrs in graphIN.adj.items() if n in NodesToKeep
         for nbr, d in nbrs.items() if nbr in NodesToKeep) 
-    #ListOfFactorGraphs = [graph.subgraph(c) for c in nx.connected_components(graph)]
+
 
     return newG #ListOfFactorGraphs
 
@@ -456,6 +445,16 @@ class CTFactorGraph(FactorGraph):
                
                 #add factor & its edges to network as an extra node  
                 nx.set_node_attributes(self,{node[0]:FactorToAdd},'InitialBelief')   
+    
+    def FillInPriors(self,prior):
+        '''fills in the taxon priors according to the given prior'''
+
+        for node in self.nodes(data=True):                   
+            #create noisy OR cpd per peptide
+            if node[1]['category']=='taxon': 
+                nx.set_node_attributes(self,{node[0]:{'InitialBelief_0':1-prior,'InitialBelief_1':prior}}) 
+
+
 
 
 

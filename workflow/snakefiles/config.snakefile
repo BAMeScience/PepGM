@@ -25,4 +25,4 @@ firstTarget = config['FirstTarget']
 
 AlphaRange = config['Alpha']
 BetaRange = config['Beta']
-Prior = config['prior']
+prior = config['prior']

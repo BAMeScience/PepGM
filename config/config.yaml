@@ -17,19 +17,20 @@ psmFDR: '5'
 
 #sample specific parameters
 
-SpectraFileType: '.mgf' #'.mgf' or '.mzML'
-SampleName: 'PXD025130_Sars_CoV_2'  #needs to be the name of your spectrum file and the folder where you have that file
-HostName: 'chlorocebus'
+SpectraFileType: '.mzML' #'.mgf' or '.mzML'
+SampleName: 'PXD003013_Cowpox_BR'  #needs to be the name of your spectrum file and the folder where you have that file
+HostName: 'human'
 ReferenceDBName: 'refseq'
 
 
 #PepGM parameters
 TaxaInPlot: 15       #how many taxa should appear in the final results barplot
 TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
-TargetTaxa: '"coronaviridae" "chlorocebus"'
-FirstTarget: 'coronaviridae'  #will be the name of your json file
+TargetTaxa: '"chordopoxvirinae" "homo sapiens"'
+FirstTarget: 'chordopoxvirinae'  #will be the name of your json file
+
 
 Alpha: [0.01,0.05,0.1,0.2,0.4,0.6,0.8] #increments of parameter alpha to use for the grid earch
 Beta: [0.01,0.05,0.1,0.2,0.4,0.5,0.7,0.9] #range of parameter beta to use for the grid search
-prior: 0.5
+prior: [0.1,0.3,0.5]
 

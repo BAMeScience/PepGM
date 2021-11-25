@@ -6,11 +6,7 @@ include : WorkflowPath + '/snakefiles/searchgui+pepshaker.snakefile'
 #include: WorkflowPath + '/snakefiles/pepGM.snakefile'
 
 
-#need to install mono for this to work
-#rule ConvertSpectratoMGF:
-#     input:'{samplename}.raw' or '{samplename}.mzml'
-#     output:'{samplename}.mgf'
-#     shell:
+#TODO should be possible to simplify the naming scheme a little as name appear in folder & resultsfiles
 
 rule all:
      input:
@@ -28,9 +24,10 @@ rule CreateFactorGraph:
           hostname = HostName,
           DBname = ReferenceDBName,
           targetTaxa = TargetTaxa,
-          firstTarget = firstTarget
+          firstTarget = firstTarget,
+          sourceDB = sourceDB
      log: ResultsDir +'{samplename}/{hostname}_{DBname}.log'
-     shell: 'python3 workflow/scripts/CreatePepGMGraph.py --targetTaxa {params.targetTaxa} --PSM_Report {input} --PeptideMapPath '+DataDirectory+'{params.samplename}/{params.firstTarget}.json --out {output} &>> {log}'
+     shell: 'python3 workflow/scripts/CreatePepGMGraph.py --sourceDB {params.sourceDB} --targetTaxa {params.targetTaxa} --PSM_Report {input} --PeptideMapPath '+DataDirectory+'{params.samplename}/{params.firstTarget}.json --out {output} &>> {log}'
 
 rule RunPepGM:
      input: ResultsDir +'{samplename}/{hostname}_{DBname}_PepGM_graph.graphml'
@@ -47,7 +44,7 @@ rule RunPepGM:
 
 rule BarPlotResults:
      input: ResultsDir +'{samplename}/Prior{Prior}/'+'{hostname}_{DBname}_PepGM_Results_a{alpha}_b{beta}_p{Prior}.csv'
-     output: ResultsDir +'{samplename}/Prior{Prior}/'+'{hostname}_{DBname}_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png'
+     output:  ResultsDir +'{samplename}/Prior{Prior}/'+'{hostname}_{DBname}_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',
      conda: 'envs/graphenv.yml'
      params: NumberofResults = TaxaInPlot
      log : ResultsDir + '{samplename}/Prior{Prior}/log/{hostname}_{DBname}__a{alpha}_b{beta}.log'
@@ -55,11 +52,11 @@ rule BarPlotResults:
 
 rule FindBestParameters:
      input: 
-          ResultsDir +'{samplename}',
           expand(ResultsDir + SampleName + '/Prior{Prior}/'+ HostName + '_' + ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior)
      output: ResultsDir +'{samplename}/paramcheck.png'
      conda: 'envs/graphenv.yml'
-     shell: 'python3 workflow/scripts/GridSearchAnalysis.py --resultsfolder {input[0]} --out {output}'
+     #log : ResultsDir + '{samplename}/paramcheck.log'
+     shell: 'python3 workflow/scripts/GridSearchAnalysis.py --resultsfolder {input[0]} --out {output}&>>{log}'
 
 #rules only needed for debugging/checking results
 rule CountProteinsInJson:

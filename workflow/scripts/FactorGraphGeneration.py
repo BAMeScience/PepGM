@@ -29,7 +29,7 @@ import time
 #e-mail for fetching viral protein sequences from entrez 
 Entrez.email = 'tanja.holstein@bam.de'
 Entrez.tool = 'PepGM'
-
+Entrez.api_key = 'cbd119d8a7d988bc27f5b0a722a7c861f408'
 #noisyOR methods
 
 
@@ -132,16 +132,16 @@ class TaxonGraph(nx.Graph):
             self.TaxidList = self.TaxidList+TaxidList
 
 
-    def FetchTaxonData(self, PeptideMapPath, *sourceDB):
+    def FetchTaxonData(self, PeptideMapPath, sourceDB):
         '''
         gets the proteins corresponding to the target taxa from entrez and saves them in a json document (Later no intermediate saving necessary or use local DB).
     
         '''
         #TODO add multiple options to query proteins from entrez
         #TODO get rid of entrez and use locally saved DB
-        entrezDbName = 'protein'
+        entrezDbName = sourceDB
 
-        sourceDBOptions = ['srcdb_swiss-prot[PROP]','???']
+        sourceDBOptions = ['srcdb_swiss-prot[PROP]','protein','scrdb_refseq_known[PROP]','srcdb_refseq_predicted[PROP]'] # options listed here https://www.ncbi.nlm.nih.gov/books/NBK49540/
         
         saveLists = {}
         for Taxid in self.TaxidList:

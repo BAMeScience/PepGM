@@ -5,6 +5,7 @@ DatabaseDir: 'resources/Databases/'
 ResultsDir: 'results/'
 
 
+
 #PeptideShaker and SearchGUI directories
 PeptideShakerDir : '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.1.1/'
 SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.1-mac_and_linux/SearchGUI-4.1.1/'
@@ -18,19 +19,20 @@ psmFDR: '5'
 #sample specific parameters
 
 SpectraFileType: '.mzML' #'.mgf' or '.mzML'
-SampleName: 'PXD003013_Cowpox_BR'  #needs to be the name of your spectrum file and the folder where you have that file
+SampleName: 'PXD008980_adenovirus_2'  #needs to be the name of your spectrum file and the folder where you have that file
 HostName: 'human'
-ReferenceDBName: 'refseq'
+ReferenceDBName: 'VirusProteinHumanhost'  #name of your fasta file. available here: VirusProteinHumanhost, refseq_viral, refseq
+
 
 
 #PepGM parameters
 TaxaInPlot: 15       #how many taxa should appear in the final results barplot
 TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
-TargetTaxa: '"chordopoxvirinae" "homo sapiens"'
-FirstTarget: 'chordopoxvirinae'  #will be the name of your json file
-
+TargetTaxa: '"adenoviridae" "homo sapiens"'
+FirstTarget: 'adenoviridae'
+sourceDB: 'protein' #choose from entrez query DBs: 'protein' = all proteins, 
+#'srdb_swiss-prot' = only swissprot proteins, 'scrdb_refseq_known[PROP]' = know refseq proteins, 'srcdb_refseq_predicted[PROP]'
 
 Alpha: [0.01,0.05,0.1,0.2,0.4,0.6,0.8] #increments of parameter alpha to use for the grid earch
 Beta: [0.01,0.05,0.1,0.2,0.4,0.5,0.7,0.9] #range of parameter beta to use for the grid search
 prior: [0.1,0.3,0.5]
-

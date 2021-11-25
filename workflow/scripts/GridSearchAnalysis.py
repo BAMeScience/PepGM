@@ -42,6 +42,7 @@ for folders in os.listdir(args.resultsfolder):
 
                 #get the corresponding parameters
                 params = re.findall('\d+\.\d+',file)
+               
                 
         
                 Params.append([params[0],params[1],params[2]])

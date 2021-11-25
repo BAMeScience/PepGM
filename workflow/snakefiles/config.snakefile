@@ -2,7 +2,7 @@ configfile: 'config/config.yaml'
 
 DataDirectory = config['DataDir']
 DatabaseDirectory = config ['DatabaseDir']
-ResultsDir = config['ResultsDir']
+ResultsDir = config['ResultsDir']+ config['ReferenceDBName'] +'/'
 
 PeptideShakerDir = config['PeptideShakerDir']
 SearchGUIDir = config['SearchGUIDir']
@@ -19,6 +19,7 @@ ReferenceDBName = config['ReferenceDBName']
 
 TaxaInPlot = config['TaxaInPlot']
 TaxaInProteinCount = config['TaxaInProteinCount']
+sourceDB = config['sourceDB']
 
 TargetTaxa = config['TargetTaxa']
 firstTarget = config['FirstTarget']

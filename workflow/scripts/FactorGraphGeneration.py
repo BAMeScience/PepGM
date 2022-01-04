@@ -139,9 +139,9 @@ class TaxonGraph(nx.Graph):
         '''
         #TODO add multiple options to query proteins from entrez
         #TODO get rid of entrez and use locally saved DB
-        entrezDbName = sourceDB
+        entrezDbName = 'protein'
 
-        sourceDBOptions = ['srcdb_swiss-prot[PROP]','protein','scrdb_refseq_known[PROP]','srcdb_refseq_predicted[PROP]'] # options listed here https://www.ncbi.nlm.nih.gov/books/NBK49540/
+        sourceDBOptions = ['refseq[filter]','swissprot[filter]','protein_all[PROP]'] # options listed here https://www.ncbi.nlm.nih.gov/books/NBK49540/
         
         saveLists = {}
         for Taxid in self.TaxidList:
@@ -149,8 +149,8 @@ class TaxonGraph(nx.Graph):
             ncbiTaxId = str(Taxid) 
 
             # Find entries matching the query (only swissprot registered proteins for now)
-            entrezQuery = "txid%s[ORGN]"%(ncbiTaxId)
-            searchResultHandle = Entrez.esearch(db=entrezDbName, term=entrezQuery)
+            entrezQuery = sourceDB +' AND txid%s[ORGN]'%(ncbiTaxId) # AND 
+            searchResultHandle = Entrez.esearch(db=entrezDbName, term=entrezQuery, retmax = 1000)
             searchResult = Entrez.read(searchResultHandle)
             searchResultHandle.close()
 
@@ -159,7 +159,7 @@ class TaxonGraph(nx.Graph):
             if searchResult['Count'] != '0':
 
                 uidList = ','.join(searchResult['IdList'])
-                proteinList = (Entrez.efetch(db=entrezDbName, id=uidList, rettype='fasta').read()).split('\n\n')
+                proteinList = (Entrez.efetch(db=entrezDbName, id=uidList, rettype='fasta',retmax = 1000).read()).split('\n\n')
                 proteinListOfLists = [ i.split('\n') for i in proteinList]
                 remove = [list.pop(0) for list in proteinListOfLists]
                 proteinList = [''.join(list) for list in proteinListOfLists]
@@ -168,7 +168,7 @@ class TaxonGraph(nx.Graph):
                 #print('just slept with entrez')
 
             
-        with open(PeptideMapPath, 'w+') as savefile:        #TODO change this naming scheme, it is shit
+        with open(PeptideMapPath, 'w+') as savefile:        
             json.dump(saveLists,savefile)
 
 

@@ -5,9 +5,11 @@ import argparse
 import re 
 import matplotlib
 from matplotlib import pyplot as plt
+from ete3 import NCBITaxa
+from ete3 import Tree
 
 matplotlib.use('Agg')
-
+ncbi = NCBITaxa()
 # script to compute a "goodness" metric for the parameters used in the grid search. the metric is the sum of the 3 best scores divided by the sum of the next 3 best scores
 
 parser = argparse.ArgumentParser(description = 'Run the PepGM algorithm from command line')
@@ -35,9 +37,21 @@ for folders in os.listdir(args.resultsfolder):
                 TaxIDS = TaxIDS.sort_values('score', ascending = False)
         
                 #compute the metric
+
+                #compare the posterior probbilities
                 FirstSum = np.sum(TaxIDS[:3]['score'])
                 NextSum = np.sum(TaxIDS[3:6]['score'])
-                Matching = FirstSum/NextSum
+                SumProportion = FirstSum/NextSum
+                print(SumProportion,'sumprop')
+
+                #compute the pairwise taxonomic distance of the first 4 Taxa
+                FourTaxa = np.array(TaxIDS[:4]['ID'])
+                tree = ncbi.get_topology(FourTaxa)
+                DistanceSum = (tree.get_distance(FourTaxa[0],FourTaxa[1]))**9+tree.get_distance(FourTaxa[1],FourTaxa[2])+tree.get_distance(FourTaxa[2],FourTaxa[3])
+                print(DistanceSum)
+                Matching = SumProportion/DistanceSum
+                print(Matching,'match')
+
                 Metrics.append(Matching)
 
                 #get the corresponding parameters
@@ -56,6 +70,7 @@ Metrics,Params = [list(tuple) for tuple in tuples]
 figure1 = plt.figure(figsize=(30,15), tight_layout=True)
 test = Metrics[0:18]
 test1 = list(range(20))
+print(test)
 
 plt.barh(list(range(20)),Metrics[0:20],color = 'mediumvioletred')
 plt.xticks(fontsize =35)

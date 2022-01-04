@@ -7,6 +7,7 @@ import math
 from scipy.signal import fftconvolve
 import pandas as pd
 from Bio import Entrez
+from FactorGraphGeneration import *
 
 import time
 
@@ -15,6 +16,12 @@ import time
 def normalize(Array):
     normalizedArray = Array/np.sum(Array)
     return normalizedArray
+
+#normalization of log propabilities
+def lognormalize(Array):
+    b = Array.max()
+    y = np.exp(Array - b)
+    return y / y.sum()
 
 
 
@@ -236,10 +243,14 @@ class Messages():
                     return self.Msg[NodeOUT,NodeIN]
 
          else:
-             IncomingMessages = np.asarray(IncomingMessages).reshape(len(IncomingMessages),2)
-             OutMessage = normalize(np.multiply(NodeBelief,[np.prod(IncomingMessages[:,0]),np.prod(IncomingMessages[:,1])]))
+             #need for logs to prevent underflow in very large multiplications
+             #IncomingMessages1 = np.asarray((IncomingMessages)).reshape(len(IncomingMessages),2)
+             IncomingMessages = np.asarray(np.log(IncomingMessages)).reshape(len(IncomingMessages),2)
+             OutMessageLog = lognormalize(np.asarray([np.sum([np.log(NodeBelief[0]),np.sum(IncomingMessages[:,0])]),np.sum([np.log(NodeBelief[1]),np.sum(IncomingMessages[:,1])])]))
              #self.CurrentBeliefsNew[NodeOUT] = OutMessage
-             return OutMessage
+             if np.isnan(np.sum(OutMessageLog))==True:
+                stoppoint = 3
+             return OutMessageLog
 
     
     #factors (Conditional probability tables), handles different dimension of output/input variables
@@ -260,7 +271,8 @@ class Messages():
 
          for NodeOUTneighbors in self.Graph.neighbors(NodeOUT):
              if NodeOUTneighbors != NodeIN:
-                 if [self.GetIncomingMessageFactor(NodeOUTneighbors, NodeOUT)]:                      #only the messages that have changed get multiplied into the current belief again
+                 if [self.GetIncomingMessageFactor(NodeOUTneighbors, NodeOUT)]:
+                    #only the messages that have changed get multiplied into the current belief again                      
                     IncomingMessages.append(self.GetIncomingMessageFactor(NodeOUTneighbors, NodeOUT))
          
          if self.Graph.nodes[NodeIN]['category'] == 'Convolution Tree':
@@ -268,6 +280,7 @@ class Messages():
                 IncomingMessages = np.asarray(IncomingMessages).reshape(len(IncomingMessages),2)
                 OutMessages = normalize(np.multiply(NodeBelief,[np.prod(IncomingMessages[:,0]),np.prod(IncomingMessages[:,1])]))
                 #self.CurrentBeliefsNew[NodeOUT] = OutMessages
+                
             
                 return np.add(OutMessages[:,0],OutMessages[:,1])    
          else:
@@ -275,12 +288,18 @@ class Messages():
                     IncomingMessages = np.asarray(IncomingMessages).reshape(IncomingMessages[0].shape[0],1)
                     OutMessages = normalize(NodeBelief*IncomingMessages)
                     #self.CurrentBeliefsNew[NodeOUT] = OutMessages
+                    if np.isnan(np.sum(OutMessages))==True:
+                        stoppoint = 3
+                    #print([np.sum(OutMessages[0,:]),np.sum(OutMessages[1,:])] )
                     return [np.sum(OutMessages[0,:]),np.sum(OutMessages[1,:])] 
                 else :
                     IncomingMessages.append([1.,1.])
                     IncomingMessages = np.asarray(IncomingMessages).reshape(len(IncomingMessages),2)
                     OutMessages = normalize(np.multiply(NodeBelief,[np.prod(IncomingMessages[:,0]),np.prod(IncomingMessages[:,1])])) 
                     #self.CurrentBeliefsNew[NodeOUT] = OutMessages
+                    #print([np.sum(OutMessages[0,:]),np.sum(OutMessages[1,:])] )
+                    if np.isnan(np.sum(OutMessages))==True:
+                        stoppoint = 3
                     return [np.sum(OutMessages[0,:]),np.sum(OutMessages[1,:])] 
 
 
@@ -467,9 +486,13 @@ class Messages():
                 for VariableNeighbors in self.Graph.neighbors(Variable):
                     IncomingMessages.append(self.GetIncomingMessageVariable(VariableNeighbors, Variable))
                 
-                IncomingMessages = np.asarray(IncomingMessages).reshape(len(IncomingMessages),2)
-                VariableMarginal = normalize(np.multiply(self.InitialBeliefs[Variable],[np.prod(IncomingMessages[:,0]),np.prod(IncomingMessages[:,1])]))
-                self.CurrentBeliefs[Variable] = VariableMarginal
+                #log to avoid overflow
+                IncomingMessages = np.asarray(np.log(IncomingMessages)).reshape(len(IncomingMessages),2)
+                LoggedVariableMarginal = lognormalize(np.asarray([np.sum([np.log(self.InitialBeliefs[Variable][0]),np.sum(IncomingMessages[:,0])]),np.sum([np.log(self.InitialBeliefs[Variable][1]),np.sum(IncomingMessages[:,1])])]))
+                if np.isnan(np.sum(LoggedVariableMarginal))==True:
+                    stoppoint = 3
+
+                self.CurrentBeliefs[Variable] = LoggedVariableMarginal
 
 
         
@@ -584,27 +607,27 @@ def VisualizeResults(NodeDict,ResultsDict,GraphType,Graph,**ResultsList,):
 
 
 if __name__== '__main__':
+
+
+ GraphMLPath = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral/PXD005104_Herpessimplex_1/human_refseqViral_PepGM_graph.graphml'
+ #GraphMLPath = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral/PXD002936_avian_bronchitis/chicken_refseqViral_PepGM_graph.graphml'
+ alpha = 0.1
+ beta = 0.01
+ prior = 0.1
  
- Taxongraph = TaxonGraph()
- #Taxongraph.GetAllLeafTaxa(['adenoviridae'])
- Taxongraph.FetchTaxonData('peptidemapapth')
- Taxongraph.CreateTaxonPeptidegraphFromMzID('/home/tholstei/repos/VirusGraph/Data/Searchresults/adeno_refseqviruses/adeno_refseq_allviruses_Default_PSM_Report.txt','TaxonGraph_adenoviridae.json',0.001)
- #Taxongraph.CreateExample()
- Factorgraph = FactorGraph()
- Factorgraph.ConstructFromTaxonGraph(Taxongraph,)
+ CTFactorgraph = CTFactorGraph(GraphMLPath)
+ CTFactorgraph.FillInFactors(alpha,beta)
+ CTFactorgraph.FillInPriors(prior)
+ max_iter = 1000
+ tol = 0.003
+ out = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral/PXD005104_Herpessimplex_1/human_refseqViral_PepGM_results_debug.csv'
 
 
- #To save a gml of your graph, uncomment this
- #GmlCTFactorgraphs = CTFactorGraph(Factorgraph)
- #GmlCTFactorgraphs.SaveToGml('TaxonpeptideGraph_herpesviridae_pxd005104')
 
+ CTFactorgraphs = [SeparateSubgraphs(CTFactorgraph,filternodes) for filternodes in nx.connected_components(CTFactorgraph)]
 
- Factorgraphs = Factorgraph.SeparateSubgraphs()
-
- CTFactorgraphs = GenerateCTFactorGraphs(Factorgraphs)
-
- Resultlist,Resultsdict,Nodetypes = CalibrateAllSubgraphs(CTFactorgraphs,10000,0.006)
- save = SaveResultsToCsv(Resultsdict,Nodetypes,'TaxonnomyTest_adeno_adenovridae_alpha0.4_beta0.9')
+ Resultlist,Resultsdict,Nodetypes = CalibrateAllSubgraphs(CTFactorgraphs,max_iter,tol)
+ save = SaveResultsToCsv(Resultsdict,Nodetypes,out)
  #VisualizeResults(Nodetypes,Resultsdict,'taxon',Taxongraph)
 
 

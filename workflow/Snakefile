@@ -27,7 +27,7 @@ rule CreateFactorGraph:
           firstTarget = firstTarget,
           sourceDB = sourceDB
      log: ResultsDir +'{samplename}/{hostname}_{DBname}.log'
-     shell: 'python3 workflow/scripts/CreatePepGMGraph.py --sourceDB {params.sourceDB} --targetTaxa {params.targetTaxa} --PSM_Report {input} --PeptideMapPath '+DataDirectory+'{params.samplename}/{params.firstTarget}.json --out {output} &>> {log}'
+     shell: 'python3 workflow/scripts/CreatePepGMGraph.py --sourceDB {params.sourceDB} --targetTaxa {params.targetTaxa} --PSM_Report {input} --PeptideMapPath '+ResultsDir+'{params.samplename}/{params.firstTarget}.json --out {output} &>> {log}'
 
 rule RunPepGM:
      input: ResultsDir +'{samplename}/{hostname}_{DBname}_PepGM_graph.graphml'
@@ -39,7 +39,7 @@ rule RunPepGM:
           DBname = ReferenceDBName,
           targetTaxa = TargetTaxa,
           firstTarget = firstTarget
-     log : ResultsDir + '{samplename}/Prior{Prior}/log/{hostname}_{DBname}__a{alpha}_b{beta}.log'
+     log : ResultsDir + '{samplename}/Prior{Prior}/log/{hostname}_{DBname}__a{alpha}_b{beta}_pepGM.log'
      shell: 'python3  workflow/scripts/PepGM.py --GraphMLPath {input} --prior {wildcards.Prior} --alpha {wildcards.alpha} --beta {wildcards.beta} --out {output} &>> {log}'
 
 rule BarPlotResults:
@@ -55,8 +55,9 @@ rule FindBestParameters:
           expand(ResultsDir + SampleName + '/Prior{Prior}/'+ HostName + '_' + ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior)
      output: ResultsDir +'{samplename}/paramcheck.png'
      conda: 'envs/graphenv.yml'
-     #log : ResultsDir + '{samplename}/paramcheck.log'
-     shell: 'python3 workflow/scripts/GridSearchAnalysis.py --resultsfolder {input[0]} --out {output}&>>{log}'
+     log : ResultsDir + '{samplename}/paramcheck.log'
+     params: Results = ResultsDir+SampleName
+     shell: 'python3 workflow/scripts/GridSearchAnalysis.py --resultsfolder {params.Results} --out {output} &>> {log}'
 
 #rules only needed for debugging/checking results
 rule CountProteinsInJson:

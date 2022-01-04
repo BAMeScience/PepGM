@@ -11,7 +11,7 @@ parser.add_argument('--targetTaxa', nargs = '*', help ='enter a list of taxa to 
 parser.add_argument('--PSM_Report', type =str, required =True, help = 'path to your PSM report txt file (output from peptideshaker)')
 parser.add_argument('--PeptideMapPath',type=str, required =True, help = 'path to where you want to save you taxon-peptide map .json file')#make it so that this works as argument for both functions
 parser.add_argument('--out', type = str, required = True, help = 'path to where you want to save the GraphML file of the factorgraph')
-parser.add_argument('--sourceDB',type = str, required = True, help = 'name of the DB queried through Entrez')
+parser.add_argument('--sourceDB',type = str, nargs ='?', const ='', help = 'name of the DB queried through Entrez')
 
 args = parser.parse_args()
 

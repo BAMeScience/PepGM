@@ -18,20 +18,19 @@ psmFDR: '5'
 
 #sample specific parameters
 
-SpectraFileType: '.mzML' #'.mgf' or '.mzML'
-SampleName: 'PXD008980_adenovirus_2'  #needs to be the name of your spectrum file and the folder where you have that file
-HostName: 'human'
-ReferenceDBName: 'VirusProteinHumanhost'  #name of your fasta file. available here: VirusProteinHumanhost, refseq_viral, refseq
-
+SpectraFileType: '.mgf' #'.mgf' or '.mzML'
+SampleName: 'PXD025130_Sars_CoV_2'  #needs to be the name of your spectrum file and the folder where you have that file
+HostName: 'chlorocebus'
+ReferenceDBName: 'refseqViral'
 
 
 #PepGM parameters
 TaxaInPlot: 15       #how many taxa should appear in the final results barplot
 TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
-TargetTaxa: '"adenoviridae" "homo sapiens"'
-FirstTarget: 'adenoviridae'
-sourceDB: 'protein' #choose from entrez query DBs: 'protein' = all proteins, 
-#'srdb_swiss-prot' = only swissprot proteins, 'scrdb_refseq_known[PROP]' = know refseq proteins, 'srcdb_refseq_predicted[PROP]'
+TargetTaxa: '"coronaviridae" "chlorocebus"'
+FirstTarget: 'coronaviridae'  #will be the name of your json file
+sourceDB: 'all[FILT]' #choose from entrez query DBs to filter the protein DB with 
+#swissprot[filter]' = only swissprot proteins, refseq[filter] = know refseq proteins, all[filter]', etc: https://www.ncbi.nlm.nih.gov/books/NBK49540/
 
 Alpha: [0.01,0.05,0.1,0.2,0.4,0.6,0.8] #increments of parameter alpha to use for the grid earch
 Beta: [0.01,0.05,0.1,0.2,0.4,0.5,0.7,0.9] #range of parameter beta to use for the grid search

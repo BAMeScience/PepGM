@@ -1,84 +1,23 @@
-import mmh3
 import datetime
-import numpy as np
-import csv
-import numba as nb
-from numba.typed import List
-import argparse
 import linecache
+from pathlib import Path
+
+import mmh3
+import os, psutil
+import numba as nb
+import numpy as np
 
 
-parser = argparse.ArgumentParser(description='get a list of all taxa which are present in peptideShaker output')
-parser.add_argument('-q', '--query',
-                    help ='path to input list of protein accession')
-parser.add_argument('-d', '--database',
-                    help='path to input protein accession database')
-parser.add_argument('-r', '--runtime', nargs='?',
-                    help='decide if runtime analytics printed')
-parser.add_argument('-t', '--taxids',
-                    help='path to taxid database')
-parser.add_argument('-sd', '--save_database', nargs='?',
-                    help='path to directory where to save database in .npy format')
-parser.add_argument('-sr', '--save_results', nargs='?',
-                    help='path to directory where to save results')
-args = parser.parse_args()
+# preliminaries
+path_to_resources = Path('../../resources/')
+path_to_sample = Path('../../resources/test/')
 
 
-def hashDatabase(path, save=True, print_runtime=args.runtime, seed=18):
+def hash_query(path):
     """
-    Perform mmh3 hashing on input database.
-    MurmurHash3 is a non-cryptographic hashing algorithm.
-    For more information on mmh3 algorithm visit https://pypi.org/project/mmh3/.
+    Hash input query.
 
-    :param path: str, input path to protein accession database (accessions need to be separated by \n)
-    :param save: bool, choose to save database in numpy format
-    :param print_runtime: bool, choose to print runtime analytics
-    :param seed: int, hashing seed: select the same integer for identical hashing
-    :return: -
-    """
-    print('Database hashing in process...')
-    print('Preparing...')
-    # initialize database
-    database = np.empty([sum(1 for _ in open(path))])
-    # save start time for runtime analytics
-    start = datetime.datetime.now()
-    print('Hashing...')
-    # hash protein accessions - this is where the magic happens
-    with open(path, 'r') as f:
-        for line_num, line in enumerate(f, 1):
-            database[line_num-1] = mmh3.hash64(line, signed=False, seed=seed)[0]
-    print('Hashing done.')
-    if print_runtime:
-        print('Time for database hashing: ', datetime.datetime.now() - start)
-    print('---')
-    if save:
-        np.save(args.save_database, database)
-    return database
-
-
-@nb.jit(nopython=True, parallel=True)
-def queryDatabase(database, query):
-    """
-    Loop to intersect.
-
-    :param database: lst, hashed protein accession numbers
-    :param query: lst, query accession numbers
-    :return: lst, matching lines of database
-    """
-    lst = [0] * len(query)
-    for i in nb.prange(len(database)):
-        for j in nb.prange(len(query)):
-            # if there is a match append the corresponding line from database
-            if database[i] == query[j]:
-                lst[j] = i + 1
-    return lst
-
-
-def hashQuery(path):
-    """
-    Hash query accession numbers.
-
-    :param path: str, path to query accession numbers
+    :param path: str, path to query
     :return: lst, hashed query
     """
     accessions = []
@@ -90,66 +29,59 @@ def hashQuery(path):
     return query
 
 
-def saveResults(results):
+@nb.jit(nopython=True, parallel=True)
+def query_database(database, query):
     """
-    Save taxon IDs in a text file.
-    :param results: lst, taxids
+    Loop to intersect.
+
+    :param database: lst, database
+    :param query: lst, query
+    :return: lst, line numbers where query and database are matching
     """
-    output = open(args.save_results, 'w')
-    for element in results:
-        output.write(str(element))
-    output.close()
+    lst = [0] * len(query)
+    for i in nb.prange(len(database)):
+        for j in nb.prange(len(query)):
+            # if there is a match append the corresponding line from database
+            if database[i] == query[j]:
+                lst[j] = i + 1
+    return lst
 
 
-def linesToTargets(match, path):
+def lines_to_taxids(match, path='../../resources/taxids.txt'):
     """
-    Convert index of match to taxon IDs.
+    Map matches to taxids.
+
     :param match: lst, index of matches
     :param path: str, path to taxid database
     :return lst, taxids
     """
-    taxids = []
+    tax_ids = []
     for idx in match:
-        taxids.append((linecache.getline(path, idx)))
-    return taxids
+        tax_ids.append((linecache.getline(path, idx)))
+    return tax_ids
 
 
-def getTargets(create_database=False):
+def save_results_to_txt(path, results):
     """
-    Main.
-    :param create_database: bool, chose whether to build new or use existing database
+    Save results.
+
+    :param path: str, where to save results
+    :param results: lst, results from database query
     """
-
-    if create_database:
-        database = hashDatabase(args.database)
-    else:
-        database = np.load(args.database)
-    print('Length of database: ', len(database))
+    f_out = open(path, 'w')
+    for result in results:
+        f_out.write(str(result))
+    f_out.close()
 
 
-    print('Query hashing...')
-    query_accessions = hashQuery(args.query)
-    print('Query hashing done.')
-    print('---')
+if __name__ == "__main__":
+    #TODO: ask T where samples are to be saved
+    query_accessions = hash_query(path_to_sample / 'sample_n100_head.txt')
 
+    database_accessions = np.load(path_to_resources / 'accessions_hashed.npy')
+    lookup = query_database(database_accessions, query_accessions)
 
-    print('Looking up...')
-    start = datetime.datetime.now()
-    match = queryDatabase(database, query_accessions)
-    print('Lookup done.')
-    print('Time for lookup: ', datetime.datetime.now() - start)
-    print('---')
+    taxids = lines_to_taxids(lookup)
 
-
-    start = datetime.datetime.now()
-    taxids = linesToTargets(match, args.taxids)
-    print('Lookup shape: ', len(match))
-    print('Time for lookup: ', datetime.datetime.now() - start)
-    print('---')
-
-
-    print('Writing into output file...')
-    saveResults(taxids)
-    print('Done.')
-
-getTargets()
+    save_results_to_txt(path_to_resources / 'results_taxids.txt', taxids)
+    print('Found targets.')

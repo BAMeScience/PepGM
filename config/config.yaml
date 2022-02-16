@@ -3,7 +3,7 @@
 DataDir: 'resources/SampleData/'
 DatabaseDir: 'resources/Databases/'
 ResultsDir: 'results/'
-
+ResourcesDir: 'resources/'
 
 
 #PeptideShaker and SearchGUI directories

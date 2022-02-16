@@ -30,11 +30,10 @@ def hash_database(path, seed=18):
 
     :param path: str, input path to protein accession database (accessions need to be separated by \n)
     :param seed: int, hashing seed: use identical integer for identical hashing results
-    :return: database, hashed database
+    :return: database: np.array, hashed database
     """
     # initialize database
     database = np.empty([sum(1 for _ in open(path))])
-    # save start time for runtime analytics
     # hash protein accessions - this is where the magic happens
     with open(path, 'r') as f:
         for line_num, line in enumerate(f, 1):

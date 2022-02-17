@@ -19,8 +19,8 @@ args = parser.parse_args()
 def preprocess_query(input_path, output_path):
     """
     Extract protein accessions from PeptideShaker output and save them in a file.
-    :param input_path:
-    :param output_path:
+    :param input_path: str, input path to raw query
+    :param output_path: str, output path
     :return:
     """
     # error bad lines should be remove when development is done
@@ -40,7 +40,7 @@ def preprocess_query(input_path, output_path):
     accessions_final.close()
 
 
-preprocess_query(args.input_path, args.output_path)
+# preprocess_query(args.input_path, args.output_path)
 
 
 def hash_query(path):
@@ -85,10 +85,15 @@ def lines_to_taxids(match, path='../../resources/taxids.txt'):
     :param path: str, path to taxid database
     :return lst, taxids
     """
-    tax_ids = []
+    taxids = []
     for idx in match:
-        tax_ids.append((linecache.getline(path, idx)))
-    return tax_ids
+        taxids.append((linecache.getline(path, idx)))
+    taxids_unique = []
+    # remove duplicates
+    for taxid in tax_ids:
+        if taxid not in taxids_unique:
+            taxids_unique.append(x)
+    return taxids_unique
 
 
 def save_results_to_txt(path, results):
@@ -105,12 +110,12 @@ def save_results_to_txt(path, results):
 
 
 
-# query_accessions = hash_query(path_to_sample / 'sample_n100_head.txt')
-#
-# database_accessions = np.load(path_to_resources / 'accessions_hashed.npy')
-# lookup = query_database(database_accessions, query_accessions)
-#
-# taxids = lines_to_taxids(lookup)
-#
-# save_results_to_txt(path_to_resources / 'results_taxids.txt', taxids)
-# print('Found targets.')
+query_accessions = hash_query('/home/fkistner/pepgm/results/chicken_refseq_query_accessions.txt')
+
+database_accessions = np.load('/home/fkistner/pepgm/resources/accessions_hashed.npy')
+lookup = query_database(database_accessions, query_accessions)
+
+taxids = lines_to_taxids(lookup)
+
+save_results_to_txt('/home/fkistner/pepgm/results/taxids.txt', taxids)
+print('Found targets.')

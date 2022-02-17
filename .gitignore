@@ -1,5 +1,6 @@
 results/*
 !results/.gitkeep
+!results/chicken_refseq_query_accessions.txt
 
 resources/*
 !resources/.gitkeep

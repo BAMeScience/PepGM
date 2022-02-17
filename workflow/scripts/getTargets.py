@@ -1,18 +1,15 @@
+import argparse
 import datetime
 import linecache
-from pathlib import Path
+import os
 
 import mmh3
-import os, psutil
 import numba as nb
 import numpy as np
-import argparse
 import pandas as pd
+import psutil
 
 # preliminaries
-path_to_resources = Path('../../resources/')
-path_to_sample = Path('../../resources/test/')
-
 parser = argparse.ArgumentParser(description = 'Hash protein accession database')
 parser.add_argument('--input_path', help ='path to query')
 parser.add_argument('--output_path', help ='path where to save preprocessed query')

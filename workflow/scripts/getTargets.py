@@ -6,11 +6,44 @@ import mmh3
 import os, psutil
 import numba as nb
 import numpy as np
-
+import argparse
+import pandas as pd
 
 # preliminaries
 path_to_resources = Path('../../resources/')
 path_to_sample = Path('../../resources/test/')
+
+parser = argparse.ArgumentParser(description = 'Hash protein accession database')
+parser.add_argument('--input_path', help ='path to query')
+parser.add_argument('--output_path', help ='path where to save preprocessed query')
+args = parser.parse_args()
+
+
+def preprocess_query(input_path, output_path):
+    """
+    Extract protein accessions from PeptideShaker output and save them in a file.
+    :param input_path:
+    :param output_path:
+    :return:
+    """
+    # error bad lines should be remove when development is done
+    psm_report = pd.read_csv(input_path, sep = '\t', error_bad_lines=False)
+    # extract accession numbers
+    accessions_raw = psm_report['Protein(s)'].tolist()
+    proteins = []
+    # split into sublists
+    for accession in accessions_raw:
+        accession.split(',')
+        proteins.append(accession)
+    # merge sublists
+    proteins = [j for i in [protein.split(',') for protein in proteins] for j in i]
+    # save in .txt file
+    accessions_final = open(output_path, "w")
+    [accessions_final.write(element + "\n") for element in proteins]
+    accessions_final.close()
+
+
+preprocess_query(args.input_path, args.output_path)
 
 
 def hash_query(path):
@@ -74,14 +107,13 @@ def save_results_to_txt(path, results):
     f_out.close()
 
 
-if __name__ == "__main__":
-    #TODO: ask T where samples are to be saved
-    query_accessions = hash_query(path_to_sample / 'sample_n100_head.txt')
 
-    database_accessions = np.load(path_to_resources / 'accessions_hashed.npy')
-    lookup = query_database(database_accessions, query_accessions)
-
-    taxids = lines_to_taxids(lookup)
-
-    save_results_to_txt(path_to_resources / 'results_taxids.txt', taxids)
-    print('Found targets.')
+# query_accessions = hash_query(path_to_sample / 'sample_n100_head.txt')
+#
+# database_accessions = np.load(path_to_resources / 'accessions_hashed.npy')
+# lookup = query_database(database_accessions, query_accessions)
+#
+# taxids = lines_to_taxids(lookup)
+#
+# save_results_to_txt(path_to_resources / 'results_taxids.txt', taxids)
+# print('Found targets.')

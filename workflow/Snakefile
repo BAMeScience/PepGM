@@ -16,6 +16,9 @@ rule all:
           #DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
 
 
+# these rules are very basic
+# one should consider adding /resources to some config file
+# but so far I did not find the correct file to do so
 rule splitToAccessions:
      input:  'resources/protacc2taxids_virus.txt'
      output: 'resources/accessions.txt'
@@ -31,7 +34,13 @@ rule splitToTaxids:
 rule hashDatabase:
      input: 'resources/accessions.txt'
      output: 'resources/accessions_hashed.npy'
-     shell: "python3 workflow/scripts/createDatabase.py --input_path {input} --output_path {output}"
+     shell: "python3 workflow/scripts/hashDatabase.py --input_path {input} --output_path {output}"
+
+
+rule getTargets:
+     input: 'resources/chicken_refseq_Default_PSM_Report.txt'
+     output: 'results/chicken_refseq_query_accessions.txt'
+     shell: "python3 workflow/scripts/getTargets.py --input_path {input} --output_path {output}"
 
 
 rule CreateFactorGraph:

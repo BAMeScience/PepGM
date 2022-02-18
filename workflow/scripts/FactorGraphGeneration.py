@@ -17,8 +17,7 @@ from datetime import datetime
 import subprocess
 from ete3 import NCBITaxa
 from Bio import Entrez
-import requests
-from LoadMzID import loadSimplePepScore
+from LoadSimplePSMResults import loadSimplePepScore
 import inspect
 
 import time

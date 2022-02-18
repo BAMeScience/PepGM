@@ -9,15 +9,21 @@ rule AddContaminantsandHost:
      output: DatabaseDirectory+ '{hostname}+crap+{DBname}.fasta'
      shell:'cat {input} > {output}'
 
+rule RemoveDuplicates:
+     input: DatabaseDirectory+ '{hostname}+crap+{DBname}.fasta'
+     output: DatabaseDirectory+ '{hostname}+crap+{DBname}_UNI.fasta'
+     conda: 'envs/graphenv.yml'
+     shell:  'seqkit rmdup -s {input} > {output}'
+
 rule AddDecoys:
-     input: DatabaseDirectory+'{hostname}+crap+{DBname}.fasta'
-     output: DatabaseDirectory+'{hostname}+crap+{DBname}_concatenated_target_decoy.fasta'
+     input: DatabaseDirectory+'{hostname}+crap+{DBname}_UNI.fasta'
+     output: DatabaseDirectory+'{hostname}+crap+{DBname}_UNI_concatenated_target_decoy.fasta'
      shell: 'java -cp '+SearchGUIDir+'SearchGUI-4.1.1.jar eu.isas.searchgui.cmd.FastaCLI -in {input} -decoy' 
 
 rule SearchSpectra:
      input:
           DataDirectory+'{samplename}/{samplename}'+SpectraFileType, 
-          DatabaseDirectory+'{hostname}+crap+{DBname}_concatenated_target_decoy.fasta',
+          DatabaseDirectory+'{hostname}+crap+{DBname}_UNI_concatenated_target_decoy.fasta',
           DataDirectory+'{samplename}/{samplename}.par'
      params:
           samplename = SampleName,
@@ -30,7 +36,7 @@ rule RunPeptideShaker:
      input:
           ResultsDir+'{samplename}/{hostname}_{DBname}_searchgui_out.zip',
           DataDirectory+'{samplename}/{samplename}'+SpectraFileType, 
-          DatabaseDirectory+'{hostname}+crap+{DBname}_concatenated_target_decoy.fasta',
+          DatabaseDirectory+'{hostname}+crap+{DBname}_UNI_concatenated_target_decoy.fasta',
      params:
           samplename = SampleName,
           hostname = HostName,

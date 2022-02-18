@@ -19,16 +19,17 @@ psmFDR: '5'
 #sample specific parameters
 
 SpectraFileType: '.mgf' #'.mgf' or '.mzML'
-SampleName: 'PXD025130_Sars_CoV_2'  #needs to be the name of your spectrum file and the folder where you have that file
-HostName: 'chlorocebus'
-ReferenceDBName: 'refseqViral'
+SampleName: 'Sars-CoV-2_WT_sim'  #needs to be the name of your spectrum file and the folder where you have that file
+HostName: 'human'
+ReferenceDBName: 'refseqViral+SarsCoV2strains'
+ScientificHostName: '"homo sapiens"'
 
 
 #PepGM parameters
 TaxaInPlot: 15       #how many taxa should appear in the final results barplot
 TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
-TargetTaxa: '"coronaviridae" "chlorocebus"'
-FirstTarget: 'coronaviridae'  #will be the name of your json file
+TargetTaxa: '"coronaviridae" "homo sapiens"'
+FirstTarget: 'coronaviridae+SarsCoV2strains'
 sourceDB: 'all[FILT]' #choose from entrez query DBs to filter the protein DB with 
 #swissprot[filter]' = only swissprot proteins, refseq[filter] = know refseq proteins, all[filter]', etc: https://www.ncbi.nlm.nih.gov/books/NBK49540/
 

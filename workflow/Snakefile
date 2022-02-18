@@ -19,13 +19,13 @@ rule all:
 
 rule getTargets:
      input:
-          'resources/chicken_refseq_Default_PSM_Report.txt',
-          'resources/accessions_hashed.npy',
-          'resources/taxids.txt'
+          ResourcesDir + TaxidMapping + 'chicken_refseq_Default_PSM_Report.txt',
+          ResourcesDir + TaxidMapping + 'accessions_hashed.npy',
+          ResourcesDir + TaxidMapping + 'taxids.txt'
      params:
-          query= 'results/chicken_refseq_query_accessions.txt'
+          query = ResultsDirTaxid + 'chicken_refseq_query_accessions.txt'
      output:
-          'results/chicken_refseq_mapped_taxids.txt'
+          ResultsDirTaxid + 'chicken_refseq_mapped_taxids.txt'
      shell: "python3 workflow/scripts/getTargets.py -rq {input[0]} -q {params.query} -d {input[1]} -t {input[2]} -r {output} "
 
 

@@ -4,7 +4,7 @@ DataDir: 'resources/SampleData/'
 DatabaseDir: 'resources/Databases/'
 ResultsDir: 'results/'
 ResourcesDir: 'resources/'
-
+TaxidMapping: 'taxidMapping/'
 
 #PeptideShaker and SearchGUI directories
 PeptideShakerDir : '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.1.1/'

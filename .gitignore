@@ -13,3 +13,5 @@ workflow/scripts/BarPlotResults_customTaxa.py
 workflow/scripts/belief_propagation_log.py
 
 workflow/Sars_strains.snakefile
+
+graphenv.yml

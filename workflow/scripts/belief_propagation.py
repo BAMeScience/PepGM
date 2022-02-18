@@ -6,13 +6,10 @@ import pandas as pd
 import math
 from scipy.signal import fftconvolve
 import pandas as pd
-from Bio import Entrez
 from FactorGraphGeneration import *
 
 import time
 
-
-#messagelog = [] #list of triples with from (node, to node, message) that logs all messages sent before the message class is initialized
 def normalize(Array):
     normalizedArray = Array/np.sum(Array)
     return normalizedArray
@@ -152,18 +149,16 @@ class ConvolutionTree:
     
     
 
-#class to hold and define all sum-product message passing methods
-#TODO detect loops & use dampening when messages do not converge
-#TODO clean up code & remove attributes I no langer use
-
 class Messages():
+    ''' 
+    Class holding all messages and beliefs.
+    Functions execute loopy residual belief propagation
+    '''
 
     #class that holds the messages of itereation t and iteration t+1 as dictionaries
 
     def __init__(self,CTGraphIn):
 
-        #if not isinstance(CTGraphIn,FactorGraphGeneration.CTFactorGraph):
-            #raise TypeError("Input graph needs to be a CT FactorGraph)")
 
         self.Msg = {}
         self.MsgNew = {}
@@ -214,17 +209,8 @@ class Messages():
 
     #variables (peptides,proteins,taxa)  
     def  GetIncomingMessageVariable(self,Node,NodeIN):
-        #Make sure to only multiply message in again if they have changed. Without checking this, peptide probs were multiplied in again and again
-        #if (np.asarray([self.Msg[Node,NodeIN] != np.asarray(self.MsgLog[Node,NodeIN])])).all():
-         #   check1 = self.Msg[Node,NodeIN] 
-        #    check2 = self.MsgLog[Node,NodeIN]
         returnedMessage = self.Msg[Node,NodeIN]
-            #self.MsgLog[Node,NodeIN] = returnedMessage
         return returnedMessage
-
-        #else:
-        #    return [1,1]
-
         
 
     def  ComputeOutMessageVariable(self,NodeOUT,NodeIN):
@@ -232,7 +218,7 @@ class Messages():
          NodeBelief = self.CurrentBeliefs[NodeOUT]
          for NodeOUTneighbors in self.Graph.neighbors(NodeOUT):
 
-             if NodeOUTneighbors != NodeIN:# and (np.asarray([self.Msg[NodeOUTneighbors,NodeOUT] != np.asarray(self.MsgLog[NodeOUTneighbors,NodeOUT])])).all():
+             if NodeOUTneighbors != NodeIN:
                 IncomingMessages.append(self.GetIncomingMessageVariable(NodeOUTneighbors, NodeOUT))
          
          if not IncomingMessages:
@@ -244,10 +230,8 @@ class Messages():
 
          else:
              #need for logs to prevent underflow in very large multiplications
-             #IncomingMessages1 = np.asarray((IncomingMessages)).reshape(len(IncomingMessages),2)
              IncomingMessages = np.asarray(np.log(IncomingMessages)).reshape(len(IncomingMessages),2)
              OutMessageLog = lognormalize(np.asarray([np.sum([np.log(NodeBelief[0]),np.sum(IncomingMessages[:,0])]),np.sum([np.log(NodeBelief[1]),np.sum(IncomingMessages[:,1])])]))
-             #self.CurrentBeliefsNew[NodeOUT] = OutMessage
              if np.isnan(np.sum(OutMessageLog))==True:
                 stoppoint = 3
              return OutMessageLog
@@ -257,13 +241,9 @@ class Messages():
     def  GetIncomingMessageFactor(self,Node,NodeIN):
         check1 = self.Msg[Node,NodeIN] 
         check2 = self.MsgLog[Node,NodeIN]
-        #Make sure to only multiply message in again if they have changed. Without checking this, peptide probs were multiplied in again and again
-        #if (np.asarray([self.Msg[Node,NodeIN] != np.asarray(self.MsgLog[Node,NodeIN])])).all():
         returnedMessage = self.Msg[Node,NodeIN]
-            #self.MsgLog[Node,NodeIN] = returnedMessage
         return returnedMessage
-        #else:
-        #    return [1,1]
+
 
     def  ComputeOutMessageFactor(self,NodeOUT,NodeIN):
          IncomingMessages = []
@@ -276,7 +256,8 @@ class Messages():
                     IncomingMessages.append(self.GetIncomingMessageFactor(NodeOUTneighbors, NodeOUT))
          
          if self.Graph.nodes[NodeIN]['category'] == 'Convolution Tree':
-                IncomingMessages.append([1.,1.]) #handles empty & messages with only one value
+                #handles empty & messages with only one value
+                IncomingMessages.append([1.,1.]) 
                 IncomingMessages = np.asarray(IncomingMessages).reshape(len(IncomingMessages),2)
                 OutMessages = normalize(np.multiply(NodeBelief,[np.prod(IncomingMessages[:,0]),np.prod(IncomingMessages[:,1])]))
                 #self.CurrentBeliefsNew[NodeOUT] = OutMessages
@@ -287,19 +268,11 @@ class Messages():
                 if  np.asarray(IncomingMessages[0]).shape[0] > 2:
                     IncomingMessages = np.asarray(IncomingMessages).reshape(IncomingMessages[0].shape[0],1)
                     OutMessages = normalize(NodeBelief*IncomingMessages)
-                    #self.CurrentBeliefsNew[NodeOUT] = OutMessages
-                    if np.isnan(np.sum(OutMessages))==True:
-                        stoppoint = 3
-                    #print([np.sum(OutMessages[0,:]),np.sum(OutMessages[1,:])] )
                     return [np.sum(OutMessages[0,:]),np.sum(OutMessages[1,:])] 
                 else :
                     IncomingMessages.append([1.,1.])
                     IncomingMessages = np.asarray(IncomingMessages).reshape(len(IncomingMessages),2)
                     OutMessages = normalize(np.multiply(NodeBelief,[np.prod(IncomingMessages[:,0]),np.prod(IncomingMessages[:,1])])) 
-                    #self.CurrentBeliefsNew[NodeOUT] = OutMessages
-                    #print([np.sum(OutMessages[0,:]),np.sum(OutMessages[1,:])] )
-                    if np.isnan(np.sum(OutMessages))==True:
-                        stoppoint = 3
                     return [np.sum(OutMessages[0,:]),np.sum(OutMessages[1,:])] 
 
 
@@ -390,8 +363,7 @@ class Messages():
                 
     
 
-    #compute messages for all edges
-    
+    #compute updated messages for all edges
     def ComputeUpdate(self, localloops = False):
 
         self.ListOfCTs = [] #keeps track of which CT has already been active
@@ -437,8 +409,6 @@ class Messages():
 
         self.MaxVal = max(Residual, key = Residual.get)
         self.Msg[self.MaxVal] = self.MsgNew[self.MaxVal]
-        check = self.CurrentBeliefsNew[self.MaxVal[0]]
-        #self.CurrentBeliefs[self.MaxVal[0]] = self.CurrentBeliefsNew[self.MaxVal[0]]
         return Residual[self.MaxVal]
 
     
@@ -461,7 +431,6 @@ class Messages():
                 self.ComputeUpdate()
                 self.MsgLog.update(self.Msg)
                 self.Msg.update(self.MsgNew)
-                #self.CurrentBeliefs.update(self.CurrentBeliefsNew)
                 k += 1
                 end_t = time.time()
                 print( "time per loop" , k, " ", end_t-start_t)
@@ -489,17 +458,10 @@ class Messages():
                 #log to avoid overflow
                 IncomingMessages = np.asarray(np.log(IncomingMessages)).reshape(len(IncomingMessages),2)
                 LoggedVariableMarginal = lognormalize(np.asarray([np.sum([np.log(self.InitialBeliefs[Variable][0]),np.sum(IncomingMessages[:,0])]),np.sum([np.log(self.InitialBeliefs[Variable][1]),np.sum(IncomingMessages[:,1])])]))
-                if np.isnan(np.sum(LoggedVariableMarginal))==True:
-                    stoppoint = 3
 
                 self.CurrentBeliefs[Variable] = LoggedVariableMarginal
 
 
-        
-
-
-
-    
     def DetectOscillations():
         pass
 
@@ -517,8 +479,7 @@ def CalibrateAllSubgraphs(ListOfCTFactorGraphs, MaxIterations, Tolerance,local =
     ResultsList = []
     ResultsDict = {}
     NodeDict = {}
-
-    
+   
 
     for Graph in ListOfCTFactorGraphs:
 
@@ -529,9 +490,6 @@ def CalibrateAllSubgraphs(ListOfCTFactorGraphs, MaxIterations, Tolerance,local =
             InitializedMessageObject.LoopyLoop(MaxIterations,Tolerance,local)
             ResultsList.append(InitializedMessageObject.CurrentBeliefs)
             ResultsDict.update(InitializedMessageObject.CurrentBeliefs)
-
-
-
 
     return ResultsList, ResultsDict, NodeDict
 
@@ -551,58 +509,6 @@ def SaveResultsToCsv(ResultsDict,NodeDict,NameString):
 
 
         
-def VisualizeResults(NodeDict,ResultsDict,GraphType,Graph,**ResultsList,):
-
-    GraphTypes = ['protein','taxon']
-    if GraphType not in GraphTypes:
-        raise ValueError("Invalid Graphtype. Expected one of: %s" % GraphTypes)
-    
-    TaxidNameDict = {}
-
-    #Get translation of taxids to names:
-    for nodes in Graph.nodes(data=True):
-        if nodes[1]['category']== 'taxon':
-            TaxidNameDict[nodes[0]]=nodes[1]['name']
-            
-
-
-
-    FullResultsDict = {key:[ResultsDict[key][1],NodeDict[key]] for key in ResultsDict.keys()}
-    resultsFrame= pd.DataFrame.from_dict(data = FullResultsDict, orient = 'index',columns = ['score','category'])
-    proteinResults = resultsFrame.loc[resultsFrame['category']==GraphType].sort_values(by='score')
-    proteinResults['score']= pd.to_numeric(proteinResults['score'])
-    peptideResults = resultsFrame.loc[resultsFrame['category']=='peptide'].sort_values(by='score')
-    proteinResults['score']= pd.to_numeric(proteinResults['score']) 
-    proteinResults.rename(index = TaxidNameDict)
-
-
-    hist1 = px.bar(proteinResults,y = proteinResults.index,x = 'score',orientation = 'h')
-    hist2 = px.bar(peptideResults,y = peptideResults.index,x = 'score',orientation = 'h')
-
-    hist1.show()
-   #TODO add sliders to make results more legible
-
-   
-
-
-
-    
-    
-
-
-        
-
-                   
-
-        
-
-
-
-
-
- 
-
-
 
 
 

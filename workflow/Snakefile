@@ -10,9 +10,9 @@ include : WorkflowPath + '/snakefiles/searchgui+pepshaker.snakefile'
 
 rule all:
      input:
-          #expand(ResultsDir + SampleName + '/Prior{Prior}/'+ HostName + '_' + ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior),
+          expand(ResultsDir + SampleName + '/Prior{Prior}/'+ HostName + '_' + ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior),
           ResultsDir +SampleName +'/paramcheck.png'
-          #DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
+          DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
 
 
 rule CreateFactorGraph:

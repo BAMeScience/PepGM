@@ -7,29 +7,18 @@ from collections import namedtuple
 import pandas as pd
 import Bio.SeqIO
 import re
-import math
-from scipy.signal import fftconvolve
-from copy import deepcopy
 import pandas as pd
 import json
-from datetime import datetime
-#import plotly.express as px
 import subprocess
 from ete3 import NCBITaxa
 from Bio import Entrez
 from LoadSimplePSMResults import loadSimplePepScore
-import inspect
-
-import time
-
-#TODO add methods that check the network/Factor graph
-
 
 #e-mail for fetching viral protein sequences from entrez 
 Entrez.email = 'tanja.holstein@bam.de'
 Entrez.tool = 'PepGM'
 Entrez.api_key = 'cbd119d8a7d988bc27f5b0a722a7c861f408'
-#noisyOR methods
+
 
 
 #peptides from cp-dt need to have minimum lenngth <peplength> to be included in the graph
@@ -200,13 +189,13 @@ class TaxonGraph(nx.Graph):
                 self.add_edges_from(TaxonPeptideEdges)
 
 
-    def CreateTaxonPeptidegraphFromMzID(self,MzIDFile,proteinListFile,minScore,minPeplength = 5,maxPeplength = 30,LCA=False):
+    def CreateTaxonPeptidegraphFromPSMresults(self,PSMResultsFile,proteinListFile,minScore,minPeplength = 5,maxPeplength = 30,LCA=False):
 
         #read proteinlists from file that recorded the NCBI matches
         with open(proteinListFile) as file:
             ProteinTaxidDict = json.load(file)
 
-        Pepnames,Pepscores = loadSimplePepScore(MzIDFile)
+        Pepnames,Pepscores = loadSimplePepScore(PSMResultsFile)
         PepScoreDict = dict(zip(Pepnames,Pepscores))
         
 
@@ -234,11 +223,6 @@ class TaxonGraph(nx.Graph):
                 # conserves peptide graph structure, score will come from DB search engines anyways
                     self.add_nodes_from(PeptideNodes)
                     self.add_edges_from(TaxonPeptideEdges)
-
-
-
-            #will need to change the "protein" and "factor" categories to something more general
-            #create and add the peptide graph part TODO add options for keeping protein layer (later)
 
 
 
@@ -278,8 +262,6 @@ class FactorGraph(nx.Graph):
         ''''
         Takes a graph of proteins to peptides as input and adds the noisy-OR factors
         '''
-
-    #TODO optional argument to keep the protein-protein interaction edges
         nodelist = list(ProteinPeptideGraph.nodes(data=True))
         self.add_nodes_from(nodelist)
         for node in nodelist:                   
@@ -287,16 +269,6 @@ class FactorGraph(nx.Graph):
             if node[1]['category']=='peptide':                        
                 degree = ProteinPeptideGraph.degree(node[0])                                  
                 neighbors = list(ProteinPeptideGraph.neighbors(node[0]))
-                # add niosyOR factors
-                #cpdArray = np.full([2,degree+1],1-pDetection)         #pre-define the CPD array and fill it with the noisyOR values
-                #ExponentArray = np.arange(0,degree+1)
-                #cpdArray[0,:] = np.power(cpdArray[0,:],ExponentArray)
-                #cpdArray[1,:] = np.add(-cpdArray[0,:],1)
-                #cpdArray = np.transpose(normalize(cpdArray))
-
-                #FactorToAdd = Factor(cpdArray,[neighbors,[node[0]+'0',node[0]+'1']])
-               
-                #add factor & its edges to network as an extra node
                 self.add_node(node[0]+' CPD', category = 'factor', ParentNumber = degree)
                 self.add_edges_from([(node[0]+' CPD',x) for x in neighbors])
                 self.add_edge(node[0]+' CPD',node[0])
@@ -309,8 +281,6 @@ class FactorGraph(nx.Graph):
         ''''
         Takes a graph of Taxa to peptides in networkx form as input and adds the factor nodes
         '''
-
-        #TODO optional argument to keep the protein-protein interaction edges
         nodelist = list(TaxonPeptideGraph.nodes(data=True))
         self.add_nodes_from(nodelist)
         for node in nodelist:                   
@@ -367,14 +337,15 @@ class CTFactorGraph(FactorGraph):
             GraphIn = nx.read_graphml(GraphIn)
           
 
-        # need these to create a new instance of a CT fractorgraph and not overwrite the previous graph....are there more elegant solutions?
+        # need these to create a new instance of a CT fractorgraph and not overwrite the previous graph
         self.add_edges_from(GraphIn.edges(data =True))
         self.add_nodes_from(GraphIn.nodes(data=True))
         
     
     def AddCTNodes(self):
         '''
-        When creating the CTGraoh and not just reading from a previously saved graph format, use this command to add the CT nodes'''
+        When creating the CTGraph and not just reading from a previously saved graph format, use this command to add the CT nodes
+        '''
         #create the convolution tree nodes and connect them in the graph
         ListOfEdgeAddList = []
         ListOfEdgeRemoveList = []
@@ -434,7 +405,8 @@ class CTFactorGraph(FactorGraph):
             if node[1]['category']=='factor':                        
                 # add noisyOR factors
                 degree = node[1]['ParentNumber']
-                cpdArray = np.full([2,degree+1],1-alpha)         #pre-define the CPD array and fill it with the noisyOR values
+                #pre-define the CPD array and fill it with the noisyOR values
+                cpdArray = np.full([2,degree+1],1-alpha)         
                 ExponentArray = np.arange(0,degree+1)
                 cpdArray[0,:] = np.power(cpdArray[0,:],ExponentArray)*(1-beta)
                 cpdArray[1,:] = np.add(-cpdArray[0,:],1)
@@ -459,7 +431,7 @@ class CTFactorGraph(FactorGraph):
 
 
 def GenerateCTFactorGraphs(ListOfFactorGraphs,GraphType = 'Taxons'):
-    ListOfCTFactorGraphs = []
+
     if type(ListOfFactorGraphs) is not list: ListOfFactorGraphs = [ListOfFactorGraphs]
     for Graph in ListOfFactorGraphs:
         CTFactorgraph = CTFactorGraph (Graph,GraphType) #ListOfCTFactorGraphs.append(CTFactorGraph(Graph,GraphType))

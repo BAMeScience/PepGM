@@ -33,7 +33,7 @@ Taxongraph.GetAllLeafTaxa(args.targetTaxa)
 if not exists(args.PeptideMapPath):
     print(exists(args.PeptideMapPath))
     Taxongraph.FetchTaxonData(args.PeptideMapPath, args.sourceDB)
-Taxongraph.CreateTaxonPeptidegraphFromMzID(args.PSM_Report,args.PeptideMapPath,0.001)
+Taxongraph.CreateTaxonPeptidegraphFromPSMresults(args.PSM_Report,args.PeptideMapPath,0.001)
 #Taxongraph.CreateExample()
 Factorgraph = FactorGraph()
 Factorgraph.ConstructFromTaxonGraph(Taxongraph)

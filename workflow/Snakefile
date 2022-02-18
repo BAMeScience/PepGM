@@ -39,8 +39,11 @@ rule hashDatabase:
 
 rule getTargets:
      input: 'resources/chicken_refseq_Default_PSM_Report.txt'
-     output: 'results/chicken_refseq_query_accessions.txt'
-     shell: "python3 workflow/scripts/getTargets.py --input_path {input} --output_path {output}"
+     output: 'results/chicken_refseq_mapped_taxids.txt'
+     params:
+          query = 'results/chicken_refseq_query_accessions.txt',
+          hashed_database = 'resources/accessions_hashed.npy'
+     shell: "python3 workflow/scripts/getTargets.py -rq {input} -q {params.query} -d {params.hashed_database} -t {output}"
 
 
 rule CreateFactorGraph:

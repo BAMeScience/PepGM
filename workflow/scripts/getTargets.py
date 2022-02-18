@@ -9,19 +9,33 @@ import numpy as np
 import pandas as pd
 import psutil
 
-# preliminaries
-parser = argparse.ArgumentParser(description = 'Hash protein accession database')
-parser.add_argument('--input_path', help ='path to query')
-parser.add_argument('--output_path', help ='path where to save preprocessed query')
+# argparser preliminaries
+parser = argparse.ArgumentParser(description = 'Find ')
+parser.add_argument('-rq', '--path_to_raw_query', help='path to raw PSM report')
+parser.add_argument('-q', '--path_to_query', help='path to processed query')
+parser.add_argument('-d', '--path_to_database', help='path to hashed database')
+parser.add_argument('-t', '--path_to_mapped_taxids', help='path to results')
 args = parser.parse_args()
+
+
+def save_results_to_txt(path, results):
+    """
+    Save results.
+
+    :param path: str, where to save results
+    :param results: lst, results from database query
+    """
+    output = open(path, 'w')
+    [output.write(str(result)) for result in results]
+    output.close()
 
 
 def preprocess_query(input_path, output_path):
     """
-    Extract protein accessions from PeptideShaker output and save them in a file.
+    Extract protein accessions from PeptideShaker output (PSM report) and save them.
     :param input_path: str, input path to raw query
     :param output_path: str, output path
-    :return:
+    :return: -
     """
     # error bad lines should be remove when development is done
     psm_report = pd.read_csv(input_path, sep = '\t', error_bad_lines=False)
@@ -34,13 +48,7 @@ def preprocess_query(input_path, output_path):
         proteins.append(accession)
     # merge sublists
     proteins = [j for i in [protein.split(',') for protein in proteins] for j in i]
-    # save in .txt file
-    accessions_final = open(output_path, "w")
-    [accessions_final.write(element + "\n") for element in proteins]
-    accessions_final.close()
-
-
-# preprocess_query(args.input_path, args.output_path)
+    save_results_to_txt(output_path, proteins)
 
 
 def hash_query(path):
@@ -96,26 +104,18 @@ def lines_to_taxids(match, path='../../resources/taxids.txt'):
     return taxids_unique
 
 
-def save_results_to_txt(path, results):
-    """
-    Save results.
+# '/home/fkistner/pepgm/resources/chicken_refseq_Default_PSM_Report.txt'
+# '/home/fkistner/pepgm/results/chicken_refseq_query_accessions.txt'
+preprocess_query(args.path_to_raw_query, args.path_to_query)
 
-    :param path: str, where to save results
-    :param results: lst, results from database query
-    """
-    f_out = open(path, 'w')
-    for result in results:
-        f_out.write(str(result))
-    f_out.close()
+# '/home/fkistner/pepgm/results/chicken_refseq_query_accessions.txt'
+query_accessions = hash_query(args.path_to_query)
 
-
-
-query_accessions = hash_query('/home/fkistner/pepgm/results/chicken_refseq_query_accessions.txt')
-
-database_accessions = np.load('/home/fkistner/pepgm/resources/accessions_hashed.npy')
+# '/home/fkistner/pepgm/resources/accessions_hashed.npy'
+database_accessions = np.load(args.path_to_database)
 lookup = query_database(database_accessions, query_accessions)
-
 taxids = lines_to_taxids(lookup)
 
-save_results_to_txt('/home/fkistner/pepgm/results/taxids.txt', taxids)
+# '/home/fkistner/pepgm/results/mapped_taxids.txt'
+save_results_to_txt(args.path_to_mapped_taxids, taxids)
 print('Found targets.')

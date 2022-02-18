@@ -3,8 +3,10 @@ results/*
 
 resources/*
 !resources/protacc2taxids_virus.txt
+!resources/.gitkeep
 !resources/Databases/.gitkeep
 !resources/SampleData/.gitkeep
+
 
 .snakemake/*
 

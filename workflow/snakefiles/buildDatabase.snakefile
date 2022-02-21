@@ -1,24 +1,23 @@
-
 rule splitToAccessions:
-     input: "resources/taxidMapping/protacc2taxids_virus.txt"
-     output: "resources/taxidMapping/accessions.txt"
+     input: ResourcesDir + TaxidMapping + "protacc2taxids_virus.txt"
+     output: ResourcesDir + TaxidMapping + "accessions.txt"
      shell:
         "awk '{{print $1}}' {input} > {output}"
 
 
 rule splitToTaxids:
      input:
-          "resources/taxidMapping/protacc2taxids_virus.txt"
+          ResourcesDir + TaxidMapping + "protacc2taxids_virus.txt"
      output:
-          "resources/taxidMapping/taxids.txt"
+          ResourcesDir + TaxidMapping + "taxids.txt"
      shell:
           "awk '{{print $2}}' {input} > {output}"
 
 
 rule hashDatabase:
      input:
-          "resources/taxidMapping/accessions.txt"
+        ResourcesDir + TaxidMapping + "accessions.txt"
      output:
-          "resources/taxidMapping/accessions_hashed.npy"
+          ResourcesDir + TaxidMapping + "accessions_hashed.npy"
      shell:
           "python3 workflow/scripts/hashDatabase.py --i {input}  --o {output}"

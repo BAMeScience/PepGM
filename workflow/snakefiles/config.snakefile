@@ -5,7 +5,7 @@ DatabaseDirectory = config ['DatabaseDir']
 ResultsDir = config['ResultsDir'] + config['ReferenceDBName'] +'/'
 ResourcesDir = config['ResourcesDir']
 TaxidMapping = config['TaxidMapping']
-ResultsDirTaxid = config['ResultsDir'] + config['TaxidMapping']
+ResultsDirStrain = config['ResultsDir']
 
 PeptideShakerDir = config['PeptideShakerDir']
 SearchGUIDir = config['SearchGUIDir']

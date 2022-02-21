@@ -18,6 +18,7 @@ psmFDR = config['psmFDR']
 SpectraFileType = config['SpectraFileType']
 SampleName = config['SampleName']
 HostName = config['HostName']
+ScientificHostName = config['ScientificHostName']
 ReferenceDBName = config['ReferenceDBName']
 
 TaxaInPlot = config['TaxaInPlot']

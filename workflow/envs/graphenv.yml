@@ -7,8 +7,8 @@ dependencies:
   - biopython=1.78=py39h7f8727e_0
   - blas=1.0=openblas
   - brotlipy=0.7.0=py39h27cfd23_1003
-  - ca-certificates=2021.7.5=h06a4308_1
-  - certifi=2021.5.30=py39h06a4308_0
+  - ca-certificates=2021.10.26=h06a4308_2
+  - certifi=2021.10.8=py39h06a4308_0
   - cffi=1.14.4=py39h261ae71_0
   - chardet=4.0.0=py39h06a4308_1003
   - cryptography=3.3.1=py39h3c74f83_0
@@ -68,6 +68,7 @@ dependencies:
   - readline=8.0=h7b6447c_0
   - requests=2.25.1=pyhd3eb1b0_0
   - scipy=1.6.2=py39hf56f3a7_1
+  - seqkit=2.1.0=h9ee0642_0 
   - setuptools=51.0.0=py39h06a4308_2
   - sip=4.19.13=py39h2531618_0
   - six=1.15.0=py39h06a4308_0

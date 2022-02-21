@@ -12,9 +12,9 @@ include : WorkflowPath + '/snakefiles/buildDatabase.snakefile'
 
 rule all:
      input:
-          #expand(ResultsDir + SampleName + '/Prior{Prior}/'+ HostName + '_' + ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior),
+          expand(ResultsDir + SampleName + '/Prior{Prior}/'+ HostName + '_' + ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior),
           ResultsDir +SampleName +'/paramcheck.png'
-          #DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
+          DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
 
 
 rule getTargets:
@@ -41,7 +41,7 @@ rule CreateFactorGraph:
           firstTarget = firstTarget,
           sourceDB = sourceDB
      log: ResultsDir +'{samplename}/{hostname}_{DBname}.log'
-     shell: 'python3 workflow/scripts/CreatePepGMGraph.py --sourceDB {params.sourceDB} --targetTaxa {params.targetTaxa} --PSM_Report {input} --PeptideMapPath '+ResultsDir+'{params.samplename}/{params.firstTarget}.json --out {output} &>> {log}'
+     shell: 'conda info -e  && python3 workflow/scripts/CreatePepGMGraph.py --sourceDB {params.sourceDB} --targetTaxa {params.targetTaxa} --PSM_Report {input} --PeptideMapPath '+ResultsDir+'{params.samplename}/{params.firstTarget}.json --out {output} &>> {log}'
 
 
 rule RunPepGM:
@@ -73,8 +73,9 @@ rule FindBestParameters:
      output: ResultsDir +'{samplename}/paramcheck.png'
      conda: 'envs/graphenv.yml'
      log : ResultsDir + '{samplename}/paramcheck.log'
-     params: Results = ResultsDir+SampleName
-     shell: 'python3 workflow/scripts/GridSearchAnalysis.py --resultsfolder {params.Results} --out {output} &>> {log}'
+     params: Results = ResultsDir+SampleName,
+             host = ScientificHostName
+     shell: 'python3 workflow/scripts/GridSearchAnalysis.py --host {params.host} --resultsfolder {params.Results} --out {output} &>> {log}'
 
 
 #rules only needed for debugging/checking results

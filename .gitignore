@@ -3,10 +3,22 @@ results/*
 !results/chicken_refseq_query_accessions.txt
 
 resources/*
-!resources/.gitkeep
-!resources/chicken_refseq_Default_PSM_Report.txt
 !resources/protacc2taxids_virus.txt
+!resources/.gitkeep
+!resources/Databases/.gitkeep
+!resources/SampleData/.gitkeep
+
 
 .snakemake/*
 
-scripts/belief_propagation_old.py
+workflow/scripts/belief_propagation_old.py
+workflow/scripts/CreatePepGMGraph_customJson.py
+workflow/scripts/BarPlotResults_customTaxa.py
+workflow/scripts/belief_propagation_log.py
+
+workflow/Sars_strains.snakefile
+
+graphenv.yml
+
+.snakemake/
+.vscode/

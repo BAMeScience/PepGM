@@ -3,16 +3,30 @@
 WorkflowPath = os.path.dirname(os.path.realpath(workflow.snakefile))
 include: WorkflowPath +'/snakefiles/config.snakefile'
 include : WorkflowPath + '/snakefiles/searchgui+pepshaker.snakefile'
+include : WorkflowPath + '/snakefiles/buildDatabase.snakefile'
 #include: WorkflowPath + '/snakefiles/pepGM.snakefile'
 
 
 #TODO should be possible to simplify the naming scheme a little as name appear in folder & resultsfiles
+
 
 rule all:
      input:
           expand(ResultsDir + SampleName + '/Prior{Prior}/'+ HostName + '_' + ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior),
           ResultsDir +SampleName +'/paramcheck.png'
           DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
+
+
+rule getTargets:
+     input:
+          ResourcesDir + TaxidMapping + 'chicken_refseq_Default_PSM_Report.txt',
+          ResourcesDir + TaxidMapping + 'accessions_hashed.npy',
+          ResourcesDir + TaxidMapping + 'taxids.txt'
+     params:
+          query = ResultsDirTaxid + 'chicken_refseq_query_accessions.txt'
+     output:
+          ResultsDirTaxid + 'chicken_refseq_mapped_taxids.txt'
+     shell: "python3 workflow/scripts/getTargets.py -rq {input[0]} -q {params.query} -d {input[1]} -t {input[2]} -r {output} "
 
 
 rule CreateFactorGraph:
@@ -29,6 +43,7 @@ rule CreateFactorGraph:
      log: ResultsDir +'{samplename}/{hostname}_{DBname}.log'
      shell: 'conda info -e  && python3 workflow/scripts/CreatePepGMGraph.py --sourceDB {params.sourceDB} --targetTaxa {params.targetTaxa} --PSM_Report {input} --PeptideMapPath '+ResultsDir+'{params.samplename}/{params.firstTarget}.json --out {output} &>> {log}'
 
+
 rule RunPepGM:
      input: ResultsDir +'{samplename}/{hostname}_{DBname}_PepGM_graph.graphml'
      output: ResultsDir +'{samplename}/Prior{Prior}/{hostname}_{DBname}_PepGM_Results_a{alpha}_b{beta}_p{Prior}.csv'
@@ -42,6 +57,7 @@ rule RunPepGM:
      log : ResultsDir + '{samplename}/Prior{Prior}/log/{hostname}_{DBname}__a{alpha}_b{beta}_pepGM.log'
      shell: 'python3  workflow/scripts/PepGM.py --GraphMLPath {input} --prior {wildcards.Prior} --alpha {wildcards.alpha} --beta {wildcards.beta} --out {output} &>> {log}'
 
+
 rule BarPlotResults:
      input: ResultsDir +'{samplename}/Prior{Prior}/'+'{hostname}_{DBname}_PepGM_Results_a{alpha}_b{beta}_p{Prior}.csv'
      output:  ResultsDir +'{samplename}/Prior{Prior}/'+'{hostname}_{DBname}_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',
@@ -49,6 +65,7 @@ rule BarPlotResults:
      params: NumberofResults = TaxaInPlot
      log : ResultsDir + '{samplename}/Prior{Prior}/log/{hostname}_{DBname}__a{alpha}_b{beta}.log'
      shell: 'python3 workflow/scripts/BarPlotResults.py --ResultsFile {input} --NumberofResults {params.NumberofResults} --out {output} &>> {log}'
+
 
 rule FindBestParameters:
      input: 
@@ -60,6 +77,7 @@ rule FindBestParameters:
              host = ScientificHostName
      shell: 'python3 workflow/scripts/GridSearchAnalysis.py --host {params.host} --resultsfolder {params.Results} --out {output} &>> {log}'
 
+
 #rules only needed for debugging/checking results
 rule CountProteinsInJson:
      input: ResultsDir +'{samplename}/{taxonname}.json'
@@ -67,7 +85,3 @@ rule CountProteinsInJson:
      params : NumberofResults = TaxaInProteinCount
      conda: 'envs/graphenv.yml'
      shell: 'python3 workflow/scripts/CountProteins.py --ResultsFile {input} --NumberofResults {params.NumberofResults} --out {output}'
-     
-
-
-     

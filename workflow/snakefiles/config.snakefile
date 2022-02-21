@@ -2,7 +2,10 @@ configfile: 'config/config.yaml'
 
 DataDirectory = config['DataDir']
 DatabaseDirectory = config ['DatabaseDir']
-ResultsDir = config['ResultsDir']+ config['ReferenceDBName'] +'/'
+ResultsDir = config['ResultsDir'] + config['ReferenceDBName'] +'/'
+ResourcesDir = config['ResourcesDir']
+TaxidMapping = config['TaxidMapping']
+ResultsDirTaxid = config['ResultsDir'] + config['TaxidMapping']
 
 PeptideShakerDir = config['PeptideShakerDir']
 SearchGUIDir = config['SearchGUIDir']

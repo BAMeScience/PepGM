@@ -4,7 +4,8 @@ results/*
 
 resources/*
 !resources/.gitkeep
-!resources/taxidMapping
+!resources/chicken_refseq_Default_PSM_Report.txt
+!resources/protacc2taxids_virus.txt
 
 .snakemake/*
 

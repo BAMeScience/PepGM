@@ -13,19 +13,23 @@ include : WorkflowPath + '/snakefiles/buildDatabase.snakefile'
 rule all:
      input:
           expand(ResultsDir + SampleName + '/Prior{Prior}/'+ HostName + '_' + ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior),
-          ResultsDir +SampleName +'/paramcheck.png'
+          ResultsDir +SampleName +'/paramcheck.png',
           DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
 
 
 rule getTargets:
      input:
-          ResourcesDir + TaxidMapping + 'chicken_refseq_Default_PSM_Report.txt',
+          ResultsDir +'{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt',
           ResourcesDir + TaxidMapping + 'accessions_hashed.npy',
           ResourcesDir + TaxidMapping + 'taxids.txt'
      params:
-          query = ResultsDirTaxid + 'chicken_refseq_query_accessions.txt'
+          query = ResultsDirTaxid + 'chicken_refseq_query_accessions.txt',
+          samplename = SampleName,
+          hostname = HostName,
+          DBname = ReferenceDBName
+
      output:
-          ResultsDirTaxid + 'chicken_refseq_mapped_taxids.txt'
+          ResultsDirTaxid + '{samplename}/{hostname}_{DBname}_mapped_taxids.txt'
      shell: "python3 workflow/scripts/getTargets.py -rq {input[0]} -q {params.query} -d {input[1]} -t {input[2]} -r {output} "
 
 

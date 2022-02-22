@@ -87,12 +87,11 @@ class TaxonGraph(nx.Graph):
         self.TaxidList = []
 
     def GetAllLeafTaxa(self,TargetTaxa,StrainResolution = True):
-        '''Gets all leaf Taxa of the TargetTaxa list. Make sure the taxons in the TargetTaxa list aren't conflicting, i.e no parent/child relationships between them.'''
 
-        self.HighestTaxa = TargetTaxa
+        '''
+        Gets all leaf Taxa of the TargetTaxa list. Make sure the taxons in the TargetTaxa list aren't conflicting, i.e no parent/child relationships between them.
+        '''
         
-
-        #TODO make target taxon a list
         for Taxon in TargetTaxa:
             TargetTaxon = Taxon
 
@@ -118,18 +117,47 @@ class TaxonGraph(nx.Graph):
 
 
             self.TaxidList = self.TaxidList+TaxidList
+    
+    def GetAllLeafTaxaFromTaxids(self,TaxidFile,StrainResolution = True):
+
+        with open(TaxidFile) as Taxids:
+            TargetTaxa = Taxids.read().splitlines()
+        
+        for Taxon in TargetTaxa:
+            TargetTaxon = Taxon
+
+            if not isinstance(TargetTaxon,str):
+                raise TypeError("Taxid must be a string")
+        
+            #create the taxonomic graph part and get list of Taxids to fetch
+            ncbi = NCBITaxa()
+
+            HighestTaxid = ncbi.get_name_translator([TargetTaxon])[TargetTaxon][0]
+            self.add_node(str(HighestTaxid),name = TargetTaxon, rank = ncbi.get_rank([HighestTaxid])[HighestTaxid],category = 'taxon')
+            
+            if StrainResolution:
+                TaxidList = ncbi.get_descendant_taxa(TargetTaxon)
+                TaxidNames= ncbi.translate_to_names(TaxidList)
+                TaxidNodeTuples = tuple((str(TaxidList[i]),{'name':TaxidNames[i],'rank':ncbi.get_rank([TaxidList[i]])[TaxidList[i]], 'category':'taxon'}) for i in range(len(TaxidList)))
+                self.add_nodes_from(TaxidNodeTuples)
+            else:
+                TaxidList = list(ncbi.get_descendant_taxa(TargetTaxon, collapse_subspecies=True))
+                TaxidNames= ncbi.translate_to_names(TaxidList)
+                TaxidNodeTuples = tuple((str(TaxidList[i]),{'name':TaxidNames[i],'rank':ncbi.get_rank([TaxidList[i]])[TaxidList[i]],'category':'taxon'}) for i in range(len(TaxidList)))
+                self.add_nodes_from(TaxidNodeTuples)
+
 
 
     def FetchTaxonData(self, PeptideMapPath, sourceDB):
         '''
-        gets the proteins corresponding to the target taxa from entrez and saves them in a json document (Later no intermediate saving necessary or use local DB).
-    
+        gets the proteins corresponding to the target taxa from entrez and saves them
+        in a json document.
         '''
-        #TODO add multiple options to query proteins from entrez
-        #TODO get rid of entrez and use locally saved DB
+    
         entrezDbName = 'protein'
 
-        sourceDBOptions = ['refseq[filter]','swissprot[filter]','protein_all[PROP]'] # options listed here https://www.ncbi.nlm.nih.gov/books/NBK49540/
+        # options listed here https://www.ncbi.nlm.nih.gov/books/NBK49540/
+        #sourceDBOptions = ['refseq[filter]','swissprot[filter]','protein_all[PROP]'] 
         
         saveLists = {}
         for Taxid in self.TaxidList:
@@ -143,7 +171,6 @@ class TaxonGraph(nx.Graph):
             searchResultHandle.close()
 
             #fetch corresponding proteins from NCBI entrez
-            
             if searchResult['Count'] != '0':
 
                 uidList = ','.join(searchResult['IdList'])
@@ -152,8 +179,7 @@ class TaxonGraph(nx.Graph):
                 remove = [list.pop(0) for list in proteinListOfLists]
                 proteinList = [''.join(list) for list in proteinListOfLists]
                 saveLists[Taxid] = proteinList[:-1] #remove last protein from list as it is empty
-                #time.sleep(5)
-                #print('just slept with entrez')
+               
 
             
         with open(PeptideMapPath, 'w+') as savefile:        

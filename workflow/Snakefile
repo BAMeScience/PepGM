@@ -9,13 +9,13 @@ include : WorkflowPath + '/snakefiles/buildDatabase.snakefile'
 
 #TODO should be possible to simplify the naming scheme a little as name appear in folder & resultsfiles
 
-"""
+
 rule all:
      input:
           expand(ResultsDir + SampleName + '/Prior{Prior}/'+ HostName + '_' + ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior),
           ResultsDir +SampleName +'/paramcheck.png',
           DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
-"""
+
 
 rule getTargets:
      input:

@@ -53,6 +53,11 @@ def preprocess_query(input_path, output_path):
     accessions_final = open(output_path, "w")
     [accessions_final.write(element + "\n") for element in proteins]
     accessions_final.close()
+    # save value counts
+    df_accessions = pd.DataFrame()
+    df_accessions['accession'] = proteins
+    df = df_accessions.value_counts().rename_axis('accession').to_frame('counts')
+    df.to_csv('/home/fkistner/pepgm/results/PXD002936_avian_bronchitis/chicken_refseq_query_valuecounts.csv')
 
 
 def hash_query(path):

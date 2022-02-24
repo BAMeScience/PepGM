@@ -56,9 +56,10 @@ def preprocess_query(input_path, output_path):
     # save value counts
     df_accessions = pd.DataFrame()
     df_accessions['accession'] = proteins
+    print(df_accessions)
     df = df_accessions.value_counts().rename_axis('accession').to_frame('counts')
     df.to_csv('/home/fkistner/pepgm/results/PXD002936_avian_bronchitis/chicken_refseq_query_valuecounts.csv')
-
+    return df_accessions
 
 def hash_query(path):
     """
@@ -94,7 +95,7 @@ def query_database(database, query):
     return lst
 
 
-def lines_to_taxids(match, path):
+def lines_to_taxids(match, path, df):
     """
     Map matches to taxids.
 
@@ -104,21 +105,31 @@ def lines_to_taxids(match, path):
     """
     taxids = []
     for idx in match:
-        taxids.append((linecache.getline(path, idx)))
+        if idx != 0:
+            taxids.append((linecache.getline(path, idx)))
+        else:
+            taxids.append('Nan')
+    df['taxids'] = taxids
+    df_counts = df.value_counts()
+    df.to_csv('/home/fkistner/pepgm/results/PXD002936_avian_bronchitis/chicken_refseq_accession_taxids.csv')
+    df_counts.to_csv('/home/fkistner/pepgm/results/PXD002936_avian_bronchitis/chicken_refseq_count_taxids.csv')
+
+
+    """
     taxids_unique = []
     # remove duplicates
     for taxid in taxids:
         if taxid not in taxids_unique:
             taxids_unique.append(taxid)
     return taxids_unique
-
+    """
 
 # prepare
-preprocess_query(args.path_to_raw_query, args.path_to_query)
+df_accessions = preprocess_query(args.path_to_raw_query, args.path_to_query)
 query_accessions = hash_query(args.path_to_query)
 database_accessions = np.load(args.path_to_database)
 # lookup
 lookup = query_database(database_accessions, query_accessions)
-taxids = lines_to_taxids(lookup, args.path_to_taxids[0])
+taxids = lines_to_taxids(lookup, args.path_to_taxids[0], df_accessions)
 # save
-save_to_txt(args.path_to_mapped_taxids, taxids)
+# save_to_txt(args.path_to_mapped_taxids, taxids)

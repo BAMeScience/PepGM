@@ -27,7 +27,7 @@ rule getTargets:
           samplename = SampleName,
           hostname = HostName,
           DBname = ReferenceDBName
-
+     conda: 'envs/graphenv.yml'
      output:
           ResultsDirStrain + '{samplename}/{hostname}_{DBname}_mapped_taxids.txt'
      shell: "python3 workflow/scripts/getTargets.py -rq {input[0]} -q {params.query} -d {input[1]} -t {input[2]} -r {output} "

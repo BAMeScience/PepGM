@@ -7,8 +7,6 @@ import numba as nb
 import numpy as np
 import pandas as pd
 
-
-# argparser preliminaries
 parser = argparse.ArgumentParser(description = 'Find ')
 parser.add_argument('-rq', '--path_to_raw_query', help='path to raw query')
 parser.add_argument('-q', '--path_to_query', help='path to processed query')
@@ -18,41 +16,35 @@ parser.add_argument('-t', '--path_to_taxids', nargs='*')
 args = parser.parse_args()
 
 
-def save_to_txt(path, results):
+def save(output_path, result):
     """
-    Save results.
+    Save in a \n separated text file.
 
-    :param path: str, where to save results
-    :param results: lst, results from database query
+    :param output_path: str, output path
+    :param result: lst, items to be saved
     """
-    f = open(path, 'w')
-    [f.write(str(result)) for result in results]
-    f.close()
+    with open(output_path, 'w') as f:
+        f.write('\n'.join(result))
 
 
 def preprocess_query(input_path, output_path):
     """
-    Extract protein accessions from PeptideShaker output (PSM report) and save them.
+    Extract protein accessions from PeptideShaker output (PSM report).
 
-    :param input_path: str, input path to raw query
-    :param output_path: str, output path
-    :return: -
+    :param input_path:
+    :param output_path:
+    :return: df, dataframe with split accessions and their weights
     """
-    # error bad lines should be remove when development is done
-    psm_report = pd.read_csv(input_path, sep = '\t', error_bad_lines=False)
-    # extract accession numbers
-    accessions_raw = psm_report['Protein(s)'].tolist()
-    proteins = []
-    # split into sublists
-    for accession in accessions_raw:
-        accession.split(',')
-        proteins.append(accession)
-    # merge sublists
-    proteins = [j for i in [protein.split(',') for protein in proteins] for j in i]
-    # write in output file
-    accessions_final = open(output_path, "w")
-    [accessions_final.write(element + "\n") for element in proteins]
-    accessions_final.close()
+    raw = pd.read_csv(input_path, sep = '\t', error_bad_lines=False, usecols=['Protein(s)'])
+    raw.columns = ['accession']
+    raw['weight'] = 1 / (raw.accession.str.count(',') + 1)
+    raw['accession'] = raw.accession.apply(lambda x: x.split(','))
+    raw['psmid'] = raw.index + 1
+    df = raw.explode('accession', ignore_index=True)
+    # extract accessions and save them
+    query = df.accession.tolist()
+    save(output_path, query)
+    return df
 
 
 def hash_query(path):
@@ -80,16 +72,16 @@ def query_database(database, query):
     :param query: lst, query
     :return: lst, line numbers where query and database are matching
     """
-    lst = [0] * len(query)
+    match = [0] * len(query)
     for i in nb.prange(len(database)):
         for j in nb.prange(len(query)):
             # if there is a match append the corresponding line from database
             if database[i] == query[j]:
-                lst[j] = i + 1
-    return lst
+                match[j] = i + 1
+    return match
 
 
-def lines_to_taxids(match, path):
+def lines2taxids(match, path):
     """
     Map matches to taxids.
 
@@ -99,21 +91,35 @@ def lines_to_taxids(match, path):
     """
     taxids = []
     for idx in match:
-        taxids.append((linecache.getline(path, idx)))
-    taxids_unique = []
-    # remove duplicates
-    for taxid in taxids:
-        if taxid not in taxids_unique:
-            taxids_unique.append(taxid)
-    return taxids_unique
+        if idx != 0:
+            taxids.append((linecache.getline(path, idx).strip()))
+        else:
+            taxids.append('no match')
+    return taxids
+
+
+def score(df, taxids, output_path, subset=50):
+    """
+    Score taxids according to their confidence and select the ones which are top scoring.
+
+    :param df: df, contains protein 2 taxid mapping and the respective weights
+    :param taxids: lst, mapped taxids
+    :param output_path: str, output path
+    :param subset: int, top <subset> scoring taxids
+    """
+    df['taxid'] = taxids
+    df_score = df.groupby('taxid')['weight'].sum().reset_index()
+    df_score = df_score.sort_values(by=['weight'], ascending=False)
+    top_scoring_taxids = df_score.taxid[1:subset + 1].tolist()
+    save(output_path, top_scoring_taxids)
 
 
 # prepare
-preprocess_query(args.path_to_raw_query, args.path_to_query)
+df_accession = preprocess_query(args.path_to_raw_query, args.path_to_query)
 query_accessions = hash_query(args.path_to_query)
 database_accessions = np.load(args.path_to_database)
 # lookup
 lookup = query_database(database_accessions, query_accessions)
-taxids = lines_to_taxids(lookup, args.path_to_taxids[0])
-# save
-save_to_txt(args.path_to_mapped_taxids, taxids)
+taxids = lines2taxids(lookup, args.path_to_taxids[0])
+# score
+score(df_accession, taxids, args.path_to_mapped_taxids)

@@ -98,7 +98,7 @@ def lines2taxids(match, path):
     return taxids
 
 
-def score(df, taxids, output_path, subset=50):
+def score(df, taxids, output_path, subset=30):
     """
     Score taxids according to their confidence and select the ones which are top scoring.
 
@@ -110,7 +110,8 @@ def score(df, taxids, output_path, subset=50):
     df['taxid'] = taxids
     df_score = df.groupby('taxid')['weight'].sum().reset_index()
     df_score = df_score.sort_values(by=['weight'], ascending=False)
-    top_scoring_taxids = df_score.taxid[1:subset + 1].tolist()
+    #df_score.to_csv('/home/tholstei/repos/PepGM_all/PepGM/results/Sars_CoV_2_auto_taxa/PXD025130_Sars_CoV_2/mapcheck.csv')
+    top_scoring_taxids = df_score.taxid[0:subset].tolist()
     save(output_path, top_scoring_taxids)
 
 

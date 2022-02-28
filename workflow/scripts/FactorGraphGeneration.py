@@ -119,20 +119,21 @@ class TaxonGraph(nx.Graph):
             self.TaxidList = self.TaxidList+TaxidList
     
     def GetAllLeafTaxaFromTaxids(self,TaxidFile,StrainResolution = True):
-
+        
         with open(TaxidFile) as Taxids:
+            
             TargetTaxa = Taxids.read().splitlines()
+            if 'no match' in TargetTaxa:
+                TargetTaxa.remove('no match')
         
-        for Taxon in TargetTaxa:
-            TargetTaxon = Taxon
+        for HighestTaxid in TargetTaxa:
 
-            if not isinstance(TargetTaxon,str):
-                raise TypeError("Taxid must be a string")
-        
+            HighestTaxid = int(HighestTaxid)
             #create the taxonomic graph part and get list of Taxids to fetch
             ncbi = NCBITaxa()
 
-            HighestTaxid = ncbi.get_name_translator([TargetTaxon])[TargetTaxon][0]
+    
+            TargetTaxon = ncbi.get_taxid_translator([HighestTaxid])[HighestTaxid]
             self.add_node(str(HighestTaxid),name = TargetTaxon, rank = ncbi.get_rank([HighestTaxid])[HighestTaxid],category = 'taxon')
             
             if StrainResolution:
@@ -145,6 +146,8 @@ class TaxonGraph(nx.Graph):
                 TaxidNames= ncbi.translate_to_names(TaxidList)
                 TaxidNodeTuples = tuple((str(TaxidList[i]),{'name':TaxidNames[i],'rank':ncbi.get_rank([TaxidList[i]])[TaxidList[i]],'category':'taxon'}) for i in range(len(TaxidList)))
                 self.add_nodes_from(TaxidNodeTuples)
+                
+            self.TaxidList = self.TaxidList+TaxidList
 
 
 
@@ -231,24 +234,24 @@ class TaxonGraph(nx.Graph):
 
             for AAsequence in AAsequences:
 
-                    cpdt = subprocess.check_output(['../../bin/cp-dt --sequence ' +AAsequence+ ' --peptides'], shell = True).decode('utf-8')
-                    peptideList = cpdt.split('\n')
-                    peptideList.pop(0)
-                    peptideList = [str[9:].split(': ') for str in peptideList]
-                    del peptideList[-3:]                                    #last three elements from cp-dt oupput are empty
-                    peptideList = [pep for pep in peptideList if minPeplength <= len(pep[0]) <= maxPeplength]
+                cpdt = subprocess.check_output(['./../../bin/cp-dt --sequence ' +AAsequence+ ' --peptides'], shell = True).decode('utf-8')
+                peptideList = cpdt.split('\n')
+                peptideList.pop(0)
+                peptideList = [str[9:].split(': ') for str in peptideList]
+                del peptideList[-3:]                                    #last three elements from cp-dt oupput are empty
+                peptideList = [pep for pep in peptideList if minPeplength <= len(pep[0]) <= maxPeplength]
 
-                    peptideList = [pep[0] for pep in peptideList]
+                peptideList = [pep[0] for pep in peptideList]
 
-                    SelectedPeps = [pep for pep in Pepnames if pep in peptideList]
-                    PeptideNodes = tuple((pep,{'InitialBelief_0':1-PepScoreDict[pep]/100,'InitialBelief_1':PepScoreDict[pep]/100, 'category':'peptide'})  for pep in SelectedPeps if PepScoreDict[pep]>minScore)
-                    TaxonPeptideEdges = tuple((Taxid,pep[0]) for pep in PeptideNodes)
+                SelectedPeps = [pep for pep in Pepnames if pep in peptideList]
+                PeptideNodes = tuple((pep,{'InitialBelief_0':1-PepScoreDict[pep]/100,'InitialBelief_1':PepScoreDict[pep]/100, 'category':'peptide'})  for pep in SelectedPeps if PepScoreDict[pep]>minScore)
+                TaxonPeptideEdges = tuple((Taxid,pep[0]) for pep in PeptideNodes)
                    
 
                 #in this version, peptide nodes that already exist and are added again are ignored/ if they attributes differ, they are overwritten. 
                 # conserves peptide graph structure, score will come from DB search engines anyways
-                    self.add_nodes_from(PeptideNodes)
-                    self.add_edges_from(TaxonPeptideEdges)
+                self.add_nodes_from(PeptideNodes)
+                self.add_edges_from(TaxonPeptideEdges)
 
 
 

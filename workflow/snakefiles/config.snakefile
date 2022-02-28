@@ -2,10 +2,11 @@ configfile: 'config/config.yaml'
 
 DataDirectory = config['DataDir']
 DatabaseDirectory = config ['DatabaseDir']
-ResultsDir = config['ResultsDir'] + config['ReferenceDBName'] +'/'
+ResultsDir = config['ResultsDir'] + config['ExperimentName'] +'/'
 ResourcesDir = config['ResourcesDir']
 TaxidMapping = config['TaxidMapping']
 ResultsDirStrain = config['ResultsDir']
+
 
 PeptideShakerDir = config['PeptideShakerDir']
 SearchGUIDir = config['SearchGUIDir']
@@ -15,6 +16,7 @@ peptideFDR = config['peptideFDR']
 proteinFDR = config['proteinFDR']
 psmFDR = config['psmFDR']
 
+ExperimentName = config['ExperimentName']
 SpectraFileType = config['SpectraFileType']
 SampleName = config['SampleName']
 HostName = config['HostName']

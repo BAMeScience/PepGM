@@ -14,27 +14,28 @@ rule all:
      input:
           expand(ResultsDir + SampleName + '/Prior{Prior}/'+ HostName + '_' + ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior),
           ResultsDir +SampleName +'/paramcheck.png',
-          DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
+#          DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
 
 
 rule getTargets:
      input:
-          ResultsDirStrain + '{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt',
+          ResultsDir + '{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt',
           ResourcesDir + TaxidMapping + 'accessions_hashed.npy',
           ResourcesDir + TaxidMapping + 'taxids.txt'
      params:
-          query = ResultsDirStrain + '{samplename}/{hostname}_{DBname}_query_accessions.txt',
+          query = ResultsDir + '{samplename}/{hostname}_{DBname}_query_accessions.txt',
           samplename = SampleName,
           hostname = HostName,
           DBname = ReferenceDBName
      conda: 'envs/graphenv.yml'
      output:
-          ResultsDirStrain + '{samplename}/{hostname}_{DBname}_mapped_taxids.txt'
+          ResultsDir + '{samplename}/{hostname}_{DBname}_mapped_taxids.txt'
      shell: "python3 workflow/scripts/getTargets.py -rq {input[0]} -q {params.query} -d {input[1]} -t {input[2]} -r {output} "
 
 
 rule CreateFactorGraph:
-     input: ResultsDir +'{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt'
+     input: ResultsDir +'{samplename}/{hostname}_{DBname}_Default_PSM_Report.txt',
+            ResultsDir + '{samplename}/{hostname}_{DBname}_mapped_taxids.txt'
      output: ResultsDir +'{samplename}/{hostname}_{DBname}_PepGM_graph.graphml'
      conda: 'envs/graphenv.yml'
      params:
@@ -42,10 +43,9 @@ rule CreateFactorGraph:
           hostname = HostName,
           DBname = ReferenceDBName,
           targetTaxa = TargetTaxa,
-          firstTarget = firstTarget,
           sourceDB = sourceDB
      log: ResultsDir +'{samplename}/{hostname}_{DBname}.log'
-     shell: 'conda info -e  && python3 workflow/scripts/CreatePepGMGraph.py --sourceDB {params.sourceDB} --targetTaxa {params.targetTaxa} --PSM_Report {input} --PeptideMapPath '+ResultsDir+'{params.samplename}/{params.firstTarget}.json --out {output} &>> {log}'
+     shell: 'conda info -e  && python3 workflow/scripts/CreatePepGMGraph.py --sourceDB {params.sourceDB} --targetTaxa {input[1]}  --PSM_Report {input[0]} --PeptideMapPath '+ResultsDir+'{params.samplename}/Mapped_Taxa_Proteins.json --out {output} &>> {log}'
 
 
 rule RunPepGM:

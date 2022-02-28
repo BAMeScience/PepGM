@@ -19,5 +19,6 @@ rule hashDatabase:
         ResourcesDir + TaxidMapping + "accessions.txt"
      output:
           ResourcesDir + TaxidMapping + "accessions_hashed.npy"
+     conda: 'envs/graphenv.yml'
      shell:
           "python3 workflow/scripts/hashDatabase.py --i {input}  --o {output}"

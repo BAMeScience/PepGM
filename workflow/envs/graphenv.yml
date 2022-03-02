@@ -2,6 +2,7 @@ name: pepgm
 channels:
   - defaults
   - conda-forge
+  - bioconda
 dependencies:
   - _libgcc_mutex=0.1=main
   - biopython=1.78=py39h7f8727e_0
@@ -68,7 +69,7 @@ dependencies:
   - readline=8.0=h7b6447c_0
   - requests=2.25.1=pyhd3eb1b0_0
   - scipy=1.6.2=py39hf56f3a7_1
-  - seqkit=2.1.0=h9ee0642_0 
+  - seqkit=2.1.0=h9ee0642_0
   - setuptools=51.0.0=py39h06a4308_2
   - sip=4.19.13=py39h2531618_0
   - six=1.15.0=py39h06a4308_0

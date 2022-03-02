@@ -1,5 +1,6 @@
 import argparse
-from belief_propagation_log import *
+#from belief_propagation_log import *
+from belief_propagation import *
 from FactorGraphGeneration import * 
 from os.path import exists
 

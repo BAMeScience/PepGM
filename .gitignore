@@ -14,6 +14,7 @@ workflow/scripts/belief_propagation_old.py
 workflow/scripts/CreatePepGMGraph_customJson.py
 workflow/scripts/BarPlotResults_customTaxa.py
 workflow/scripts/belief_propagation_log.py
+workflow/scripts/__pycache__/*
 
 workflow/Sars_strains.snakefile
 

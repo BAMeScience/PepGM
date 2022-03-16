@@ -1,30 +1,43 @@
 
 
-rule AddContaminantsandHost:
-     input:
-          DatabaseDirectory+'crap.fasta',
-          DatabaseDirectory+'{hostname}.fasta',
-          DatabaseDirectory+'{DBname}.fasta'
+#rule AddContaminantsandHost:
+#     input:
+#          DatabaseDirectory+'crap.fasta',
+#          DatabaseDirectory+'{hostname}.fasta',
+#          DatabaseDirectory+'{DBname}.fasta'
+#
+#     output: DatabaseDirectory+ '{hostname}+crap+{DBname}.fasta'
+#     shell:'cat {input} > {output}'
 
-     output: DatabaseDirectory+ '{hostname}+crap+{DBname}.fasta'
-     shell:'cat {input} > {output}'
+#rule RemoveDuplicates:
+#     input: DatabaseDirectory+ '{hostname}+crap+{DBname}.fasta'
+#     output: DatabaseDirectory+ '{hostname}+crap+{DBname}_UNI.fasta'
+#     conda: 'envs/graphenv.yml'
+#     shell:  'seqkit rmdup -s {input} > {output}'
 
 rule RemoveDuplicates:
-     input: DatabaseDirectory+ '{hostname}+crap+{DBname}.fasta'
-     output: DatabaseDirectory+ '{hostname}+crap+{DBname}_UNI.fasta'
+     input: DatabaseDirectory+ '{DBname}.fasta'
+     output: DatabaseDirectory+ '{DBname}_UNI.fasta'
      conda: 'envs/graphenv.yml'
      shell:  'seqkit rmdup -s {input} > {output}'
 
+
 rule AddDecoys:
-     input: DatabaseDirectory+'{hostname}+crap+{DBname}_UNI.fasta'
-     output: DatabaseDirectory+'{hostname}+crap+{DBname}_UNI_concatenated_target_decoy.fasta'
+     input: DatabaseDirectory+'{DBname}_UNI.fasta'
+     output: DatabaseDirectory+'{DBname}_UNI_concatenated_target_decoy.fasta'
      shell: 'java -cp '+SearchGUIDir+'SearchGUI-4.1.1.jar eu.isas.searchgui.cmd.FastaCLI -in {input} -decoy' 
 
 rule SearchSpectra:
      input:
-          DataDirectory+'{samplename}/{samplename}'+SpectraFileType, 
-          DatabaseDirectory+'{hostname}+crap+{DBname}_UNI_concatenated_target_decoy.fasta',
-          DataDirectory+'{samplename}/{samplename}.par'
+          if FilterSpectra:
+             DataDirectory+'{samplename}/SpectraFilter/{samplename}'+SpectraFileType, 
+             DatabaseDirectory+'{DBname}_concatenated_target_decoy.fasta',
+             DataDirectory+'{samplename}/{samplename}.par'
+
+          else:
+             DataDirectory+'{samplename}/{samplename}'+SpectraFileType, 
+             DatabaseDirectory+'{DBname}_UNI_concatenated_target_decoy.fasta',
+             DataDirectory+'{samplename}/{samplename}.par'
      params:
           samplename = SampleName,
           hostname = HostName,

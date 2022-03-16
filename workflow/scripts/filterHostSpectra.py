@@ -3,20 +3,20 @@ import time
 import argparse
 import difflib
 
-#parser = argparse.ArgumentParser(description = 'Filter host spectra from mgf or mzML file')
+parser = argparse.ArgumentParser(description = 'Filter host spectra from mgf or mzML file')
 #PSMReport = '/home/tholstei/repos/PepGM_all/PepGM/results/PXD002936_avian_bronchitis/chicken_refseq_Default_PSM_Report.txt'
-PSMReport ='/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD003013_Cowpox_BR/human_refseq_Default_PSM_Report.txt' 
+#PSMReport ='/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD003013_Cowpox_BR/human_refseq_Default_PSM_Report.txt' 
 #SpectrumFile ='/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD002936_avian_bronchitis/BeauR2.mgf'
-SpectrumFile = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD003013_Cowpox_BR/PXD003013_Cowpox_BR.mzML'
+#SpectrumFile = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD003013_Cowpox_BR/PXD003013_Cowpox_BR.mzML'
 #out = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD002936_avian_bronchitis/PXD002936_avian_bronchitis_filtered_test.mgf'
-out = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD003013_Cowpox_BR/PXD003013_Cowpox_BR_filtertest.mzML'
+#out = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD003013_Cowpox_BR/PXD003013_Cowpox_BR_filtertest.mzML'
 
-#parser.add_argument('--SpectrumFile',type = str, required = True, help = 'path to your spectrum file')
-#parser.add_argument('--PSMReport', type = str, required = True, help = 'path to PeptideShaker simple psm report file')
-#parser.add_argument('--out',type = str, required = True, help= 'output filepath')
+parser.add_argument('--SpectrumFile',type = str, required = True, help = 'path to your spectrum file')
+parser.add_argument('--PSMReport', type = str, required = True, help = 'path to PeptideShaker simple psm report file')
+parser.add_argument('--out',type = str, required = True, help= 'output filepath')
 
 
-#args = parser.parse_args()
+args = parser.parse_args()
 
 def getSpectraNames(filepath):
 
@@ -46,8 +46,7 @@ def filterMzML(SpectraToFilter,SpectrumFile,output):
     lastline = ''
 
     writeLine = True
-    print(Spectra)
-
+    
     for line in Spectra:
             
         if line.find('<spectrum') != -1:
@@ -63,7 +62,7 @@ def filterMzML(SpectraToFilter,SpectrumFile,output):
         
         lastline = line
         
-    print('filtered '+len(SpectraToFilter)+ 'host or crap spectra')
+    print('filtered '+str(len(SpectraToFilter))+ 'host or crap spectra')
     cleanedSpectra.writelines(LinesToWrite)
 
     Spectra.close()
@@ -102,7 +101,7 @@ def FilterMGF(SpectraToFilter,SpectrumFile,output):
         
         lastline = line
         
-    print('filtered '+len(SpectraToFilter)+ 'host or crap spectra')
+    print('filtered '+str(len(SpectraToFilter))+ 'host or crap spectra')
     cleanedSpectra.writelines(LinesToWrite)
 
     Spectra.close()
@@ -110,12 +109,12 @@ def FilterMGF(SpectraToFilter,SpectrumFile,output):
 
 
 
-FilterList = getSpectraNames(PSMReport)
+FilterList = getSpectraNames(args.PSMReport)
 
-if SpectrumFile[-1] == 'L':
-    filterMzML(FilterList,SpectrumFile,out)
+if args.SpectrumFile[-1] == 'L':
+    filterMzML(FilterList,args.SpectrumFile,args.out)
 else:
-    FilterMGF(FilterList,SpectrumFile,out)
+    FilterMGF(FilterList,args.SpectrumFile,args.out)
 
 
 

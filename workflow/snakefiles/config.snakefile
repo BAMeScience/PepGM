@@ -16,6 +16,9 @@ peptideFDR = config['peptideFDR']
 proteinFDR = config['proteinFDR']
 psmFDR = config['psmFDR']
 
+
+FilterSpectra = config['FilterSpectra']
+AddHostandCrapToDB = config['AddHostandCrapToDB']
 ExperimentName = config['ExperimentName']
 SpectraFileType = config['SpectraFileType']
 SampleName = config['SampleName']

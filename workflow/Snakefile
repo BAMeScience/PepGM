@@ -45,7 +45,7 @@ rule CreateFactorGraph:
           sourceDB = sourceDB,
           ResultsDir = ResultsDir
      log: ResultsDir +SampleName+'/{DBname}.log'
-     shell: 'cp config/config.yaml {params.ResultsDir}/{wildcards.samplename}/  && python3 workflow/scripts/CreatePepGMGraph.py --sourceDB {params.sourceDB} --targetTaxa {input[1]}  --PSM_Report {input[0]} --PeptideMapPath '+ResultsDir+'{params.samplename}/Mapped_Taxa_Proteins.json --out {output} &>> {log}'
+     shell: 'cp config/config.yaml {params.ResultsDir}/{params.samplename}/  && python3 workflow/scripts/CreatePepGMGraph.py --sourceDB {params.sourceDB} --targetTaxa {input[1]}  --PSM_Report {input[0]} --PeptideMapPath '+ResultsDir+'{params.samplename}/Mapped_Taxa_Proteins.json --out {output} &>> {log}'
 
 
 rule RunPepGM:

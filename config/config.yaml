@@ -10,8 +10,6 @@ TaxidMapping: 'taxidMapping/'
 PeptideShakerDir : '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.1.1/'
 SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.1-mac_and_linux/SearchGUI-4.1.1/'
 
-#Name of folder for the PepGM run in the results folder
-ExperimentName: 'Cowpox_auto_taxa_no_added_strains'
 
 #parameters for SearchGUI Search
 searchengines: '-xtandem'
@@ -20,27 +18,28 @@ proteinFDR: '5'
 psmFDR: '5'
 
 #Name of folder for the PepGM run in the results folder
-ExperimentName: 'Adeno_2_auto_taxa'
+ExperimentName: 'Hendravirus_auto_taxa_2'
 
 
 #sample specific parameters
 
-SpectraFileType: '.mzML' #'.mgf' or '.mzML'
-SampleName: 'PXD008980_adenovirus_2'  #needs to be the name of your spectrum file and the folder where you have that file
+SpectraFileType: '.mgf' #'.mgf' or '.mzML'
+SampleName: 'PXD001165_Hendra'  #needs to be the name of your spectrum file and the folder where you have that file
 HostName: 'human'
 ReferenceDBName: 'refseqViral'  #name of your fasta file. available here: VirusProteinHumanhost, refseqViral, refseq
-ScientificHostName: 'chlorocebus'
+ScientificHostName: '"homo sapiens"'
+FilterSpectra: True
+AddHostandCrapToDB: False
 
 
 #PepGM parameters
 TaxaInPlot: 15       #how many taxa should appear in the final results barplot
 TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
-TargetTaxa: '"adenoviridae" "homo sapiens"'
-FirstTarget: 'adenoviridae'
+TargetTaxa: '"hendraviridae" "homo sapiens"'
+FirstTarget: 'hendraviridae'
 sourceDB: 'all[FILT]' #choose from entrez query DBs to filter the protein DB with 
 #swissprot[filter]' = only swissprot proteins, refseq[filter] = know refseq proteins, all[filter]', etc: https://www.ncbi.nlm.nih.gov/books/NBK49540/
 
-Alpha: [0.01,0.05,0.1,0.2,0.4,0.6
-] #increments of parameter alpha to use for the grid earch
+Alpha: [0.01,0.05,0.1,0.2,0.4,0.6] #increments of parameter alpha to use for the grid earch
 Beta: [0.01,0.05,0.1,0.2,0.4,0.5,0.7] #range of parameter beta to use for the grid search
 prior: [0.1,0.3,0.5]

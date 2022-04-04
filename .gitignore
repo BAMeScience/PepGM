@@ -7,6 +7,9 @@ resources/*
 !resources/Databases/.gitkeep
 !resources/SampleData/.gitkeep
 
+resources/taxidMapping/accessions_hashed.npy
+resources/taxidMapping/taxids.txt
+resources/taxidMapping/accessions.txt
 
 .snakemake/*
 

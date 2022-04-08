@@ -7,12 +7,12 @@ from collections import namedtuple
 import pandas as pd
 import Bio.SeqIO
 import re
-import pandas as pd
 import json
 import subprocess
 from ete3 import NCBITaxa
 from Bio import Entrez
 from LoadSimplePSMResults import loadSimplePepScore
+import re
 
 #e-mail for fetching viral protein sequences from entrez 
 Entrez.email = 'tanja.holstein@bam.de'
@@ -198,7 +198,7 @@ class TaxonGraph(nx.Graph):
 
         #loop digesting and adding the peptides to the graph, connecting to the corresponding taxid nodes
 
-        for Taxid,AAsequences in ProteinTaxidDict.items():
+        for Taxid, AAsequences in ProteinTaxidDict.items():
 
             for AAsequence in AAsequences:
 
@@ -218,43 +218,38 @@ class TaxonGraph(nx.Graph):
                 self.add_nodes_from(PeptideNodes)
                 self.add_edges_from(TaxonPeptideEdges)
 
-
-    def CreateTaxonPeptidegraphFromPSMresults(self,PSMResultsFile,proteinListFile,minScore,minPeplength = 5,maxPeplength = 30,LCA=False):
-
-        #read proteinlists from file that recorded the NCBI matches
+    def CreateTaxonPeptidegraphFromPSMresults(self, proteinListFile, PSMResultsFile, minPeplength=5, maxPeplength=30,
+                                              minScore=10):
+        # read proteinlists from file that recorded the NCBI matches
         with open(proteinListFile) as file:
             ProteinTaxidDict = json.load(file)
 
-        Pepnames,Pepscores = loadSimplePepScore(PSMResultsFile)
-        PepScoreDict = dict(zip(Pepnames,Pepscores))
-        
+        Pepnames, Pepscores = loadSimplePepScore(PSMResultsFile)
+        PepScoreDict = dict(zip(Pepnames, Pepscores))
 
-        for Taxid,AAsequences in ProteinTaxidDict.items():
-
+        for taxid, aa_sequences in ProteinTaxidDict.items():
             self.add_node(Taxid, category='taxon')
-
-            for AAsequence in AAsequences:
-
-                cpdt = subprocess.check_output(['./../../bin/cp-dt --sequence ' +AAsequence+ ' --peptides'], shell = True).decode('utf-8')
-                peptideList = cpdt.split('\n')
-                peptideList.pop(0)
-                peptideList = [str[9:].split(': ') for str in peptideList]
-                del peptideList[-3:]                                    #last three elements from cp-dt oupput are empty
-                peptideList = [pep for pep in peptideList if minPeplength <= len(pep[0]) <= maxPeplength]
-
-                peptideList = [pep[0] for pep in peptideList]
-
-                SelectedPeps = [pep for pep in Pepnames if pep in peptideList]
-                PeptideNodes = tuple((pep,{'InitialBelief_0':1-PepScoreDict[pep]/100,'InitialBelief_1':PepScoreDict[pep]/100, 'category':'peptide'})  for pep in SelectedPeps if PepScoreDict[pep]>minScore)
-                TaxonPeptideEdges = tuple((Taxid,pep[0]) for pep in PeptideNodes)
-                   
-
-                #in this version, peptide nodes that already exist and are added again are ignored/ if they attributes differ, they are overwritten. 
+            for seq in aa_sequences:
+                result = []
+                peptides = re.sub(r'(?<=[RK])(?=[^P])', '\n', seq)
+                # filter (length)
+                peptides = [pep for pep in peptides if minPeplength <= len(pep) <= maxPeplength]
+                # filter for occurrence in
+                sel_peptides = [pep for pep in Pepnames if pep in peptides]
+                PeptideNodes = tuple((pep, {'InitialBelief_0': 1 - PepScoreDict[pep] / 100,
+                                            'InitialBelief_1': PepScoreDict[pep] / 100, 'category': 'peptide'})
+                                     for pep in sel_peptides if PepScoreDict[pep] > minScore)
+                TaxonPeptideEdges = tuple((taxid, pep[0]) for pep in PeptideNodes)
+                print(TaxonPeptideEdges)
+                # in this version, peptide nodes that already exist and are added again are ignored/ if they attributes differ, they are overwritten.
                 # conserves peptide graph structure, score will come from DB search engines anyways
                 self.add_nodes_from(PeptideNodes)
                 self.add_edges_from(TaxonPeptideEdges)
 
-
+# this is for my developping
+json_file = '/home/fkistner/pepgm/results/PXD002936/PXD002936_avian_bronchitis/Mapped_Taxa_Proteins.json'
+psm_report = '/home/fkistner/pepgm/results/PXD002936/PXD002936_avian_bronchitis/chicken_refseqViral_Default_PSM_Report.txt'
+CreateTaxonPeptidegraphFromPSMresults(json_file, psm_report)
 
 
 class Factor:
@@ -467,7 +462,7 @@ def GenerateCTFactorGraphs(ListOfFactorGraphs,GraphType = 'Taxons'):
         CTFactorgraph = CTFactorGraph (Graph,GraphType) #ListOfCTFactorGraphs.append(CTFactorGraph(Graph,GraphType))
     return CTFactorgraph
 
-
+"""
 if __name__== '__main__':
     Taxongraph = TaxonGraph()
     #Taxongraph.GetAllLeafTaxa(['adenoviridae'])
@@ -481,3 +476,4 @@ if __name__== '__main__':
 
     CTFactorgraphs = GenerateCTFactorGraphs(Factorgraph)
     CTFactorgraphs.SaveToGraphML('/home/tholstei/repos/PepGM_all/PepGM/graph.graphml')
+"""

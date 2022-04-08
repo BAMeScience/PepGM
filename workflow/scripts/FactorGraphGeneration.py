@@ -202,6 +202,7 @@ class TaxonGraph(nx.Graph):
 
             for AAsequence in AAsequences:
 
+                # this needs to be replace
                 cpdt = subprocess.check_output(['./cp-dt --sequence ' +AAsequence+ ' --peptides'], shell = True).decode('utf-8')
                 peptideList = cpdt.split('\n')
                 peptideList.pop(0)

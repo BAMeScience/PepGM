@@ -28,8 +28,8 @@ SampleName: 'PXD001165_Hendra'  #needs to be the name of your spectrum file and 
 HostName: 'human'
 ReferenceDBName: 'refseqViral'  #name of your fasta file. available here: VirusProteinHumanhost, refseqViral, refseq
 ScientificHostName: '"homo sapiens"'
-FilterSpectra: True
-AddHostandCrapToDB: False
+FilterSpectra: True        #option to filter out the host spectra and crap
+AddHostandCrapToDB: False   #option to add host and crap to the search db. must be False if previous option is True.s  
 
 
 #PepGM parameters

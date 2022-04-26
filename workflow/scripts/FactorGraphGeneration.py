@@ -1,18 +1,20 @@
 ''' functions and classes to hold and generate the graphs for the belief propagation algorithm'''
 #implementation of belief propagation on a peptide-protein graph
 #__________________________________________________________________________________________
-import numpy as np
-import networkx as nx
-from collections import namedtuple 
-import pandas as pd
-import Bio.SeqIO
-import re
 import json
-import subprocess
-from ete3 import NCBITaxa
-from Bio import Entrez
-from LoadSimplePSMResults import loadSimplePepScore
+import random
 import re
+import subprocess
+from collections import namedtuple
+
+import Bio.SeqIO
+import networkx as nx
+import numpy as np
+import pandas as pd
+from Bio import Entrez
+from ete3 import NCBITaxa
+from LoadSimplePSMResults import loadSimplePepScore
+
 
 #e-mail for fetching viral protein sequences from entrez 
 Entrez.email = 'tanja.holstein@bam.de'
@@ -228,10 +230,10 @@ class TaxonGraph(nx.Graph):
         PepScoreDict = dict(zip(Pepnames, Pepscores))
 
         for taxid, aa_sequences in ProteinTaxidDict.items():
-            self.add_node(Taxid, category='taxon')
+            self.add_node(taxid, category='taxon')
             for seq in aa_sequences:
                 result = []
-                peptides = re.sub(r'(?<=[RK])(?=[^P])', '\n', seq)
+                peptides = re.split(r'(?<=[RK])(?=[^P])', seq)
                 # filter (length)
                 peptides = [pep for pep in peptides if minPeplength <= len(pep) <= maxPeplength]
                 # filter for occurrence in
@@ -246,10 +248,51 @@ class TaxonGraph(nx.Graph):
                 self.add_nodes_from(PeptideNodes)
                 self.add_edges_from(TaxonPeptideEdges)
 
+
+def digest(peptide, start = 0):
+    pattern = re.compile(r'(?<=[RK])(?=[^P])')
+    digested_peps = []
+
+    for m in re.finditer(pattern, peptide):
+        cut = m.start()
+        if start == cut:
+            digested_peps.append(peptide[cut + 1])
+        else:
+            digested_peps.append(peptide[start:cut])
+        start = cut
+
+    return digested_peps
+
+
+# DON'T FORGET TO PUT ELF IN THERE AGAIN !!!!
+def CreateTaxonPeptidegraphFromPSMresults(mapped_prot, psm_report, min_pep_len=5, max_pep_len=30, min_score=10):
+    with open(mapped_prot) as file:
+        mapped_prot_dict = json.load(file)
+
+    pepnames, pepscores = loadSimplePepScore(psm_report)
+    pepscore_dict = dict(zip(pepnames, pepscores))
+
+    for taxid, peptides in mapped_prot_dict.items():
+        # self.add_node(taxid, category='taxon')
+        for seq in peptides:
+            # print(seq)
+            # digest with trypson and filter for length
+            digested_peps = [pep for pep in digest(seq) if min_pep_len <= len(pep) <= max_pep_len]
+            # filter for occurrence in
+            selected_peps = [pep for pep in pepnames if pep in digested_peps]
+
+            pep_nodes = tuple((pep,
+                               {'InitialBelief_0': 1 - pepscore_dict[pep] / 100,
+                                'InitialBelief_1': pepscore_dict[pep] / 100, 'category': 'peptide'})
+                              for pep in selected_peps if pepscore_dict[pep] > min_score)
+
+            taxon_pep_edges = tuple((taxid, pep[0]) for pep in pep_nodes)
+            print(taxon_pep_edges)
+
 # this is for my developping
-json_file = '/home/fkistner/pepgm/results/PXD002936/PXD002936_avian_bronchitis/Mapped_Taxa_Proteins.json'
+mapped_prot = '/home/fkistner/pepgm/results/PXD002936/PXD002936_avian_bronchitis/Mapped_Taxa_Proteins.json'
 psm_report = '/home/fkistner/pepgm/results/PXD002936/PXD002936_avian_bronchitis/chicken_refseqViral_Default_PSM_Report.txt'
-CreateTaxonPeptidegraphFromPSMresults(json_file, psm_report)
+CreateTaxonPeptidegraphFromPSMresults(mapped_prot, psm_report)
 
 
 class Factor:

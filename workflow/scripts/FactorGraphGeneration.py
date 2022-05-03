@@ -31,6 +31,40 @@ def normalize(Array):
     normalizedArray = Array/np.sum(Array)
     return normalizedArray
 
+
+def digest(peptide, n_missed_sites=1):
+    """
+    In-situ trypsin digestion of peptides with up to 2 missed cleavage sites.
+    :param n_missed_sites: number of allowed missed cleavage sites
+    :param peptide: str, input peptide sequence
+    :return: lst, digested peptides extended by peptides which  for up to <n_missed_sites> missed cleavage sites
+    """
+
+    # in-situ trypsin digestion (without errors)
+    # cut after every R and K except a P follows
+    trypsin_pattern = re.compile(r'(?<=[RK])(?=[^P])')
+    digested_peps = list(re.split(trypsin_pattern, peptide))
+
+    # in-situ trypsin digestion (with up to <n_missed_sites> error)
+    # prepare index for slicing
+    # note that the last element of a list slice is not contained in the slice
+    cut = 2
+    counter = 0
+    # initialize limit
+    N = len(digested_peps) - 1
+
+    for n in range(0, n_missed_sites):
+        # shorten the list to avoid indexing error
+        for i in range(0, N - counter):
+            missed_peptide = "".join(digested_peps[i:i+cut])
+            # append
+            digested_peps.append(missed_peptide)
+        counter += 1
+        cut += 1
+
+    return digested_peps
+
+
 class ProteinPeptideGraph(nx.Graph):
     
     #class for stroing the protein-peptide graph with scores and priors but no factors, e.g for visual representation
@@ -220,7 +254,8 @@ class TaxonGraph(nx.Graph):
                 self.add_nodes_from(PeptideNodes)
                 self.add_edges_from(TaxonPeptideEdges)
 
-    def CreateTaxonPeptidegraphFromPSMresults(self, proteinListFile, PSMResultsFile, minPeplength=5, maxPeplength=30,
+
+    def CreateTaxonPeptidegraphFromPSMresults_old(self, proteinListFile, PSMResultsFile, minPeplength=5, maxPeplength=30,
                                               minScore=10):
         # read proteinlists from file that recorded the NCBI matches
         with open(proteinListFile) as file:
@@ -249,50 +284,33 @@ class TaxonGraph(nx.Graph):
                 self.add_edges_from(TaxonPeptideEdges)
 
 
-def digest(peptide, start = 0):
-    pattern = re.compile(r'(?<=[RK])(?=[^P])')
-    digested_peps = []
+    def CreateTaxonPeptidegraphFromPSMresults(self, mapped_prot, psm_report, min_pep_len=5, max_pep_len=30, min_score=10):
+        with open(mapped_prot) as file:
+            mapped_prot_dict = json.load(file)
 
-    for m in re.finditer(pattern, peptide):
-        cut = m.start()
-        if start == cut:
-            digested_peps.append(peptide[cut + 1])
-        else:
-            digested_peps.append(peptide[start:cut])
-        start = cut
+        pepnames, pepscores = loadSimplePepScore(psm_report)
+        pepscore_dict = dict(zip(pepnames, pepscores))
 
-    return digested_peps
+        for taxid, peptides in mapped_prot_dict.items():
+            self.add_node(taxid, category='taxon')
+            for seq in peptides:
+                # digest with trypsin and filter for length
+                digested_peps = [pep for pep in digest(seq) if min_pep_len <= len(pep) <= max_pep_len]
+                selected_peps = [pep for pep in pepnames if pep in digested_peps]
+                # initialize peptide nodes
+                pep_nodes = tuple((pep,
+                                   {'InitialBelief_0': 1 - pepscore_dict[pep] / 100,
+                                    'InitialBelief_1': pepscore_dict[pep] / 100, 'category': 'peptide'})
+                                  for pep in selected_peps if pepscore_dict[pep] > min_score)
 
+                taxon_pep_edges = tuple((taxid, pep[0]) for pep in pep_nodes)
+                print(taxon_pep_edges)
+                # in this version, peptide nodes that already exist and are added again are ignored/
+                # if they attributes differ, they are overwritten.
+                # conserves peptide graph structure, score will come from DB search engines anyways
+                self.add_nodes_from(pep_nodes)
+                self.add_edges_from(taxon_pep_edges)
 
-# DON'T FORGET TO PUT ELF IN THERE AGAIN !!!!
-def CreateTaxonPeptidegraphFromPSMresults(mapped_prot, psm_report, min_pep_len=5, max_pep_len=30, min_score=10):
-    with open(mapped_prot) as file:
-        mapped_prot_dict = json.load(file)
-
-    pepnames, pepscores = loadSimplePepScore(psm_report)
-    pepscore_dict = dict(zip(pepnames, pepscores))
-
-    for taxid, peptides in mapped_prot_dict.items():
-        # self.add_node(taxid, category='taxon')
-        for seq in peptides:
-            # print(seq)
-            # digest with trypson and filter for length
-            digested_peps = [pep for pep in digest(seq) if min_pep_len <= len(pep) <= max_pep_len]
-            # filter for occurrence in
-            selected_peps = [pep for pep in pepnames if pep in digested_peps]
-
-            pep_nodes = tuple((pep,
-                               {'InitialBelief_0': 1 - pepscore_dict[pep] / 100,
-                                'InitialBelief_1': pepscore_dict[pep] / 100, 'category': 'peptide'})
-                              for pep in selected_peps if pepscore_dict[pep] > min_score)
-
-            taxon_pep_edges = tuple((taxid, pep[0]) for pep in pep_nodes)
-            print(taxon_pep_edges)
-
-# this is for my developping
-mapped_prot = '/home/fkistner/pepgm/results/PXD002936/PXD002936_avian_bronchitis/Mapped_Taxa_Proteins.json'
-psm_report = '/home/fkistner/pepgm/results/PXD002936/PXD002936_avian_bronchitis/chicken_refseqViral_Default_PSM_Report.txt'
-CreateTaxonPeptidegraphFromPSMresults(mapped_prot, psm_report)
 
 
 class Factor:

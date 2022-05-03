@@ -284,7 +284,7 @@ class TaxonGraph(nx.Graph):
                 self.add_edges_from(TaxonPeptideEdges)
 
 
-    def CreateTaxonPeptidegraphFromPSMresults(self, mapped_prot, psm_report, min_pep_len=5, max_pep_len=30, min_score=10):
+    def CreateTaxonPeptidegraphFromPSMresults(self, mapped_prot, psm_report, min_score, min_pep_len=5, max_pep_len=30):
         with open(mapped_prot) as file:
             mapped_prot_dict = json.load(file)
 

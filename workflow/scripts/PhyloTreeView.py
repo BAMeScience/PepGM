@@ -3,6 +3,34 @@ from ete3 import NCBITaxa
 import pandas as pd
 
 
+'''
+This script plots the PepGM results onto a phylogenetic tree using the ete3 tree visualization tools
+'''
+
+#resultsfile = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral/PXD025131_Sars_CoV_2/Prior0.1/chlorocebus_refseqViral_PepGM_Results_a0.01_b0.05_p0.1.csv'
+#out = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral/PXD025131_Sars_CoV_2/PhyloTree.png'
+#host = 'chlorocebus'
+
+#resultsfile = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral/PXD002936_avian_bronchitis/Prior0.3/chicken_refseqViral_PepGM_Results_a0.1_b0.1_p0.3.csv'
+#out = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral/PXD002936_avian_bronchitis/Phylotree.png'
+#host = "gallus gallus"
+
+#resultsfile = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral/PXD005104_Herpessimplex_1/Prior0.1/human_refseqViral_PepGM_Results_a0.01_b0.4_p0.1.csv'
+#out = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral/PXD005104_Herpessimplex_1/Phylotree.png'
+#host = "homo sapiens"
+
+#resultsfile = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral/PXD025130_Sars_CoV_2/Prior0.1/chlorocebus_refseqViral_PepGM_Results_a0.01_b0.05_p0.1.csv'
+#out = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral/PXD025130_Sars_CoV_2/PhyloTree.png'
+#host = 'chlorocebus'
+
+#resultsfile = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral+cowpoxstrains/PXD003013_Cowpox_BR/Prior0.1/human_refseqViral+cowpoxstrains_PepGM_Results_a0.2_b0.01_p0.1.csv'
+#out = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral+cowpoxstrains/PXD003013_Cowpox_BR/PhyloTree.png'
+#host = 'homo sapiens'
+
+resultsfile = '/home/tholstei/repos/PepGM_all/PepGM/results/Adeno_2_auto_taxa/PXD004095_Adenovirus2/Prior0.1/refseqViral_PepGM_Results_a0.01_b0.1_p0.1.csv'
+out = '/home/tholstei/repos/PepGM_all/PepGM/results/Adeno_2_auto_taxa/PXD004095_Adenovirus2/Phylotree.png'
+host = 'homo sapiens'
+
 ncbi = NCBITaxa()
 
 def CreatePhyloTreeView(resultsfile,host,out):

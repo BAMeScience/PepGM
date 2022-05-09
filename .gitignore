@@ -2,11 +2,14 @@ results/*
 !results/.gitkeep
 
 resources/*
-!resources/taxidMapping/protacc2taxids_virus.txt
+resources/taxidMapping/protacc2taxids_virus.txt
 !resources/.gitkeep
 !resources/Databases/.gitkeep
 !resources/SampleData/.gitkeep
 
+resources/taxidMapping/accessions_hashed.npy
+resources/taxidMapping/taxids.txt
+resources/taxidMapping/accessions.txt
 
 .snakemake/*
 

@@ -236,10 +236,10 @@ class TaxonGraph(nx.Graph):
 
         # read proteinlists from file that recorded the NCBI matches
         with open(map) as file:
-            mapped_prot_dict = json.load(file)
+            mapped_pep_dict = json.load(file)
 
         #loop digesting and adding the peptides to the graph, connecting to the corresponding taxid nodes
-        for taxid, peptides in mapped_prot_dict.items():
+        for taxid, peptides in mapped_pep_dict.items():
             for seq in peptides:
                 # digest with trypsin and filter for length
                 digested_peps = [pep for pep in digest(seq) if min_pep_len <= len(pep) <= max_pep_len]
@@ -269,12 +269,12 @@ class TaxonGraph(nx.Graph):
 
         # read proteinlists from file that recorded the NCBI matches
         with open(map) as file:
-            mapped_prot_dict = json.load(file)
+            mapped_pep_dict = json.load(file)
 
         pepnames, pepscores = loadSimplePepScore(psm_report)
         pepscore_dict = dict(zip(pepnames, pepscores))
 
-        for taxid, peptides in mapped_prot_dict.items():
+        for taxid, peptides in mapped_pep_dict.items():
             self.add_node(taxid, category='taxon')
             for seq in peptides:
                 # digest with trypsin and filter for length

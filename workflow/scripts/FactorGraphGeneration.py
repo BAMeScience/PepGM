@@ -32,12 +32,12 @@ def normalize(Array):
     return normalizedArray
 
 
-def digest(peptide, n_missed_sites=1):
+def digest(peptide, n_missed_sites=2):
     """
-    In-situ trypsin digestion of peptides with up to 2 missed cleavage sites.
-    :param n_missed_sites: number of allowed missed cleavage sites
+    In-situ trypsin digestion of peptides. Creates all possible cleavage products with up to n missed cleavage sites.
+    :param n_missed_sites: int, number of allowed missed cleavage sites
     :param peptide: str, input peptide sequence
-    :return: lst, digested peptides extended by peptides which  for up to <n_missed_sites> missed cleavage sites
+    :return: lst, digested peptides
     """
 
     # in-situ trypsin digestion (without errors)
@@ -45,7 +45,7 @@ def digest(peptide, n_missed_sites=1):
     trypsin_pattern = re.compile(r'(?<=[RK])(?=[^P])')
     digested_peps = list(re.split(trypsin_pattern, peptide))
 
-    # in-situ trypsin digestion (with up to <n_missed_sites> error)
+    # in-situ trypsin digestion (with up to n errors)
     # prepare index for slicing
     # note that the last element of a list slice is not contained in the slice
     cut = 2
@@ -57,7 +57,7 @@ def digest(peptide, n_missed_sites=1):
         # shorten the list to avoid indexing error
         for i in range(0, N - counter):
             missed_peptide = "".join(digested_peps[i:i+cut])
-            # append
+            # sequentially append to list
             digested_peps.append(missed_peptide)
         counter += 1
         cut += 1
@@ -254,7 +254,7 @@ class TaxonGraph(nx.Graph):
                 self.add_nodes_from(PeptideNodes)
                 self.add_edges_from(TaxonPeptideEdges)
 
-
+    """
     def CreateTaxonPeptidegraphFromPSMresults_old(self, proteinListFile, PSMResultsFile, minPeplength=5, maxPeplength=30,
                                               minScore=10):
         # read proteinlists from file that recorded the NCBI matches
@@ -283,8 +283,10 @@ class TaxonGraph(nx.Graph):
                 self.add_nodes_from(PeptideNodes)
                 self.add_edges_from(TaxonPeptideEdges)
 
+    """
 
     def CreateTaxonPeptidegraphFromPSMresults(self, mapped_prot, psm_report, min_score, min_pep_len=5, max_pep_len=30):
+        # read proteinlists from file that recorded the NCBI matches
         with open(mapped_prot) as file:
             mapped_prot_dict = json.load(file)
 

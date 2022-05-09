@@ -20,16 +20,30 @@ proteinFDR: '5'
 psmFDR: '5'
 
 #Name of folder for the PepGM run in the results folder
+<<<<<<< Updated upstream
 ExperimentName: 'Adeno_2_auto_taxa'
+=======
+ExperimentName: 'H1N1_Jans_data'
+>>>>>>> Stashed changes
 
 
 #sample specific parameters
 
+<<<<<<< Updated upstream
 SpectraFileType: '.mzML' #'.mgf' or '.mzML'
 SampleName: 'PXD008980_adenovirus_2'  #needs to be the name of your spectrum file and the folder where you have that file
 HostName: 'human'
 ReferenceDBName: 'refseqViral'  #name of your fasta file. available here: VirusProteinHumanhost, refseqViral, refseq
 ScientificHostName: 'chlorocebus'
+=======
+SpectraFileType: '.mgf' #'.mgf' or '.mzML'
+SampleName: 'H1N1'  #needs to be the name of your spectrum file and the folder where you have that file
+HostName: 'dog'
+ReferenceDBName: 'refseqViral'  #name of your fasta file. available here: VirusProteinHumanhost, refseqViral, refseq
+ScientificHostName: '"canis lupus familiaris"'
+FilterSpectra: True        #option to filter out the host spectra and crap
+AddHostandCrapToDB: False   #option to add host and crap to the search db. must be False if previous option is True.s  
+>>>>>>> Stashed changes
 
 
 #PepGM parameters

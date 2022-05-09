@@ -74,13 +74,21 @@ rule BarPlotResults:
 
 rule FindBestParameters:
      input: 
+<<<<<<< Updated upstream
           expand(ResultsDir + SampleName + '/Prior{Prior}/'+ HostName + '_' + ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior)
      output: ResultsDir +'{samplename}/paramcheck.png'
+=======
+          expand(ResultsDir + SampleName + '/Prior{Prior}/'+ ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior)
+     output: ResultsDir +SampleName+'/paramcheck.png', 
+             ResultsDir +SampleName+'/PhyloTreeView.png'
+             
+>>>>>>> Stashed changes
      conda: 'envs/graphenv.yml'
      log : ResultsDir + '{samplename}/paramcheck.log'
      params: Results = ResultsDir+SampleName,
-             host = ScientificHostName
-     shell: 'python3 workflow/scripts/GridSearchAnalysis.py --host {params.host} --resultsfolder {params.Results} --out {output} &>> {log}'
+             host = ScientificHostName,
+             DB = ReferenceDBName
+     shell: 'python3 workflow/scripts/SearchAnalysisOutputFormatter.py --reference_db {params.DB} --host {params.host} --resultsfolder {params.Results} --out {output[0]} &>> {log}'
 
 
 #rules only needed for debugging/checking results

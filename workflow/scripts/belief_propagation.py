@@ -517,9 +517,9 @@ if __name__== '__main__':
 
  GraphMLPath = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral/PXD005104_Herpessimplex_1/human_refseqViral_PepGM_graph.graphml'
  #GraphMLPath = '/home/tholstei/repos/PepGM_all/PepGM/results/refseqViral/PXD002936_avian_bronchitis/chicken_refseqViral_PepGM_graph.graphml'
- alpha = 0.1
- beta = 0.01
- prior = 0.1
+ #alpha = 0.1
+ #beta = 0.01
+ #prior = 0.1
  
  CTFactorgraph = CTFactorGraph(GraphMLPath)
  CTFactorgraph.FillInFactors(alpha,beta)

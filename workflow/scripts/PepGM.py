@@ -1,8 +1,7 @@
 import argparse
-#from belief_propagation_log import *
 from belief_propagation import *
 from FactorGraphGeneration import * 
-from os.path import exists
+
 
 
 parser = argparse.ArgumentParser(description = 'Run the PepGM algorithm from command line')
@@ -16,15 +15,6 @@ parser.add_argument('--beta',type = float, required = True, help = 'probability 
 parser.add_argument('--prior', type = float, required = True, help = 'prior assigned to all taxa')
 
 args = parser.parse_args()
-
-#graphMLPath = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/human_refseq_PepGM_graph.graphml'
-#alpha = 0.9
-#beta = 0.3
-#out =  'resources/SampleData/PXD005104_Herpessimplex_1/human_refseq_PepGM_Results_0.8_0.4.csv'
-#max_iter = 1000
-#tol = 0.003
-
-
 
 CTFactorgraph = CTFactorGraph(args.GraphMLPath)
 CTFactorgraph.FillInFactors(args.alpha,args.beta)

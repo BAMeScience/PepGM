@@ -1,7 +1,6 @@
 import pandas as pd 
-import time
 import argparse
-import difflib
+
 
 parser = argparse.ArgumentParser(description = 'Filter host spectra from mgf or mzML file')
 #PSMReport = '/home/tholstei/repos/PepGM_all/PepGM/results/PXD002936_avian_bronchitis/chicken_refseq_Default_PSM_Report.txt'

@@ -30,8 +30,8 @@ TaxaInPlot = config['TaxaInPlot']
 TaxaInProteinCount = config['TaxaInProteinCount']
 sourceDB = config['sourceDB']
 
-TargetTaxa = config['TargetTaxa']
-firstTarget = config['FirstTarget']
+#TargetTaxa = config['TargetTaxa']
+#firstTarget = config['FirstTarget']
 
 AlphaRange = config['Alpha']
 BetaRange = config['Beta']

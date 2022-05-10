@@ -90,7 +90,9 @@ def ComputeMetric(resultsfolder, host, output):
     plt.xticks(fontsize =35)
     plt.yticks(list(range(20)),Params[0:20],fontsize=35)
     
+    print(output)
     plt.savefig(output)
+    plt.close()
 
     return Params[0]
 

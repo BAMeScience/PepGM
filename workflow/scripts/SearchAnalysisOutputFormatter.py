@@ -50,11 +50,11 @@ def MoveBestResultsPlot(filepath,out):
 
 #analyse the PepGM grid search with an empirical metric, retrieve best parameters
 Parameters = ComputeMetric(args.resultsfolder, args.host, args.out)
-Resultsfile = args.resultsfolder+'/Prior'+str(Parameters[2]) +'/'+ args.reference_db + '_PepGM_Results_a'+str(Parameters[0])+'_b'+str(Parameters[1])+'_p'+str(Parameters[2])+'.csv'
+Resultsfile = args.resultsfolder+'/Prior'+str(Parameters[2]) +'/'+ args.reference_db + '_PepGM_Results_a'+str(Parameters[0])+'_b'+str(Parameters[1])+'_p'+str(Parameters[2])
 
 #save the reduced results csv
-SaveReducedCSV(Resultsfile, args.host, args.resultsfolder +'/PepGm_Results.csv')
-MoveBestResultsPlot(Resultsfile,args.resultsfolder+'/PepGM_ResultsPlot.png')
+SaveReducedCSV(Resultsfile+'.csv', args.host, args.resultsfolder +'/PepGm_Results.csv')
+MoveBestResultsPlot(Resultsfile+'.png',args.resultsfolder+'/PepGM_ResultsPlot.png')
 
 #save a phylogenetic tree view of the PepGm results
-CreatePhyloTreeView(Resultsfile,args.host, args.resultsfolder + '/PhyloTreeView.png')
+CreatePhyloTreeView(Resultsfile+'.csv',args.host, args.resultsfolder + '/PhyloTreeView.png')

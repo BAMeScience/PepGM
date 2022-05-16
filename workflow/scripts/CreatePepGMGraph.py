@@ -7,7 +7,6 @@ from FactorGraphGeneration import *
 
 parser = argparse.ArgumentParser(description = 'Run the PepGM algorithm from command line')
 
-#parser.add_argument('--targetTaxa', nargs = '*', help ='enter a list of taxa to include in your graphical model')
 parser.add_argument('--targetTaxa', type = str, nargs = 1, help ='path to the .txt file containing a list of taids to include in the graph, one taxid per line')
 parser.add_argument('--PSM_Report', type =str, required =True, help = 'path to your PSM report txt file (output from peptideshaker)')
 parser.add_argument('--PeptideMapPath',type=str, required =True, help = 'path to where you want to save you taxon-peptide map .json file')#make it so that this works as argument for both functions
@@ -15,17 +14,6 @@ parser.add_argument('--out', type = str, required = True, help = 'path to where 
 parser.add_argument('--sourceDB',type = str, nargs ='?', const ='', help = 'name of the DB queried through Entrez')
 
 args = parser.parse_args()
-
-#targetTaxa ='/home/tholstei/repos/PepGM_all/PepGM/results/PXD025130_Sars_CoV_2/chlorocebus_refseq_mapped_taxids.txt'
-#PeptideMapPath = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD025130_Sars_CoV_2/Sars_automap_taxa.json'
-#PSM_Report = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD025130_Sars_CoV_2/chlorocebus_refseq_Default_PSM_Report.txt'
-#out = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD025130_Sars_CoV_2/refseq_PepGM_graph.graphml'
-#sourceDB = 'all[FILT]'
-
-#targetTaxa = ['herpesviridae','homo sapiens']
-#PeptideMapPath = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/herpesviridae.json'
-#PSM_Report = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/human_refseq_Default_PSM_Report.txt'
-#out = '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/human_refseq_PepGM_graph.graphml'
 
 
 print(args.targetTaxa)

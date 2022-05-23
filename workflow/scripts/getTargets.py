@@ -110,7 +110,7 @@ def score(df, taxids, output_path, subset=30):
     df['taxid'] = taxids
     df_score = df.groupby('taxid')['weight'].sum().reset_index()
     df_score = df_score.sort_values(by=['weight'], ascending=False)
-    df_score.to_csv(output_path +'taxidweights.csv')
+    df_score.head(subset).to_csv(output_path[:-4] +'_weights.csv',index= False)
     top_scoring_taxids = df_score.taxid[0:subset].tolist()
     save(output_path, top_scoring_taxids)
 

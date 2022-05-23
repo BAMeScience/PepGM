@@ -26,8 +26,8 @@ rule getTargets:
           DBname = ReferenceDBName
      conda: 'envs/graphenv.yml'
      output:
-          ResultsDir +SampleName+'/{DBname}_mapped_taxids.txt'
-     shell: "python3 workflow/scripts/getTargets.py -rq {input[0]} -q {params.query} -d {input[1]} -t {input[2]} -r {output} "
+          ResultsDir +SampleName+'/{DBname}_mapped_taxids.txt',ResultsDir +SampleName+'/{DBname}_mapped_taxids_weights.csv'
+     shell: "python3 workflow/scripts/getTargets.py -rq {input[0]} -q {params.query} -d {input[1]} -t {input[2]} -r {output[0]} "
 
 
 rule CreateFactorGraph:
@@ -67,7 +67,8 @@ rule BarPlotResults:
 
 
 rule FindBestParameters:
-     input: expand(ResultsDir + SampleName + '/Prior{Prior}/'+ ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior)
+     input: ResultsDir +SampleName+'/' + ReferenceDBName+'_mapped_taxids_weights.csv',
+            expand(ResultsDir + SampleName + '/Prior{Prior}/'+ ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior)
      output: ResultsDir +SampleName+'/paramcheck.png', 
              ResultsDir +SampleName+'/PhyloTreeView.png'
      conda: 'envs/graphenv.yml'
@@ -75,7 +76,7 @@ rule FindBestParameters:
      params: Results = ResultsDir+SampleName,
              host = ScientificHostName,
              DB = ReferenceDBName
-     shell: 'python3 workflow/scripts/SearchAnalysisOutputFormatter.py --reference_db {params.DB} --host {params.host} --resultsfolder {params.Results} --out {output[0]} &>> {log}'
+     shell: 'python3 workflow/scripts/SearchAnalysisOutputFormatter.py --weights {input[0]} --reference_db {params.DB} --host {params.host} --resultsfolder {params.Results} --out {output[0]} &>> {log}'
 
 
 #rules only needed for debugging/checking results

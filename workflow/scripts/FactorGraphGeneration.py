@@ -154,7 +154,7 @@ class TaxonGraph(nx.Graph):
 
             self.TaxidList = self.TaxidList+TaxidList
     
-    def GetAllLeafTaxaFromTaxids(self,TaxidFile,StrainResolution = True):
+    def GetAllLeafTaxaFromTaxids(self, TaxidFile, StrainResolution = True):
         
         with open(TaxidFile) as Taxids:
             
@@ -287,7 +287,6 @@ class TaxonGraph(nx.Graph):
                                   for pep in selected_peps if pepscore_dict[pep] > min_score)
 
                 taxon_pep_edges = tuple((taxid, pep[0]) for pep in pep_nodes)
-                print(taxon_pep_edges)
                 # in this version, peptide nodes that already exist and are added again are ignored/
                 # if they attributes differ, they are overwritten.
                 # conserves peptide graph structure, score will come from DB search engines anyways
@@ -346,7 +345,7 @@ class FactorGraph(nx.Graph):
                 
         return [self]
 
-    def ConstructFromTaxonGraph(self,TaxonPeptideGraph):
+    def ConstructFromTaxonGraph(self, TaxonPeptideGraph):
         ''''
         Takes a graph of Taxa to peptides in networkx form as input and adds the factor nodes
         '''
@@ -386,7 +385,7 @@ class CTFactorGraph(FactorGraph):
     This class is a networkx graph representing the full graphical model with all variables, CTrees, and Noisy-OR factors
     '''
     
-    def __init__(self,GraphIn,GraphType = 'Taxons'):
+    def __init__(self, GraphIn, GraphType = 'Taxons'):
         '''
         takes either a graph or a path to a graphML file as input
         
@@ -497,14 +496,15 @@ class CTFactorGraph(FactorGraph):
 
 
 
-
-
 def GenerateCTFactorGraphs(ListOfFactorGraphs,GraphType = 'Taxons'):
+
+    global CTFactorgraph
 
     if type(ListOfFactorGraphs) is not list: ListOfFactorGraphs = [ListOfFactorGraphs]
     for Graph in ListOfFactorGraphs:
         CTFactorgraph = CTFactorGraph (Graph,GraphType) #ListOfCTFactorGraphs.append(CTFactorGraph(Graph,GraphType))
     return CTFactorgraph
+
 
 """
 if __name__== '__main__':

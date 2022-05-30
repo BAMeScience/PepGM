@@ -1,5 +1,4 @@
 #paths to directories
-
 DataDir: 'resources/SampleData/'
 DatabaseDir: 'resources/Databases/'
 ResultsDir: 'results/'
@@ -7,16 +6,17 @@ ResourcesDir: 'resources/'
 TaxidMapping: 'taxidMapping/'
 
 #PeptideShaker and SearchGUI directories
-PeptideShakerDir : "/home/fkistner/pepgm/bin/PeptideShaker-2.1.1"
-SearchGUIDir: "/home/fkistner/pepgm/bin/SearchGUI-4.1.1-mac_and_linux/SearchGUI-4.1.1"
+PeptideShakerDir : '/home/fkistner/pepgm/bin/PeptideShaker-2.1.1/'
+SearchGUIDir: '/home/fkistner/pepgm/bin/SearchGUI-4.1.1-mac_and_linux/SearchGUI-4.1.1/'
+
 
 #Name of folder for the PepGM run in the results folder
-ExperimentName: 'Cowpox_nohostfilter'
+ExperimentName: '5psm_5pep_100protFDR'
 
 #parameters for SearchGUI Search
 searchengines: '-xtandem'
 peptideFDR: '5'
-proteinFDR: '5'
+proteinFDR: '100'
 psmFDR: '5'
 
 #sample specific parameters
@@ -26,9 +26,8 @@ SampleName: 'PXD014913_cowpox_BR'  #needs to be the name of your spectrum file a
 HostName: 'human'
 ReferenceDBName: 'refseqViral'
 ScientificHostName: '"homo sapiens"'
-FilterSpectra: False
-AddHostandCrapToDB: True
-
+FilterSpectra: True       #option to filter out the host spectra and crap
+AddHostandCrapToDB: False   #option to add host and crap to the search db. must be False if previous option is True.s
 
 #PepGM parameters
 TaxaInPlot: 15       #how many taxa should appear in the final results barplot

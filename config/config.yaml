@@ -1,5 +1,4 @@
 #paths to directories
-
 DataDir: 'resources/SampleData/'
 DatabaseDir: 'resources/Databases/'
 ResultsDir: 'results/'
@@ -10,8 +9,9 @@ TaxidMapping: 'taxidMapping/'
 PeptideShakerDir : '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.1.1/'
 SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.1-mac_and_linux/SearchGUI-4.1.1/'
 
+
 #Name of folder for the PepGM run in the results folder
-ExperimentName: 'Cowpox_nohostfilter'
+ExperimentName: 'Sars_CoV_2_auto_taxa'
 
 #parameters for SearchGUI Search
 searchengines: '-xtandem'
@@ -22,13 +22,12 @@ psmFDR: '5'
 #sample specific parameters
 
 SpectraFileType: '.mgf' #'.mgf' or '.mzML'
-SampleName: 'PXD014913_cowpox_BR'  #needs to be the name of your spectrum file and the folder where you have that file
-HostName: 'human'
+SampleName: 'PXD018594_Sars_CoV_2'  #needs to be the name of your spectrum file and the folder where you have that file
+HostName: 'chlorocebus'             #name of your host fasta file
 ReferenceDBName: 'refseqViral'
-ScientificHostName: '"homo sapiens"'
-FilterSpectra: False
-AddHostandCrapToDB: True
-
+ScientificHostName: "'chlorocebus'"
+FilterSpectra: False      #option to filter out the host spectra and crap
+AddHostandCrapToDB: True   #option to add host and crap to the search db. must be False if previous option is True.s  
 
 #PepGM parameters
 TaxaInPlot: 15       #how many taxa should appear in the final results barplot

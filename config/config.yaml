@@ -11,7 +11,7 @@ SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.1-mac_and_linux/
 
 
 #Name of folder for the PepGM run in the results folder
-ExperimentName: 'Sars_CoV_2_auto_taxa'
+ExperimentName: 'Sars_CoV_2_withhostfilter'
 
 #parameters for SearchGUI Search
 searchengines: '-xtandem'
@@ -26,8 +26,8 @@ SampleName: 'PXD018594_Sars_CoV_2'  #needs to be the name of your spectrum file 
 HostName: 'chlorocebus'             #name of your host fasta file
 ReferenceDBName: 'refseqViral'
 ScientificHostName: "'chlorocebus'"
-FilterSpectra: False      #option to filter out the host spectra and crap
-AddHostandCrapToDB: True   #option to add host and crap to the search db. must be False if previous option is True.s  
+FilterSpectra: True      #option to filter out the host spectra and crap
+AddHostandCrapToDB: False   #option to add host and crap to the search db. must be False if previous option is True.s  
 
 #PepGM parameters
 TaxaInPlot: 15       #how many taxa should appear in the final results barplot

@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import matplotlib
 from ete3 import NCBITaxa
-import os
 import argparse
 
 matplotlib.use('Agg')

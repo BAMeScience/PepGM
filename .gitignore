@@ -16,6 +16,7 @@ resources/taxidMapping/accessions.txt
 workflow/scripts/belief_propagation_old.py
 workflow/scripts/CreatePepGMGraph_customJson.py
 workflow/scripts/BarPlotResults_customTaxa.py
+workflow/scripts/PrettyPlots.py
 workflow/scripts/belief_propagation_log.py
 workflow/scripts/__pycache__/*
 

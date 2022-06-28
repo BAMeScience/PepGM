@@ -1,6 +1,4 @@
-"""
-This module initializes the graphical models and adds taxons, peptides and factors.
-"""
+
 import argparse
 from os.path import exists
 from FactorGraphGeneration import *
@@ -23,16 +21,13 @@ args = parser.parse_args()
 # init networkx graph object
 Taxongraph = TaxonGraph()
 Taxongraph.GetAllLeafTaxaFromTaxids(args.targetTaxa[0])
-# only fetch taxon data if the taxon peptide map file doesn't exist yet
+#only fetch TaxonData if the PeptideMap File doesn't exist yet:
 if not exists(args.PeptideMapPath):
     print(exists(args.PeptideMapPath))
     Taxongraph.FetchTaxonData(args.PeptideMapPath, args.sourceDB)
-# add peptides
-Taxongraph.CreateTaxonPeptidegraphFromPSMresults(args.PeptideMapPath, args.PSM_Report, 0.001)
-
-# add factors
+Taxongraph.CreateTaxonPeptidegraphFromPSMresults(args.PSM_Report,args.PeptideMapPath,0.001)
+#Taxongraph.CreateExample()
 Factorgraph = FactorGraph()
 Factorgraph.ConstructFromTaxonGraph(Taxongraph)
 CTFactorgraph = GenerateCTFactorGraphs(Factorgraph)
-# save
 CTFactorgraph.SaveToGraphML(args.out)

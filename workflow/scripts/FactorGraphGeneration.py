@@ -116,7 +116,6 @@ class ProteinPeptideGraph(nx.Graph):
 class TaxonGraph(nx.Graph):
     '''
     class with functions to construct a peptide-taxon graph using entrez/ncbi mapping
-    to consider for the future: local DB versions!!
     '''
     def __init__(self):
         nx.Graph.__init__(self)
@@ -206,6 +205,7 @@ class TaxonGraph(nx.Graph):
             # Find entries matching the query (only swissprot registered proteins for now)
             entrezQuery = sourceDB +' AND txid%s[ORGN]'%(ncbiTaxId) # AND 
             searchResultHandle = Entrez.esearch(db=entrezDbName, term=entrezQuery, retmax = 1000)
+            print(entrezQuery)
             searchResult = Entrez.read(searchResultHandle)
             searchResultHandle.close()
 

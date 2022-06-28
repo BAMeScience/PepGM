@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import os
-import argparse 
 import re 
 import matplotlib
 from matplotlib import pyplot as plt
@@ -15,7 +14,7 @@ ncbi = NCBITaxa()
 
 
 
-def ComputeMetric(resultsfolder, host, output):
+def ComputeMetric(resultsfolder, host, output, weightsfile):
 
     """
     Compute a "goodness" metric for the parameters used in the grid search. 
@@ -25,6 +24,7 @@ def ComputeMetric(resultsfolder, host, output):
     :param resultsfolder: str, path to PepGM resultsfolder
     :param host: str, host to be excluded from the parameter checked taxa
     :param output: str, name of the output .png file 
+    :param weightsfile: str, path to the .csv file containing potential taxids and their weights
     
     """
     
@@ -34,6 +34,26 @@ def ComputeMetric(resultsfolder, host, output):
     SumProportions = []
     Entropies = []
     TaxDistances = []
+    WeightCoeffs = []
+
+    #file with weights of taxids
+    Weights = pd.read_csv(weightsfile)
+    Maxweight = Weights.max()['weight']
+    AllTaxidsToAdd = []
+    #remove 'no match' line from weight DF
+    Weights = Weights[Weights.taxid.isin(['no match'])==False]
+    Weights.drop(Weights[Weights.taxid.isin(['no match'])].index, inplace=True)
+    #add descendant taxa into weight dataframe
+    for Taxid in Weights['taxid']:
+        TaxidsToAdd = ncbi.get_descendant_taxa(Taxid)
+        TaxidsToAdd = [[txd,float((Weights.loc[Weights['taxid']==Taxid]['weight']).to_string(index=False))]for txd in TaxidsToAdd]
+        AllTaxidsToAdd.append(TaxidsToAdd[:])
+       
+    AllTaxidsToAdd = [txd_1 for txd in AllTaxidsToAdd for txd_1 in txd]
+    AllWeights = pd.concat([Weights, pd.DataFrame(AllTaxidsToAdd,columns = ['taxid','weight'])],axis =0)
+
+        
+
     
     for folders in os.listdir(resultsfolder):
         if os.path.isdir(resultsfolder+ '/' + folders):
@@ -51,9 +71,12 @@ def ComputeMetric(resultsfolder, host, output):
                     TaxIDS = TaxIDS.sort_values('score', ascending = False)
                     TaxIDS = TaxIDS[TaxIDS.ID.isin(HostTaxidList)==False]
                     TaxIDS.drop(TaxIDS[TaxIDS.ID.isin(HostTaxidList)].index, inplace=True)
-        
-            
                     #compute the metric
+                    
+                    #what's the weight of the highest scoring taxid?
+                    Weight = AllWeights.loc[AllWeights['taxid']==int(TaxIDS.ID.head(1).item())]['weight'].head(1).item()
+                    WeightCoeff = Weight/Maxweight
+                    WeightCoeffs.append(WeightCoeff)
     
                     #compare the posterior probbilities
                     FirstSum = np.sum(TaxIDS[:3]['score'])
@@ -69,7 +92,7 @@ def ComputeMetric(resultsfolder, host, output):
                     tree = ncbi.get_topology(FourTaxa)
                     DistanceSum = (tree.get_distance(FourTaxa[0],FourTaxa[1]))**2+tree.get_distance(FourTaxa[1],FourTaxa[2])+tree.get_distance(FourTaxa[2],FourTaxa[3])
                     TaxDistances.append(DistanceSum)
-                    Matching = (1/(Entropy))*SumProportion*(1/DistanceSum)
+                    Matching = (1/(Entropy))*SumProportion*(1/DistanceSum)*WeightCoeff
     
                     Metrics.append(Matching)
     

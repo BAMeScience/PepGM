@@ -27,3 +27,5 @@ graphenv.yml
 
 .snakemake/
 .vscode/
+
+./config/*

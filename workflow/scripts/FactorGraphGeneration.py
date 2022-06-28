@@ -1,18 +1,20 @@
 ''' functions and classes to hold and generate the graphs for the belief propagation algorithm'''
 #implementation of belief propagation on a peptide-protein graph
 #__________________________________________________________________________________________
-import numpy as np
-import networkx as nx
-from collections import namedtuple 
-import pandas as pd
-import Bio.SeqIO
-import re
-import pandas as pd
 import json
+import random
+import re
 import subprocess
-from ete3 import NCBITaxa
+from collections import namedtuple
+
+import Bio.SeqIO
+import networkx as nx
+import numpy as np
+import pandas as pd
 from Bio import Entrez
+from ete3 import NCBITaxa
 from LoadSimplePSMResults import loadSimplePepScore
+
 
 #e-mail for fetching viral protein sequences from entrez 
 Entrez.email = 'tanja.holstein@bam.de'
@@ -28,6 +30,40 @@ peplength = 3
 def normalize(Array):
     normalizedArray = Array/np.sum(Array)
     return normalizedArray
+
+
+def digest(peptide, n_missed_sites=2):
+    """
+    In-situ trypsin digestion of peptides. Creates all possible cleavage products with up to n missed cleavage sites.
+    :param n_missed_sites: int, number of allowed missed cleavage sites
+    :param peptide: str, input peptide sequence
+    :return: lst, digested peptides
+    """
+
+    # in-situ trypsin digestion (without errors)
+    # cut after every R and K except a P follows
+    trypsin_pattern = re.compile(r'(?<=[RK])(?=[^P])')
+    digested_peps = list(re.split(trypsin_pattern, peptide))
+
+    # in-situ trypsin digestion (with up to n errors)
+    # prepare index for slicing
+    # note that the last element of a list slice is not contained in the slice
+    cut = 2
+    counter = 0
+    # initialize limit
+    N = len(digested_peps) - 1
+
+    for n in range(0, n_missed_sites):
+        # shorten the list to avoid indexing error
+        for i in range(0, N - counter):
+            missed_peptide = "".join(digested_peps[i:i+cut])
+            # sequentially append to list
+            digested_peps.append(missed_peptide)
+        counter += 1
+        cut += 1
+
+    return digested_peps
+
 
 class ProteinPeptideGraph(nx.Graph):
     
@@ -117,7 +153,7 @@ class TaxonGraph(nx.Graph):
 
             self.TaxidList = self.TaxidList+TaxidList
     
-    def GetAllLeafTaxaFromTaxids(self,TaxidFile,StrainResolution = True):
+    def GetAllLeafTaxaFromTaxids(self, TaxidFile, StrainResolution = True):
         
         with open(TaxidFile) as Taxids:
             
@@ -189,70 +225,73 @@ class TaxonGraph(nx.Graph):
             json.dump(saveLists,savefile)
 
 
-    def CreateTaxonPeptideGraph(self,proteinListFile,minScore,minPeplength = 5,maxPeplength = 30,LCA=False):
-        
-        #read proteinlists from file that recorded the NCBI matches
-        with open(proteinListFile) as file:
-            ProteinTaxidDict = json.load(file)
+    def CreateTaxonPeptideGraph(self, map, min_score, min_pep_len=5, max_pep_len=30):
+        """
+        Initialize graphical model consisting of nodes (taxons, peptides) and edges (mapping).
+        :param map: lst, taxon-peptide map
+        :param min_score: int, score cutoff
+        :param min_pep_len: int, peptide length lower limit
+        :param max_pep_len: int, peptide length upper limit
+        """
 
+        # read proteinlists from file that recorded the NCBI matches
+        with open(map) as file:
+            mapped_pep_dict = json.load(file)
 
         #loop digesting and adding the peptides to the graph, connecting to the corresponding taxid nodes
-
-        for Taxid,AAsequences in ProteinTaxidDict.items():
-
-            for AAsequence in AAsequences:
-
-                cpdt = subprocess.check_output(['./cp-dt --sequence ' +AAsequence+ ' --peptides'], shell = True).decode('utf-8')
-                peptideList = cpdt.split('\n')
-                peptideList.pop(0)
-                peptideList = [str[9:].split(': ') for str in peptideList]
-                del peptideList[-3:]                                    #last three elements from cp-dt oupput are empty
-                peptideList = [pep for pep in peptideList if minPeplength <= len(pep[0]) <= maxPeplength]
-              
-                PeptideNodes = tuple((pep[0],{'InitialBelief_0':1-float(pep[-1]),'InitialBelief_1': float(pep[-1]), 'category':'peptide'})  for pep in peptideList if float(pep[-1])>minScore)
-                TaxonPeptideEdges = tuple((Taxid,pep[0]) for pep in PeptideNodes)
-                
-                #in this version, peptide nodes that already exist and are added again are ignored/ if they attributes differ, they are overwritten. 
+        for taxid, peptides in mapped_pep_dict.items():
+            for seq in peptides:
+                # digest with trypsin and filter for length
+                digested_peps = [pep for pep in digest(seq) if min_pep_len <= len(pep) <= max_pep_len]
+                # initialize peptide nodes
+                pep_nodes = tuple((pep[0],{'InitialBelief_0':1-float(pep[-1]),
+                                           'InitialBelief_1': float(pep[-1]), 'category':'peptide'})
+                                  for pep in digested_peps if float(pep[-1]) > min_score)
+                taxon_pep_edges = tuple((taxid, pep[0]) for pep in pep_nodes)
+                # in this version, peptide nodes that already exist and are added again are ignored/
+                # if they attributes differ, they are overwritten.
                 # conserves peptide graph structure, score will come from DB search engines anyways
-                self.add_nodes_from(PeptideNodes)
-                self.add_edges_from(TaxonPeptideEdges)
+                self.add_nodes_from(pep_nodes)
+                self.add_edges_from(taxon_pep_edges)
 
 
-    def CreateTaxonPeptidegraphFromPSMresults(self,PSMResultsFile,proteinListFile,minScore,minPeplength = 5,maxPeplength = 30,LCA=False):
 
-        #read proteinlists from file that recorded the NCBI matches
-        with open(proteinListFile) as file:
-            ProteinTaxidDict = json.load(file)
+    def CreateTaxonPeptidegraphFromPSMresults(self, map, psm_report, min_score, min_pep_len=5, max_pep_len=30):
+        """
+        Initialize graphical model consisting of nodes (taxons, peptides) and edges (mapping).
 
-        Pepnames,Pepscores = loadSimplePepScore(PSMResultsFile)
-        PepScoreDict = dict(zip(Pepnames,Pepscores))
-        
+        :param map: str, path to taxon-peptide map
+        :param psm_report: str, path to psm report
+        :param min_score: int, score cutoff
+        :param min_pep_len: int, peptide length lower limit
+        :param max_pep_len: int, peptide length upper limit
+        """
 
-        for Taxid,AAsequences in ProteinTaxidDict.items():
+        # read proteinlists from file that recorded the NCBI matches
+        with open(map) as file:
+            mapped_pep_dict = json.load(file)
 
-            self.add_node(Taxid, category='taxon')
+        pepnames, pepscores = loadSimplePepScore(psm_report)
+        pepscore_dict = dict(zip(pepnames, pepscores))
 
-            for AAsequence in AAsequences:
+        for taxid, peptides in mapped_pep_dict.items():
+            self.add_node(taxid, category='taxon')
+            for seq in peptides:
+                # digest with trypsin and filter for length
+                digested_peps = [pep for pep in digest(seq) if min_pep_len <= len(pep) <= max_pep_len]
+                selected_peps = [pep for pep in pepnames if pep in digested_peps]
+                # initialize peptide nodes
+                pep_nodes = tuple((pep,
+                                   {'InitialBelief_0': 1 - pepscore_dict[pep] / 100,
+                                    'InitialBelief_1': pepscore_dict[pep] / 100, 'category': 'peptide'})
+                                  for pep in selected_peps if pepscore_dict[pep] > min_score)
 
-                cpdt = subprocess.check_output(['./../../bin/cp-dt --sequence ' +AAsequence+ ' --peptides'], shell = True).decode('utf-8')
-                peptideList = cpdt.split('\n')
-                peptideList.pop(0)
-                peptideList = [str[9:].split(': ') for str in peptideList]
-                del peptideList[-3:]                                    #last three elements from cp-dt oupput are empty
-                peptideList = [pep for pep in peptideList if minPeplength <= len(pep[0]) <= maxPeplength]
-
-                peptideList = [pep[0] for pep in peptideList]
-
-                SelectedPeps = [pep for pep in Pepnames if pep in peptideList]
-                PeptideNodes = tuple((pep,{'InitialBelief_0':1-PepScoreDict[pep]/100,'InitialBelief_1':PepScoreDict[pep]/100, 'category':'peptide'})  for pep in SelectedPeps if PepScoreDict[pep]>minScore)
-                TaxonPeptideEdges = tuple((Taxid,pep[0]) for pep in PeptideNodes)
-                   
-
-                #in this version, peptide nodes that already exist and are added again are ignored/ if they attributes differ, they are overwritten. 
+                taxon_pep_edges = tuple((taxid, pep[0]) for pep in pep_nodes)
+                # in this version, peptide nodes that already exist and are added again are ignored/
+                # if they attributes differ, they are overwritten.
                 # conserves peptide graph structure, score will come from DB search engines anyways
-                self.add_nodes_from(PeptideNodes)
-                self.add_edges_from(TaxonPeptideEdges)
-
+                self.add_nodes_from(pep_nodes)
+                self.add_edges_from(taxon_pep_edges)
 
 
 
@@ -306,7 +345,7 @@ class FactorGraph(nx.Graph):
                 
         return [self]
 
-    def ConstructFromTaxonGraph(self,TaxonPeptideGraph):
+    def ConstructFromTaxonGraph(self, TaxonPeptideGraph):
         ''''
         Takes a graph of Taxa to peptides in networkx form as input and adds the factor nodes
         '''
@@ -346,7 +385,7 @@ class CTFactorGraph(FactorGraph):
     This class is a networkx graph representing the full graphical model with all variables, CTrees, and Noisy-OR factors
     '''
     
-    def __init__(self,GraphIn,GraphType = 'Taxons'):
+    def __init__(self, GraphIn, GraphType = 'Taxons'):
         '''
         takes either a graph or a path to a graphML file as input
         
@@ -457,9 +496,9 @@ class CTFactorGraph(FactorGraph):
 
 
 
-
-
 def GenerateCTFactorGraphs(ListOfFactorGraphs,GraphType = 'Taxons'):
+
+    global CTFactorgraph
 
     if type(ListOfFactorGraphs) is not list: ListOfFactorGraphs = [ListOfFactorGraphs]
     for Graph in ListOfFactorGraphs:
@@ -467,6 +506,7 @@ def GenerateCTFactorGraphs(ListOfFactorGraphs,GraphType = 'Taxons'):
     return CTFactorgraph
 
 
+"""
 if __name__== '__main__':
     Taxongraph = TaxonGraph()
     #Taxongraph.GetAllLeafTaxa(['adenoviridae'])
@@ -480,3 +520,4 @@ if __name__== '__main__':
 
     CTFactorgraphs = GenerateCTFactorGraphs(Factorgraph)
     CTFactorgraphs.SaveToGraphML('/home/tholstei/repos/PepGM_all/PepGM/graph.graphml')
+"""

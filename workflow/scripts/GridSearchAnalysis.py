@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import os
-import argparse 
 import re 
 import matplotlib
 from matplotlib import pyplot as plt
@@ -44,7 +43,6 @@ def ComputeMetric(resultsfolder, host, output, weightsfile):
     #remove 'no match' line from weight DF
     Weights = Weights[Weights.taxid.isin(['no match'])==False]
     Weights.drop(Weights[Weights.taxid.isin(['no match'])].index, inplace=True)
-    print(Weights)
     #add descendant taxa into weight dataframe
     for Taxid in Weights['taxid']:
         TaxidsToAdd = ncbi.get_descendant_taxa(Taxid)
@@ -73,13 +71,10 @@ def ComputeMetric(resultsfolder, host, output, weightsfile):
                     TaxIDS = TaxIDS.sort_values('score', ascending = False)
                     TaxIDS = TaxIDS[TaxIDS.ID.isin(HostTaxidList)==False]
                     TaxIDS.drop(TaxIDS[TaxIDS.ID.isin(HostTaxidList)].index, inplace=True)
-
-
-            
                     #compute the metric
                     
                     #what's the weight of the highest scoring taxid?
-                    Weight = AllWeights.loc[AllWeights['taxid']==int(TaxIDS.ID.head(1).item())]['weight'].item()
+                    Weight = AllWeights.loc[AllWeights['taxid']==int(TaxIDS.ID.head(1).item())]['weight'].head(1).item()
                     WeightCoeff = Weight/Maxweight
                     WeightCoeffs.append(WeightCoeff)
     

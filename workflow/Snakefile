@@ -1,10 +1,10 @@
 
 #configuration
 WorkflowPath = os.path.dirname(os.path.realpath(workflow.snakefile))
-include: WorkflowPath +'/snakefiles/config.snakefile'
-include : WorkflowPath + '/snakefiles/searchgui+pepshaker.snakefile'
-include : WorkflowPath + '/snakefiles/buildDatabase.snakefile'
-include : WorkflowPath + '/snakefiles/filterHostCrap.snakefile'
+include: WorkflowPath +'/rules/config.smk'
+include : WorkflowPath + '/rules/searchgui+pepshaker.smk'
+include : WorkflowPath + '/rules/buildDatabase.smk'
+include : WorkflowPath + '/rules/filterHostCrap.smk'
 
 
 rule all:

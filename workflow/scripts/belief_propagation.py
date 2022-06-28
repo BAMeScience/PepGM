@@ -365,6 +365,7 @@ class Messages():
 
     #compute updated messages for all edges
     def ComputeUpdate(self, localloops = False):
+        
 
         self.ListOfCTs = [] #keeps track of which CT has already been active
 
@@ -378,8 +379,6 @@ class Messages():
                 StartName = self.MaxVal[1]
                 self.SingleEdgeDirectionUpdate(StartName, EndName)
             
-
-
         else:
             for edge in self.Graph.edges():
                 #update all edges
@@ -399,13 +398,13 @@ class Messages():
             self.FullResidual[(StartName, EndName)] = self.ComputeResidual(StartName, EndName)
                 
                 
-            
 
-        
-    
-    
-    #send only the message with largest Residual
     def updateResidualMessage(self,Residual):
+
+        '''
+        check which message Residual has the largest residual and updates that message in self.Msg
+        :param Residual: dict, residuals of the last belief propagation iteration
+        '''
 
         self.MaxVal = max(Residual, key = Residual.get)
         self.Msg[self.MaxVal] = self.MsgNew[self.MaxVal]
@@ -414,8 +413,13 @@ class Messages():
     
     
 
-    #run the loopy BP, returns number of iterations
     def LoopyLoop(self,maxLoops, tolerance,local = False):
+        '''
+        Run the loopy belief propagation algorithm
+        :param maxLoops: int, maximum number of iterations in case of non-convergence
+        :param tolerance: float, toleance for convergence check
+        :param local: Bool, parameter passed to Computed Update function
+        '''
         
         if not isinstance(local,bool):
             raise TypeError("localloops needs to be boolean")
@@ -470,6 +474,13 @@ class Messages():
 
 #calibration through message passing of all subgraphs in the List of factor graphs
 def CalibrateAllSubgraphs(ListOfCTFactorGraphs, MaxIterations, Tolerance,local = False):
+    '''
+    Performs bayesian inferencethrough loopy belief propgation, returns dictionary {variable:posterior_probability}
+    :param ListOfCTFactorGraphs: list, contains FactorGraph objects on which inference can be performed
+    :param MaxIterations: int, max number of iterations in case of non-convergence
+    :param Tolerance: float, error tolerance between messages for convergence criterion
+    :param local: Bool, whether loops are calculated locally
+    '''
 
     if not isinstance(ListOfCTFactorGraphs,list):
         raise TypeError("ListOfFactorGraphs needs to be a list of graphs")    
@@ -495,6 +506,12 @@ def CalibrateAllSubgraphs(ListOfCTFactorGraphs, MaxIterations, Tolerance,local =
 
 #save the resulstsdictionary from CalibrateAllSubgraphs to a csv file
 def SaveResultsToCsv(ResultsDict,NodeDict,NameString):
+    '''
+    Save Loopy Belief Propagation results to .csv file
+    :param ResultsDict: dict, {variable:posterior_probability}
+    :param NodeDict: dict, dictionary of nodes that were in the factor graph and their attributes, to include the node category in the results
+    :param NameString: str, csv ouptut path
+    '''
 
     if not isinstance(NameString,str):
        raise TypeError("AddNameString needs to a string with Info on your run")

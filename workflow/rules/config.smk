@@ -6,6 +6,8 @@ ResultsDir = config['ResultsDir'] + config['ExperimentName'] +'/'
 ResourcesDir = config['ResourcesDir']
 TaxidMapping = config['TaxidMapping']
 ResultsDirStrain = config['ResultsDir']
+SamplePath = config['SamplePath']
+ParametersFile = config['ParametersFile']
 
 
 PeptideShakerDir = config['PeptideShakerDir']
@@ -20,7 +22,6 @@ psmFDR = config['psmFDR']
 FilterSpectra = config['FilterSpectra']
 AddHostandCrapToDB = config['AddHostandCrapToDB']
 ExperimentName = config['ExperimentName']
-SpectraFileType = config['SpectraFileType']
 SampleName = config['SampleName']
 HostName = config['HostName']
 ScientificHostName = config['ScientificHostName']

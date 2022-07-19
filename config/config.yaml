@@ -4,10 +4,12 @@ DatabaseDir: 'resources/Databases/'
 ResultsDir: 'results/'
 ResourcesDir: 'resources/'
 TaxidMapping: 'taxidMapping/'
+SamplePath: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD018594_Sars_CoV_2/PXD018594_Sars_CoV_2.mgf'
+ParametersFile: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD018594_Sars_CoV_2/PXD018594_Sars_CoV_2.par'
 
 #PeptideShaker and SearchGUI directories
-PeptideShakerDir : '/home/fkistner/pepgm/bin/PeptideShaker-2.1.1/'
-SearchGUIDir: '/home/fkistner/pepgm/bin/SearchGUI-4.1.1-mac_and_linux/SearchGUI-4.1.1/'
+PeptideShakerDir : '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.2.9/'
+SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.14/'
 
 
 #Name of folder for the PepGM run in the results folder
@@ -21,7 +23,6 @@ psmFDR: '5'
 
 #sample specific parameters
 
-SpectraFileType: '.mgf' #'.mgf' or '.mzML'
 SampleName: 'PXD018594_Sars_CoV_2'  #needs to be the name of your spectrum file and the folder where you have that file
 HostName: 'chlorocebus'             #name of your host fasta file
 ReferenceDBName: 'refseqViral'

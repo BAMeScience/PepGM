@@ -5,6 +5,8 @@ include: WorkflowPath +'/rules/config.smk'
 include : WorkflowPath + '/rules/searchgui+pepshaker.smk'
 include : WorkflowPath + '/rules/buildDatabase.smk'
 include : WorkflowPath + '/rules/filterHostCrap.smk'
+include : WorkflowPath + '/rules/XTandem.smk'
+include : WorkflowPath + '/rules/MS2Rescore.smk'
 
 
 rule all:

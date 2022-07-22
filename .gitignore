@@ -10,6 +10,7 @@ resources/taxidMapping/protacc2taxids_virus.txt
 resources/taxidMapping/accessions_hashed.npy
 resources/taxidMapping/taxids.txt
 resources/taxidMapping/accessions.txt
+resources/taxidMapping/protacc2taxids_virus.txt
 
 .snakemake/*
 

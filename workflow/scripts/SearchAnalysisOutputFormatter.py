@@ -1,61 +1,65 @@
+""" This module formats grid search results and generates a phylo tree."""
+import argparse
+
 from GridSearchAnalysis import *
 from PhyloTreeView import *
-import pandas as pd
-import os
-import argparse 
-from ete3 import NCBITaxa
-
-parser = argparse.ArgumentParser(description = 'Downstream analysis of the grid search for the PepGM algorithm')
-parser.add_argument('--resultsfolder', required = True, help = 'folder with the results from the beliefpropagation in csv format')
-parser.add_argument('--out', required=True, help ='output png file')
-parser.add_argument('--host', required =True, help = 'name of the host, to be excluded from parameter checked taxa')
-parser.add_argument('--reference_db',required = True, help = 'name of the reference datasbe used to include in the filepath string')
-parser.add_argument('--weights', required = True, help = 'path to the file of weighted taxids')
-
-args = parser.parse_args()
-
-ncbi = NCBITaxa()
 
 
-def SaveReducedCSV(filepath,host,output):
-    '''
-    Saves CSV of the 20 best results to a file in the main results folder
-    :param filepath: str, path of cvs to be reduced
-    :param host: str,if included in the search results, the host will be excluded from the results list
-    :param output: str,output path of csv
-    '''
-        
-    HostTaxid = ncbi.get_name_translator([host])[host][0]
-    HostTaxidList = [str(i) for i in ncbi.get_descendant_taxa(HostTaxid)]+[str(HostTaxid)]
-            
-    Results = pd.read_csv(filepath,names = ['ID','score','type'])
-    TaxIDS = Results.loc[Results['type']=='taxon']
-    TaxIDS.loc[:,'score'] = pd.to_numeric(TaxIDS['score'],downcast = 'float')
-    TaxIDS = TaxIDS.sort_values('score', ascending = False)
-    TaxIDS = TaxIDS[TaxIDS.ID.isin(HostTaxidList)==False]
-    TaxIDS.drop(TaxIDS[TaxIDS.ID.isin(HostTaxidList)].index, inplace=True)
-    
-    TaxIDS.to_csv(output)
-           
+def SaveReducedCSV(results_gridsearch, host, output):
+    """
+    Save best results.
+    :param results_gridsearch: str, path of cvs to be reduced
+    :param host: str, if included in the search results, the host will be excluded from the results list
+    :param output: str, output path
+
+    """
+    host_taxid = ncbi.get_name_translator([host])[host][0]
+    host_taxid_list = [str(i) for i in ncbi.get_descendant_taxa(host_taxid)] + [str(host_taxid)]
+
+    results_df = pd.read_csv(results_gridsearch, names=['ID', 'score', 'type'])
+    # filter tax ids
+    tax_ids = results_df.loc[results_df['type'] == 'taxon']
+    # convert to numeric
+    tax_ids.loc[:, 'score'] = pd.to_numeric(tax_ids['score'], downcast='float')
+    tax_ids = tax_ids.sort_values('score', ascending=False)
+    # drop all non host taxids
+    tax_ids = tax_ids[tax_ids.ID.isin(host_taxid_list) == False]
+    tax_ids.drop(tax_ids[tax_ids.ID.isin(host_taxid_list)].index, inplace=True)
+    tax_ids.to_csv(output, index=False)
 
 
-def MoveBestResultsPlot(filepath,out):
-    '''
-    Copies barplot of best identifiedparameter set to main resultsfolder
+def MoveBestResultsPlot(filepath, out):
+    """
+    Copy bar plot to results folder.
     :param filepath: list, the three grid search parameters identified as best for the sample at hand
     :param out: output path where the file will be copied
 
-    '''
-    os.system('cp '+filepath +' '+out)
+    """
+    os.system('cp ' + filepath + ' ' + out)
 
 
-#analyse the PepGM grid search with an empirical metric, retrieve best parameters
-Parameters = ComputeMetric(args.resultsfolder, args.host, args.out,args.weights)
-Resultsfile = args.resultsfolder+'/Prior'+str(Parameters[2]) +'/'+ args.reference_db + '_PepGM_Results_a'+str(Parameters[0])+'_b'+str(Parameters[1])+'_p'+str(Parameters[2])
+if __name__ == "__main__":
+    # init argparser
+    parser = argparse.ArgumentParser(description='Downstream analysis of grid search results.')
+    required = parser.add_argument_group('required arguments')
+    required.add_argument('--results', required=True, help='path to folder with raw results from belief propagation (.csv)')
+    required.add_argument('--out', required=True, help='output path to save parameter grid search results')
+    required.add_argument('--host', required=True, help='name of the host: to be excluded from parameter checked taxa')
+    required.add_argument('--refdb', required=True, help='name of the reference database')
+    required.add_argument('--weights', required=True, help='path to file with weighted taxids')
+    args = parser.parse_args()
 
-#save the reduced results csv
-SaveReducedCSV(Resultsfile+'.csv', args.host, args.resultsfolder +'/PepGm_Results.csv')
-MoveBestResultsPlot(Resultsfile+'.png',args.resultsfolder+'/PepGM_ResultsPlot.png')
+    # init NCBI API
+    ncbi = NCBITaxa()
 
-#save a phylogenetic tree view of the PepGm results
-CreatePhyloTreeView(Resultsfile+'.csv',args.host, args.resultsfolder + '/PhyloTreeView.png')
+    # score grid search results with empirical metric
+    parameter = ComputeMetric(args.results, args.host, args.out, args.weights)
+    results = args.results + '/Prior' + str(parameter[2]) + '/' + args.refdb + '_PepGM_Results_a' + str(
+        parameter[0]) + '_b' + str(parameter[1]) + '_p' + str(parameter[2])
+
+    # save the reduced results as csv
+    SaveReducedCSV(results + '.csv', args.host, args.results + '/PepGm_Results.csv')
+    MoveBestResultsPlot(results + '.png', args.results + '/PepGM_ResultsPlot.png')
+
+    # save a phylogenetic tree view of grid search results
+    CreatePhyloTreeView(results + '.csv', args.host, args.results + '/PhyloTreeView.png')

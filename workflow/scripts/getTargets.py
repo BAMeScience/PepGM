@@ -1,19 +1,10 @@
 import argparse
 import linecache
-import os
 
 import mmh3
 import numba as nb
 import numpy as np
 import pandas as pd
-
-parser = argparse.ArgumentParser(description = 'Find ')
-parser.add_argument('-rq', '--path_to_raw_query', help='path to raw query')
-parser.add_argument('-q', '--path_to_query', help='path to processed query')
-parser.add_argument('-d', '--path_to_database', help='path to hashed database')
-parser.add_argument('-r', '--path_to_mapped_taxids', help='path to results')
-parser.add_argument('-t', '--path_to_taxids', nargs='*')
-args = parser.parse_args()
 
 
 def save(output_path, result):
@@ -35,7 +26,7 @@ def preprocess_query(input_path, output_path):
     :param output_path:
     :return: df, dataframe with split accessions and their weights
     """
-    raw = pd.read_csv(input_path, sep = '\t', error_bad_lines=False, usecols=['Protein(s)'])
+    raw = pd.read_csv(input_path, sep='\t', error_bad_lines=False, usecols=['Protein(s)'])
     raw.columns = ['accession']
     raw['weight'] = 1 / (raw.accession.str.count(',') + 1)
     raw['accession'] = raw.accession.apply(lambda x: x.split(','))
@@ -98,7 +89,7 @@ def lines2taxids(match, path):
     return taxids
 
 
-def score(df, taxids, output_path, subset=30):
+def score(df, taxids, output_path):
     """
     Score taxids according to their confidence and select the ones which are top scoring.
 
@@ -110,17 +101,28 @@ def score(df, taxids, output_path, subset=30):
     df['taxid'] = taxids
     df_score = df.groupby('taxid')['weight'].sum().reset_index()
     df_score = df_score.sort_values(by=['weight'], ascending=False)
-    df_score.head(subset).to_csv(output_path[:-4] +'_weights.csv',index= False)
-    top_scoring_taxids = df_score.taxid[0:subset].tolist()
+    threshold = df_score.weight.median()
+    top_scoring_df = df_score.loc[df_score["weight"] >= threshold]
+    top_scoring_df.to_csv(output_path[:-4] + '_weights.csv', index=False)
+    top_scoring_taxids = top_scoring_df.taxid.tolist()
     save(output_path, top_scoring_taxids)
 
 
-# prepare
-df_accession = preprocess_query(args.path_to_raw_query, args.path_to_query)
-query_accessions = hash_query(args.path_to_query)
-database_accessions = np.load(args.path_to_database)
-# lookup
-lookup = query_database(database_accessions, query_accessions)
-taxids = lines2taxids(lookup, args.path_to_taxids[0])
-# score
-score(df_accession, taxids, args.path_to_mapped_taxids)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Find ')
+    parser.add_argument('-rq', '--path_to_raw_query', help='path to raw query')
+    parser.add_argument('-q', '--path_to_query', help='path to processed query')
+    parser.add_argument('-d', '--path_to_database', help='path to hashed database')
+    parser.add_argument('-r', '--path_to_mapped_taxids', help='path to results')
+    parser.add_argument('-t', '--path_to_taxids', nargs='*')
+    args = parser.parse_args()
+
+    # prepare
+    df_accession = preprocess_query(args.path_to_raw_query, args.path_to_query)
+    query_accessions = hash_query(args.path_to_query)
+    database_accessions = np.load(args.path_to_database)
+    # lookup
+    lookup = query_database(database_accessions, query_accessions)
+    taxids = lines2taxids(lookup, args.path_to_taxids[0])
+    # score
+    score(df_accession, taxids, args.path_to_mapped_taxids)

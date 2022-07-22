@@ -256,7 +256,7 @@ class TaxonGraph(nx.Graph):
 
 
 
-    def CreateTaxonPeptidegraphFromPSMresults(self, map, psm_report, min_score, min_pep_len=5, max_pep_len=30):
+    def CreateTaxonPeptidegraphFromPSMresults(self, psm_report, map, min_score, min_pep_len=5, max_pep_len=30):
         """
         Initialize graphical model consisting of nodes (taxons, peptides) and edges (mapping).
 

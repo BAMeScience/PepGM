@@ -1,7 +1,7 @@
 results/*
 !results/.gitkeep
 
-resources/*
+resources/
 !resources/.gitkeep
 !resources/Databases/.gitkeep
 !resources/SampleData/.gitkeep

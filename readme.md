@@ -1,4 +1,4 @@
-<h2> PGM for Metaproteomic and virus strain identification <\h2>
+<h2> PepGM: a probaiblistic graphical model for virus strain identification <\h2>
 
 A snakemake workflow <br>
 

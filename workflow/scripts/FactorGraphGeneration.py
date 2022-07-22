@@ -66,8 +66,9 @@ def digest(peptide, n_missed_sites=2):
 
 
 class ProteinPeptideGraph(nx.Graph):
-    
-    #class for stroing the protein-peptide graph with scores and priors but no factors, e.g for visual representation
+    '''
+    class for stroing the protein-peptide graph with scores and priors but no factors, e.g for visual representation
+    '''
     
     def ProteinsFromStringData(self,StringDirectory,pProteinprior):
         StringDirectory = StringDirectory

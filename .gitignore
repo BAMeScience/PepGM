@@ -1,8 +1,8 @@
 results/*
 !results/.gitkeep
 
-resources/
-
+resources/*
+resources/taxidMapping/
 !resources/Databases/.gitkeep
 !resources/SampleData/.gitkeep
 

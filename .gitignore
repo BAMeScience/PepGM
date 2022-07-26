@@ -2,9 +2,8 @@ results/*
 !results/.gitkeep
 
 **/resources
-resources/taxidMapping/
-!resources/Databases/.gitkeep
-!resources/SampleData/.gitkeep
+**/resources/taxidMapping
+
 
 
 .snakemake/*

@@ -5,7 +5,7 @@ rule catDatabase:
 
      output: ResourcesDir + TaxidMapping + "protacc2taxids_virus.txt"
 
-     shell: "cat {input[0]} {input[1]} {input[2]} > protacc2taxids_virus.txt"
+     shell: "cat > protacc2taxids_virus.txt"
 
 
 rule splitToAccessions:

@@ -1,8 +1,16 @@
 results/*
 !results/.gitkeep
 
-**/resources
-**/resources/taxidMapping
+**/Databases
+**/SampleData
+**/ncbi_dumpfiles
+**/XTandem
+**/taxadb
+resources/taxidMapping/accessions_hashed.npy
+resources/taxidMapping/accessions.txt
+resources/taxidMapping/protacc2taxids_virus.txt
+resources/taxidMapping/taxids.txt
+
 
 
 

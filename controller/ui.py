@@ -5,12 +5,14 @@ import os
 import re
 import subprocess
 import sys
+import webbrowser
+from os.path import exists as file_exists
 
 import PySimpleGUI as sg
 import yaml
 
-from layout import scaffold
-import webbrowser
+import layout
+
 
 def run_command(cmd, timeout=None, window=None):
     """
@@ -27,18 +29,18 @@ def run_command(cmd, timeout=None, window=None):
     return retval, output
 
 
-def parse_config(input):
+def parse_config(settings):
     """
     Parse user input into a list that creates config file.
     """
-    config_file_name = input["config_file_name"]
+    config_file_name = settings["config_file_name"]
 
     # remove old config file
     if os.path.exists(f"../config/{config_file_name}"):
         os.remove(f"../config/{config_file_name}")
 
     # remove unnecessary entries
-    configs = {k: input[k] for k in input if not re.match('^Browse', k)}
+    configs = {k: settings[k] for k in settings if not re.match('^Browse', k)}
 
     # parser
     for key, _ in configs.items():
@@ -50,10 +52,6 @@ def parse_config(input):
             configs[key] = str(int(configs[key]))
         elif key in ("TaxaInPlot", "TaxaInProteinCount"):
             configs[key] = int(configs[key])
-        elif key == "ScientificHostName":
-            configs[key] = '"' + configs[key] + '"'
-        elif key in ("PeptideShakerDir", "SearchGUIDir", "DataDir", "DatabaseDir"):
-            configs[key] = str(configs[key] + '/')
         elif key in ("searchengines", "ResourcesDir", "ResultsDir", "TaxidMapping"):
             configs[key] = str(configs[key])
 
@@ -61,31 +59,48 @@ def parse_config(input):
     with open(f"../config/{config_file_name}", "w") as outfile:
         yaml.safe_dump(configs, outfile, default_flow_style=None)
 
+
 if __name__ == "__main__":
     sg.theme("SystemDefaultForReal")
 
-    # initialize window
-    window = sg.Window(title="Run PepGM", layout=scaffold, resizable=True)
-    while True:
-        event, values = window.Read()
-        # run button
-        if event == 'Run':
-            parse_config(values)
-            cores = int(values["core_number"])
-            snakemake_cmd = f"cd ..; snakemake --cores {cores} -p"
-            print(snakemake_cmd)
-            run_command(cmd=snakemake_cmd, window=window)
+    # load config settings if already present
+    if file_exists("../config/config.yaml"):
+        # load yaml
+        with open("../config/config.yaml", 'r') as config_file:
+            configs = yaml.load(config_file, Loader=yaml.FullLoader)
+        scaffold = layout.setup(configs["ExperimentName"], configs["SampleName"], configs["HostName"],
+                                configs["ScientificHostName"], configs["ReferenceDBName"], configs["SamplePath"],
+                                configs["ParametersFile"], configs["DataDir"], configs["DatabaseDir"],
+                                configs["PeptideShakerDir"], configs["SearchGUIDir"], configs["Alpha"], configs["Beta"],
+                                configs["prior"], configs["psmFDR"], configs["peptideFDR"], configs["proteinFDR"],
+                                configs["TaxaInPlot"], configs["TaxaInProteinCount"], configs["sourceDB"])
+    # set up fresh GUI else
+    else:
+        scaffold = layout.setup()
 
-        # dry run button
-        if event == 'Dry run':
-            parse_config(values)
-            snakemake_cmd = f"cd ..; snakemake -np"
-            run_command(cmd=snakemake_cmd, window=window)
+# initialize window
+window = sg.Window(title="Run PepGM", layout=scaffold, resizable=True)
+while True:
+    event, values = window.Read()
 
-        # help pages are on GitHub
-        if event == 'Help':
-            webbrowser.open("https://github.com/BAMeScience/PepGM/blob/master/readme.md")
+    # run button
+    if event == 'Run':
+        parse_config(values)
+        cores = int(values["core_number"])
+        snakemake_cmd = f"cd ..; snakemake --cores {cores} -p"
+        print(snakemake_cmd)
+        run_command(cmd=snakemake_cmd, window=window)
 
-        # exit
-        if event in (None, 'Exit'):
-            break
+    # dry run button
+    if event == 'Dry run':
+        parse_config(values)
+        snakemake_cmd = f"cd ..; snakemake -np"
+        run_command(cmd=snakemake_cmd, window=window)
+
+    # help pages are on GitHub
+    if event == 'Help':
+        webbrowser.open("https://github.com/BAMeScience/PepGM/blob/master/readme.md")
+
+    # exit
+    if event in (None, 'Exit'):
+        break

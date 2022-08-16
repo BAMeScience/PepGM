@@ -6,14 +6,13 @@ rule catDatabase:
 
      output: ResourcesDir + TaxidMapping + 'protacc2taxids_virus.txt'
 
-     shell: 'cat {input} > {output}'
+     shell: "cat {input} > {output}"
 
 
 rule splitToAccessions:
      input: ResourcesDir + TaxidMapping + 'protacc2taxids_virus.txt'
      output: ResourcesDir + TaxidMapping + 'accessions.txt'
-     shell:
-        'awk '{{print $1}}' {input} > {output}'
+     shell: "awk '{{print $1}}' {input} > {output}"
 
 
 rule splitToTaxids:
@@ -22,7 +21,7 @@ rule splitToTaxids:
      output:
           ResourcesDir + TaxidMapping + 'taxids.txt'
      shell:
-          'awk '{{print $2}}' {input} > {output}'
+          "awk '{{print $2}}' {input} > {output}"
 
 
 rule hashDatabase:
@@ -32,4 +31,4 @@ rule hashDatabase:
           ResourcesDir + TaxidMapping + 'accessions_hashed.npy'
      conda: 'envs/graphenv.yml'
      shell:
-          'python3 workflow/scripts/hashDatabase.py --i {input}  --o {output}'
+          "python3 workflow/scripts/hashDatabase.py --i {input}  --o {output}"

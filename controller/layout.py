@@ -1,4 +1,4 @@
-""" This module generates the layout by combining frames."""
+""" Combine frames."""
 from PySimpleGUI import Frame, Input, Button, Output, Text, theme
 
 import frames

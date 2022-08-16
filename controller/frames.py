@@ -1,4 +1,4 @@
-""" This module builds gui frames that are imported in the gui layout. """
+""" Build GUI layout. """
 from PySimpleGUI import Col, Input, Frame, FolderBrowse, FileBrowse, Slider, InputText, Text, Combo, Radio, theme
 
 theme("SystemDefaultForReal")

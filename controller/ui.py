@@ -1,3 +1,5 @@
+""""Main for GUI."""
+
 import json
 import os
 import re
@@ -10,9 +12,10 @@ import yaml
 from layout import scaffold
 import webbrowser
 
-sg.theme("SystemDefaultForReal")
-
 def run_command(cmd, timeout=None, window=None):
+    """
+    Display snakemake run details in a windows inside the GUI.
+    """
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output = ""
     for line in p.stdout:
@@ -24,15 +27,18 @@ def run_command(cmd, timeout=None, window=None):
     return retval, output
 
 
-def parse_config(values):
-    config_file_name = values["config_file_name"]
+def parse_config(input):
+    """
+    Parse user input into a list that creates config file.
+    """
+    config_file_name = input["config_file_name"]
 
     # remove old config file
     if os.path.exists(f"../config/{config_file_name}"):
         os.remove(f"../config/{config_file_name}")
 
-    # remove unnecessary entries from gui
-    configs = {k: values[k] for k in values if not re.match('^Browse', k)}
+    # remove unnecessary entries
+    configs = {k: input[k] for k in input if not re.match('^Browse', k)}
 
     # parser
     for key, _ in configs.items():
@@ -51,33 +57,35 @@ def parse_config(values):
         elif key in ("searchengines", "ResourcesDir", "ResultsDir", "TaxidMapping"):
             configs[key] = str(configs[key])
 
+    # save
     with open(f"../config/{config_file_name}", "w") as outfile:
         yaml.safe_dump(configs, outfile, default_flow_style=None)
 
+if __name__ == "__main__":
+    sg.theme("SystemDefaultForReal")
 
-# initialize window
-window = sg.Window(title="Run PepGM", layout=scaffold, resizable=True)
+    # initialize window
+    window = sg.Window(title="Run PepGM", layout=scaffold, resizable=True)
+    while True:
+        event, values = window.Read()
+        # run button
+        if event == 'Run':
+            parse_config(values)
+            cores = int(values["core_number"])
+            snakemake_cmd = f"cd ..; snakemake --cores {cores} -p"
+            print(snakemake_cmd)
+            run_command(cmd=snakemake_cmd, window=window)
 
-# main
-while True:
-    event, values = window.Read()
-    # run button
-    if event == 'Run':
-        parse_config(values)
-        cores = int(values["core_number"])
-        snakemake_cmd = f"cd ..; snakemake --cores {cores} -p"
-        print(snakemake_cmd)
-        run_command(cmd=snakemake_cmd, window=window)
+        # dry run button
+        if event == 'Dry run':
+            parse_config(values)
+            snakemake_cmd = f"cd ..; snakemake -np"
+            run_command(cmd=snakemake_cmd, window=window)
 
-    # dry run button
-    if event == 'Dry run':
-        parse_config(values)
-        snakemake_cmd = f"cd ..; snakemake -np"
-        run_command(cmd=snakemake_cmd, window=window)
+        # help pages are on GitHub
+        if event == 'Help':
+            webbrowser.open("https://github.com/BAMeScience/PepGM/blob/master/readme.md")
 
-    if event == 'Help':
-        #TODO: replace private GitLab by public GitHub link
-        webbrowser.open("https://git.bam.de/tholstei/pepgm/-/blob/master/readme.md")
-
-    if event in (None, 'Exit'):
-        break
+        # exit
+        if event in (None, 'Exit'):
+            break

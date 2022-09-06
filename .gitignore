@@ -31,3 +31,11 @@ workflow/Sars_strains.snakefile
 .vscode/
 
 ./config/*
+.idea/deployment.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/PepGM.iml
+.idea/snakemake-settings.xml
+.idea/vcs.xml

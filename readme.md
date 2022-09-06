@@ -143,8 +143,20 @@ mamba create -c conda-forge -c bioconda -n <your_snakemake_env> snakemake
 
 <!-- USAGE EXAMPLES -->
 ## Usage
-
 ### Using the graphical user interface
+The Graphical User Interface (GUI) is designed to run Snakemake workflows without modifying 
+a configuration file in a text editor. The config file is automatically generated when pressing
+the Run button. 
+
+<details>
+  <summary>Details on frames</summary>
+   Config file panel <br>
+   Run panel <br>
+   Input files panel <br>
+   Input directories panel <br>
+   SearchGUI settings <br>
+   PepGM settings <br>
+</details>
 
 <div align="center">
   <a href=https://git.bam.de/tholstei/pepgm/>
@@ -156,6 +168,10 @@ mamba create -c conda-forge -c bioconda -n <your_snakemake_env> snakemake
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Through the command line
+<details>
+  <summary>Details</summary>
+  
+</details>
 
 <!-- ROADMAP -->
 ## Roadmap

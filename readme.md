@@ -69,15 +69,15 @@ PepGM is a probabilistic graphical model embedded into a snakemake workflow for 
 developed by the the eScience group at BAM (Federal Institute for Materials Research and Testing).
 
 The PepGM workflow includes the following steps:
+
 0. Optional host and cRAP filtering step
-1. SearchDB cleanup : cRAP DB ist added, host is added (if wanted), duplicate entries are removed using seqkit. generation of target-decoy DB using searchCLI <br>
-2. Peptide search using searchCLI + PeptideShaker. Generation of a a peptide list <br>
-3. All descendant strain of the target taxa are queried in the NCBI protein DB (possibility to filter swissprot only/all/refseq onlyetc) through the NCBI API. scripts: CreatePepGMGraph.py and FactorGraphGeneration.py<br>
-4. Donwloaded protein recordes are digested using cp-dt and queried again the protein ID list to generate a bipartite taxon-peptide graph scripts: CreatePepGMGraph.py and FactorGraphGeneration.py<br>
-5. The bipartite graph is transformed into a factor graph using convolution trees and conditional probability table factors (CPD). scripts: CreatePepGMGraph.py and FactorGraphGeneration.py<br>
-6. For different sets of CPD parameters, the belief propagation algorithm is run until convergence to obtain the posterior probabilites of the taxa. scripts: belief_propagation.py and PepGM.py <br>
-7. Through an  empirically deduced metric, the ideal parameter set is inferred. script GridSearchAnalysis.py <br>
-8. For this ideal parameter set, we output a results barchart and phylogenetic tree view showcasing the 15 best scoring tax. scripts: BarPlotResults, PhyloTreeView.py<br> 
+1. SearchDB cleanup : cRAP DB ist added, host is added (if wanted), duplicate entries are removed using seqkit. generation of target-decoy DB using searchCLI. Susequent peptide search using searchCLI + PeptideShaker. Generation of a a peptide list <br>
+2. All descendant strains of the target taxa are queried in the NCBI protein DB  through the NCBI API. scripts: GetTargets.py, CreatePepGMGraph.py and FactorGraphGeneration.py<br>
+3. Downloaded protein recordes are digested and queried against the protein ID list to generate a bipartite taxon-peptide graph. scripts: CreatePepGMGraph.py and FactorGraphGeneration.py<br>
+4. The bipartite graph is transformed into a factor graph using convolution trees and conditional probability table factors (CPD). scripts: CreatePepGMGraph.py and FactorGraphGeneration.py<br>
+5. For different sets of CPD parameters, the belief propagation algorithm is run until convergence to obtain the posterior probabilites of the taxa. scripts: belief_propagation.py and PepGM.py <br>
+6. Through an  empirically deduced metric, the ideal parameter set is inferred. script GridSearchAnalysis.py <br>
+7. For this ideal parameter set, we output a results barchart and phylogenetic tree view showcasing the 15 best scoring tax. scripts: BarPlotResults, PhyloTreeView.py<br> 
 
 <div align="center">
   <a href=https://git.bam.de/tholstei/pepgm/>
@@ -113,7 +113,7 @@ Download the necessary files at the following link:
 * PeptideShaker : [http://compomics.github.io/projects/searchgui](http://compomics.github.io/projects/searchgui)
 
 PepGM is a snakemake workflow. Installing snakemake requires mamba.
-PepGM was tested using snakemake 
+PepGM was tested using snakemake 5.10.0. 
 
 To install mamba:
   ```sh

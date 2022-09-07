@@ -35,29 +35,32 @@ def parse_config(settings):
     """
     config_file_name = settings["config_file_name"]
 
-    # remove old config file
     if os.path.exists(f"../config/{config_file_name}"):
-        os.remove(f"../config/{config_file_name}")
+        with open(f"../config/{config_file_name}", "r") as stream:
+            try:
+                configs = yaml.safe_load(stream)
+            except yaml.YAMLError as exc:
+                print(exc)
 
-    # remove unnecessary entries
-    configs = {k: settings[k] for k in settings if not re.match('^Browse', k)}
+    else:
+        # parser
+        configs = {k: settings[k] for k in settings if not re.match('^Browse', k)}
+        for key, _ in configs.items():
+            if key in ('Alpha', 'Beta', 'prior'):
+                configs[key] = json.loads(configs[key])
+            elif key in ("AddHostandCrapToDB", "FilterSpectra"):
+                configs[key] = bool(configs[key])
+            elif key in ("peptideFDR", "proteinFDR", "psmFDR"):
+                configs[key] = str(int(configs[key]))
+            elif key in ("TaxaInPlot", "TaxaInProteinCount"):
+                configs[key] = int(configs[key])
+            elif key in ("searchengines", "ResourcesDir", "ResultsDir", "TaxidMapping"):
+                configs[key] = str(configs[key])
 
-    # parser
-    for key, _ in configs.items():
-        if key in ('Alpha', 'Beta', 'prior'):
-            configs[key] = json.loads(configs[key])
-        elif key in ("AddHostandCrapToDB", "FilterSpectra"):
-            configs[key] = bool(configs[key])
-        elif key in ("peptideFDR", "proteinFDR", "psmFDR"):
-            configs[key] = str(int(configs[key]))
-        elif key in ("TaxaInPlot", "TaxaInProteinCount"):
-            configs[key] = int(configs[key])
-        elif key in ("searchengines", "ResourcesDir", "ResultsDir", "TaxidMapping"):
-            configs[key] = str(configs[key])
-
-    # save
-    with open(f"../config/{config_file_name}", "w") as outfile:
-        yaml.safe_dump(configs, outfile, default_flow_style=None)
+        # save
+        with open(f"../config/{config_file_name}", "w") as outfile:
+            yaml.safe_dump(configs, outfile, default_flow_style=None)
+        # remove unnecessary entries
 
 
 if __name__ == "__main__":
@@ -73,13 +76,15 @@ if __name__ == "__main__":
                                 configs["ParametersFile"], configs["DataDir"], configs["DatabaseDir"],
                                 configs["PeptideShakerDir"], configs["SearchGUIDir"], configs["Alpha"], configs["Beta"],
                                 configs["prior"], configs["psmFDR"], configs["peptideFDR"], configs["proteinFDR"],
-                                configs["TaxaInPlot"], configs["TaxaInProteinCount"], configs["sourceDB"])
+                                configs["TaxaInPlot"], configs["TaxaInProteinCount"], configs["sourceDB"], configs["APImail"],
+                                configs["APIkey"])
     # set up fresh GUI else
     else:
         scaffold = layout.setup()
 
 # initialize window
-window = sg.Window(title="Run PepGM", layout=scaffold, resizable=True)
+window = sg.Window(title="Run PepGM", layout=scaffold, resizable=True, scaling=True, grab_anywhere=True,
+                   auto_size_text=True, auto_size_buttons=True)
 while True:
     event, values = window.Read()
 
@@ -102,5 +107,5 @@ while True:
         webbrowser.open("https://github.com/BAMeScience/PepGM/blob/master/readme.md")
 
     # exit
-    if event in (None, 'Exit'):
+    if event == 'Stop':
         break

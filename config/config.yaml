@@ -1,20 +1,25 @@
+APImail: 'tanja.holstein@bam.de'
+APIkey: 'cbd119d8a7d988bc27f5b0a722a7c861f408'
+
+config_file_name: 'config.yaml'
+
 #paths to directories
 DataDir: 'resources/SampleData/'
 DatabaseDir: 'resources/Databases/'
 ResultsDir: 'results/'
 ResourcesDir: 'resources/'
 TaxidMapping: 'taxidMapping/'
-SamplePath: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD014913_cowpox_BR/PXD014913_cowpox_BR.mgf'
-ParametersFile: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD014913_cowpox_BR/PXD014913_cowpox_BR.par'
+SamplePath: '/home/fkistner/pepgm/resources/SampleData/PXD014913_cowpox_BR/PXD014913_cowpox_BR.mgf'
+ParametersFile: '/home/fkistner/pepgm/resources/SampleData/PXD014913_cowpox_BR/PXD014913_cowpox_BR.par'
 
 #PeptideShaker and SearchGUI directories
 #PeptideShaker and SearchGUI directories
-PeptideShakerDir : '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.2.9/'
-SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.14/'
+PeptideShakerDir : '/home/fkistner/pepgm/bin/PeptideShaker-2.2.9/'
+SearchGUIDir: '/home/fkistner/pepgm/bin/SearchGUI-4.1.14/'
 
 
 #Name of folder for the PepGM run in the results folder
-ExperimentName: 'Cowpox_cowpox_removed'
+ExperimentName: '5pepFDR'
 
 #parameters for SearchGUI Search
 searchengines: '-xtandem'
@@ -27,7 +32,7 @@ psmFDR: '5'
 SpectraFileType: '.mgf' #'.mgf' or '.mzML'
 SampleName: 'PXD014913_cowpox_BR'  #needs to be the name of your spectrum file and the folder where you have that file
 HostName: 'human'
-ReferenceDBName: 'refseqViralwocpxv'
+ReferenceDBName: 'refseqViral'
 ScientificHostName: "'homo sapiens'"
 FilterSpectra: False       #option to filter out the host spectra and crap
 AddHostandCrapToDB: True   #option to add host and crap to the search db. must be False if previous option is True.s  

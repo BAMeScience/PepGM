@@ -71,7 +71,7 @@ developed by the the eScience group at BAM (Federal Institute for Materials Rese
 The PepGM workflow includes the following steps:
 
 0. Optional host and cRAP filtering step
-1. SearchDB cleanup : cRAP DB ist added, host is added (if wanted), duplicate entries are removed using seqkit. generation of target-decoy DB using searchCLI. Susequent peptide search using searchCLI + PeptideShaker. Generation of a a peptide list <br>
+1. SearchDB cleanup : cRAP DB ist added, host is added (if wanted), duplicate entries are removed using [seqkit](https://bioinf.shenwei.me/seqkit/). generation of target-decoy DB using searchCLI. Susequent peptide search using searchCLI + PeptideShaker. Generation of a a peptide list <br>
 2. All descendant strains of the target taxa are queried in the NCBI protein DB  through the NCBI API. scripts: GetTargets.py, CreatePepGMGraph.py and FactorGraphGeneration.py<br>
 3. Downloaded protein recordes are digested and queried against the protein ID list to generate a bipartite taxon-peptide graph. scripts: CreatePepGMGraph.py and FactorGraphGeneration.py<br>
 4. The bipartite graph is transformed into a factor graph using convolution trees and conditional probability table factors (CPD). scripts: CreatePepGMGraph.py and FactorGraphGeneration.py<br>
@@ -87,7 +87,8 @@ The PepGM workflow includes the following steps:
 
 If you find PepGM helpful for your research, please cite: insert citation
 
-PepGM uses convolution trees. The code for the convolution trees was developed and is described in: [https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507)
+PepGM uses convolution trees. The code for the convolution trees was developed and is described in: [https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507)<br>
+PepGM uses a version of the belief propagatin algorithm with a graphical network architecture previously described in [https://pubs.acs.org/doi/10.1021/acs.jproteome.9b00566](https://pubs.acs.org/doi/10.1021/acs.jproteome.9b00566)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -126,23 +127,37 @@ conda activate <your_env>
 mamba create -c conda-forge -c bioconda -n <your_snakemake_env> snakemake
 ```
 
+
 ### Installation
 
 1. Clone the repo 
    ```sh
    git clone https://github.com/BAMeScience/PepGM.git
    ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
+ In accordance with the Snakemake recommendations, we suggest to save youe data in the 'resources' folder. All outputs will be saved in the 'results' folder.
+
+### Preparation
+
+We recommend using the RefSeq Viral database as a general reference database. It can be downloaded from the NCBI ftp using the following commands:
+  ```sh
+  wget ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/\*.protein.faa.gz &&
+  gzip -d viral.*.protein.faa.gz &&
+  cat viral.*.protein.faa> refseq_viral.fasta &&
+  rm viral.*.protein.faa
+  ```
+
+PepGM uses the NCBI Entrez API. We recommend you create an account with NCBI and generate your own API key, which enable a faster download of strain-level protoemes required by PepGM.<br>
+Find out how to obtain your NCBI API key [here](https://support.nlm.nih.gov/knowledgebase/article/KA-05317/en-us). <br>
+If you decide to create your API key, you wil need to specify it aswell as the e-mail it is associated to in the config file (or the GUI, depending on whether you use the command line or not).
+
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
 
 <!-- USAGE EXAMPLES -->
-## Usage
+## Execution
+
 ### Using the graphical user interface
 The Graphical User Interface (GUI) is designed to run Snakemake workflows without modifying 
 a configuration file in a text editor. The config file is automatically generated when pressing

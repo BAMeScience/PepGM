@@ -1,5 +1,9 @@
 configfile: 'config/config.yaml'
 
+
+EntrezMail = config['APImail']
+EntrezKey = config['APIkey']
+
 DataDirectory = config['DataDir']
 DatabaseDirectory = config ['DatabaseDir']
 ResultsDir = config['ResultsDir'] + config['ExperimentName'] +'/'
@@ -30,9 +34,6 @@ ReferenceDBName = config['ReferenceDBName']
 TaxaInPlot = config['TaxaInPlot']
 TaxaInProteinCount = config['TaxaInProteinCount']
 sourceDB = config['sourceDB']
-
-#TargetTaxa = config['TargetTaxa']
-#firstTarget = config['FirstTarget']
 
 AlphaRange = config['Alpha']
 BetaRange = config['Beta']

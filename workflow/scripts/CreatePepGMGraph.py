@@ -16,7 +16,17 @@ parser.add_argument('--out', type = str, required = True,
                     help = 'Output directory')
 parser.add_argument('--sourceDB',type = str, nargs ='?', const ='',
                     help = 'Name of the DB queried through Entrez.')
+parser.add_argument('--APIkey', type = int, help = 'your NCBI API key if you have one')
+parser.add_argument ('--APImail', help = ' e-mail connected to your NCBI API key' )
 args = parser.parse_args()
+
+
+#e-mail for fetching viral protein sequences from entrez 
+if args.APIkey and args.APImail:
+    Entrez.email = args.APImail
+    Entrez.api_key = args.APIkey
+
+Entrez.tool = 'PepGM'
 
 # init networkx graph object
 Taxongraph = TaxonGraph()

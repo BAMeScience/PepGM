@@ -1,10 +1,7 @@
 ''' functions and classes to hold and generate the graphs for the belief propagation algorithm'''
-#implementation of belief propagation on a peptide-protein graph
 #__________________________________________________________________________________________
 import json
-import random
 import re
-import subprocess
 from collections import namedtuple
 
 import Bio.SeqIO
@@ -14,13 +11,6 @@ import pandas as pd
 from Bio import Entrez
 from ete3 import NCBITaxa
 from LoadSimplePSMResults import loadSimplePepScore
-
-
-#e-mail for fetching viral protein sequences from entrez 
-Entrez.email = 'tanja.holstein@bam.de'
-Entrez.tool = 'PepGM'
-Entrez.api_key = 'cbd119d8a7d988bc27f5b0a722a7c861f408'
-
 
 
 #peptides from cp-dt need to have minimum lenngth <peplength> to be included in the graph

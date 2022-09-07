@@ -1,3 +1,9 @@
+#Entrez API data
+
+APIkey: 'cbd119d8a7d988bc27f5b0a722a7c861f408'
+APImail: 'tanja.holstein@bam.de'
+
+
 #paths to directories
 DataDir: 'resources/SampleData/'
 DatabaseDir: 'resources/Databases/'

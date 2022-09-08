@@ -130,11 +130,11 @@ mamba create -c conda-forge -c bioconda -n <your_snakemake_env> snakemake
 
 ### Installation
 
-1. Clone the repo 
+Clone the repo 
    ```sh
    git clone https://github.com/BAMeScience/PepGM.git
    ```
- In accordance with the Snakemake recommendations, we suggest to save youe data in the 'resources' folder. All outputs will be saved in the 'results' folder.
+In accordance with the Snakemake recommendations, we suggest to save your data in the 'resources' folder. All outputs will be saved in the 'results' folder.
 
 ### Preparation
 

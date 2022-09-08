@@ -13,7 +13,7 @@ def build(ConfigName, ExperimentName, SampleName, HostName, ScientificHostName, 
                          InputText(key="APIkey", default_text=APIkey)]])
     # run frame
     run_frame = Col([
-        [InputText(key="ExperimentName", default_text=ExperimentName, expand_x=True)],
+        [InputText(key="ExperimentName", default_text=ExperimentName, expand_x=True, enable_events=True)],
         [Text("Sample", size=(12, 1)),
          Input(key="SampleName", default_text=SampleName, expand_x=True),
          Text("Host", size=(12, 1)),

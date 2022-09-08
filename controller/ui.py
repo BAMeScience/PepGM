@@ -1,8 +1,4 @@
 """"Main for GUI."""
-
-import json
-import os
-import re
 import subprocess
 import sys
 import webbrowser
@@ -10,8 +6,10 @@ from os.path import exists as file_exists
 
 import PySimpleGUI as sg
 import yaml
+from yaml.loader import SafeLoader
 
 import layout
+import const
 
 
 def run_command(cmd, timeout=None, window=None):
@@ -29,83 +27,98 @@ def run_command(cmd, timeout=None, window=None):
     return retval, output
 
 
-def parse_config(settings):
+def parse_config(configs, config_file_path="../config/config.yaml"):
     """
-    Parse user input into a list that creates config file.
+    Parse configuration from GUI into config file.
+    :param configs: list, configuration as retrieved from GUI
+    :param config_file_path: str, path to config file
     """
-    config_file_name = settings["config_file_name"]
-
-    if os.path.exists(f"../config/{config_file_name}"):
-        with open(f"../config/{config_file_name}", "r") as stream:
-            try:
-                configs = yaml.safe_load(stream)
-            except yaml.YAMLError as exc:
-                print(exc)
-
-    else:
-        # parser
-        configs = {k: settings[k] for k in settings if not re.match('^Browse', k)}
-        for key, _ in configs.items():
-            if key in ('Alpha', 'Beta', 'prior'):
-                configs[key] = json.loads(configs[key])
-            elif key in ("AddHostandCrapToDB", "FilterSpectra"):
-                configs[key] = bool(configs[key])
-            elif key in ("peptideFDR", "proteinFDR", "psmFDR"):
-                configs[key] = str(int(configs[key]))
-            elif key in ("TaxaInPlot", "TaxaInProteinCount"):
-                configs[key] = int(configs[key])
-            elif key in ("searchengines", "ResourcesDir", "ResultsDir", "TaxidMapping"):
-                configs[key] = str(configs[key])
-
-        # save
-        with open(f"../config/{config_file_name}", "w") as outfile:
-            yaml.safe_dump(configs, outfile, default_flow_style=None)
-        # remove unnecessary entries
+    with open(config_file_path, 'w') as config_file_out:
+        # iterate over all dictionary keys and entries that are retrieved from the GUI
+        for key, value in configs.items():
+            # integer
+            if key in ["TaxaInPlot", "TaxaInProteinCount"]:
+                config_file_out.write("%s: %i\n" % (key, int(value)))
+            # bool
+            elif key in ["AddHostandCrapToDB", "FilterSpectra"]:
+                config_file_out.write("%s: %r\n" % (key, bool(value)))
+            # lists needs different formatting
+            elif key in ["Alpha", "Beta", "prior"]:
+                # gridsearch parameter have to be saved in a list with the following format
+                # [0.010000, 0.050000, 0.100000, 0.200000, 0.400000]
+                config_file_out.write("%s: [" % key)
+                # init
+                temp = []
+                digit = ""
+                # merge digits into a float
+                for element in configs[key]:
+                    if element == '(' or element == ')':
+                        continue
+                    if element.isdigit() or element == ".":
+                        digit = digit + element
+                    if element == ",":
+                        temp.append(float(digit))
+                        digit = ""
+                # write merged digits
+                for element in temp:
+                    config_file_out.write("%f," % element)
+                # write end of array
+                config_file_out.write("]\n")
+            # use bool format
+            elif key == "ScientificHostName":
+                config_file_out.write('%s: '"%s"'\n' % (key, value))
+            # use string format
+            else:
+                config_file_out.write("%s: '%s'\n" % (key, value))
 
 
 if __name__ == "__main__":
     sg.theme("SystemDefaultForReal")
-
-    # load config settings if already present
+    # load settings if config file is present
+    # file has to have name 'config.yaml'
     if file_exists("../config/config.yaml"):
         # load yaml
-        with open("../config/config.yaml", 'r') as config_file:
-            configs = yaml.load(config_file, Loader=yaml.FullLoader)
-        scaffold = layout.setup(configs["ExperimentName"], configs["SampleName"], configs["HostName"],
-                                configs["ScientificHostName"], configs["ReferenceDBName"], configs["SamplePath"],
-                                configs["ParametersFile"], configs["DataDir"], configs["DatabaseDir"],
-                                configs["PeptideShakerDir"], configs["SearchGUIDir"], configs["Alpha"], configs["Beta"],
-                                configs["prior"], configs["psmFDR"], configs["peptideFDR"], configs["proteinFDR"],
-                                configs["TaxaInPlot"], configs["TaxaInProteinCount"], configs["sourceDB"], configs["APImail"],
-                                configs["APIkey"])
+        with open("../config/config.yaml") as f:
+            prev_configs = yaml.load(f, Loader=SafeLoader)
+        # auto fill input
+        scaffold = layout.setup(prev_configs["ExperimentName"], prev_configs["SampleName"], prev_configs["HostName"],
+                                prev_configs["ScientificHostName"], prev_configs["ReferenceDBName"],
+                                prev_configs["SamplePath"],
+                                prev_configs["ParametersFile"], prev_configs["DataDir"], prev_configs["DatabaseDir"],
+                                prev_configs["PeptideShakerDir"], prev_configs["SearchGUIDir"], prev_configs["Alpha"],
+                                prev_configs["Beta"],
+                                prev_configs["prior"], prev_configs["psmFDR"], prev_configs["peptideFDR"],
+                                prev_configs["proteinFDR"],
+                                prev_configs["TaxaInPlot"], prev_configs["TaxaInProteinCount"],
+                                prev_configs["sourceDB"], prev_configs["APImail"],
+                                prev_configs["APIkey"])
     # set up fresh GUI else
     else:
         scaffold = layout.setup()
-
-# initialize window
-window = sg.Window(title="Run PepGM", layout=scaffold, resizable=True, scaling=True, grab_anywhere=True,
-                   auto_size_text=True, auto_size_buttons=True)
-while True:
-    event, values = window.Read()
-
-    # run button
-    if event == 'Run':
-        parse_config(values)
-        cores = int(values["core_number"])
-        snakemake_cmd = f"cd ..; snakemake --cores {cores} -p"
-        print(snakemake_cmd)
-        run_command(cmd=snakemake_cmd, window=window)
-
-    # dry run button
-    if event == 'Dry run':
-        parse_config(values)
-        snakemake_cmd = f"cd ..; snakemake -np"
-        run_command(cmd=snakemake_cmd, window=window)
-
-    # help pages are on GitHub
-    if event == 'Help':
-        webbrowser.open("https://github.com/BAMeScience/PepGM/blob/master/readme.md")
-
-    # exit
-    if event == 'Stop':
-        break
+    # initialize window
+    window = sg.Window(title="Run PepGM", layout=scaffold, resizable=True, scaling=True, grab_anywhere=True,
+                       auto_size_text=True, auto_size_buttons=True)
+    # event loop
+    while True:
+        event, values = window.Read()
+        input_key_list = [key for key, value in window.key_dict.items()]
+        # run button
+        if event == 'Run':
+            cores = int(values["core_number"])
+            snakemake_cmd = f"cd ..; snakemake --cores {cores} -p"
+            print(snakemake_cmd)
+            run_command(cmd=snakemake_cmd, window=window)
+        # dry run button
+        if event == 'Dry run':
+            snakemake_cmd = f"cd ..; snakemake -np"
+            run_command(cmd=snakemake_cmd, window=window)
+        # update config file
+        if event == "Read":
+            configs = {key: val for key, val in values.items() if key in const.keys_to_keep}
+            parse_config(configs)
+        # help pages are on GitHub
+        if event == 'Help':
+            webbrowser.open("https://github.com/BAMeScience/PepGM/blob/master/readme.md")
+        # exit
+        if event == 'Exit':
+            break

@@ -158,6 +158,9 @@ If you decide to create your API key, you wil need to specify it aswell as the e
 <!-- USAGE EXAMPLES -->
 ## Execution
 
+### Generating a SearchGUI parameters file
+As PepGM relies on SearchGUI to perform the database search, a SearchGUI parameters file, specifying the database search parameters, has to be provided. The easiest way for generating that file is through the GUI provided by SearchGUI. Should this not be usable for your setup, the CLI to set SearchGUI parameters is described [here](http://compomics.github.io/projects/searchgui#user-defined-modifications)
+
 ### Using the graphical user interface
 The Graphical User Interface (GUI) is designed to run Snakemake workflows without modifying 
 a configuration file in a text editor. The config file is automatically generated when pressing
@@ -183,11 +186,75 @@ the Run button.
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Through the command line
-<details>
-  <summary>Details</summary>
-  
-</details>
 
+PepGM can also be run from the command line. To run the snakemake workflow, you need to be in your PepGM repository and have the Snakemake conda environment activated. Additionally, your .json format config file needs to be up to date. Run the following command 
+```sh
+  snakemake --use-conda --conda-frontend conda --cores <n_cores> 
+  ```
+Where n_cores is the number of cores you want snakemake to use. 
+
+An example of a config file is:
+```json
+#Entrez API data
+
+APIkey: ''
+APImail: ''
+
+
+#paths to directories
+DataDir: 'resources/SampleData/'
+DatabaseDir: 'resources/Databases/'
+ResultsDir: 'results/'
+ResourcesDir: 'resources/'
+TaxidMapping: 'taxidMapping/'
+SamplePath: '/resources/SampleData/PXD014913_cowpox_BR/PXD014913_cowpox_BR.mgf'
+ParametersFile: '/resources/SampleData/PXD014913_cowpox_BR/PXD014913_cowpox_BR.par'
+
+#PeptideShaker and SearchGUI directories
+PeptideShakerDir : '/home/tholstei/repos/bin/PeptideShaker-2.2.9/'
+SearchGUIDir: '/home/tholstei/repos/bin/SearchGUI-4.1.14/'
+
+
+#Name of folder for the PepGM run in the results folder
+ExperimentName: 'Cowpox_cowpox_removed'
+
+#parameters for SearchGUI Search
+searchengines: '-xtandem'
+peptideFDR: '5'
+proteinFDR: '5'
+psmFDR: '5'
+
+#sample specific parameters
+
+SpectraFileType: '.mgf' #'.mgf' or '.mzML'
+SampleName: 'PXD014913_cowpox_BR'  #needs to be the name of your spectrum file and the folder where you have that file
+HostName: 'human'
+ReferenceDBName: 'refseqViral'
+ScientificHostName: "'homo sapiens'"
+FilterSpectra: False       #option to filter out the host spectra and crap
+AddHostandCrapToDB: True   #option to add host and crap to the search db. must be False if previous option is True.s  
+
+#PepGM parameters
+TaxaInPlot: 15       #how many taxa should appear in the final results barplot
+TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
+sourceDB: 'all[FILT]' #choose from entrez query DBs to filter the protein DB with 
+#swissprot[filter]' = only swissprot proteins, refseq[filter] = know refseq proteins, all[filter]', etc: https://www.ncbi.nlm.nih.gov/books/NBK49540/
+
+Alpha: [0.01,0.05,0.1,0.2,0.4,0.6] #increments of parameter alpha to use for the grid earch
+Beta: [0.01,0.05,0.1,0.2,0.4,0.5,0.7] #range of parameter beta to use for the grid search
+prior: [0.1,0.3,0.5]
+```
+
+### Output files
+
+All PepGM output files are saved into the specified results folder. The output files include the following : <br>
+- PepGM_Results.csv: a csv file with the values ID, score, type (contains all taxids under 'ID' and all probabilities under 'score' that were attributed by PepGM) <br>
+- PepGM_ResultsPlot.png : barplot of the 15 highest scoring taxa <br>
+- PhyloTreeView.png : 15 highest scoring taxa projected onto the taxonomic tree together with their score <br>
+- One output folder for each taxon prior that contains the PepGM results ( as .png plot and csv file) for all possible parameter combination <br>
+- _mapped_taxids_weights.csv: csv file of all taxids that had at least one protein map to them and their weight 
+- _PepGM_graph.graphml: graphml file of the graphical model (without convolution tree factors). Usefulo to visualize the graph structure and peptide-taxon connections <br>
+- paramcheck.png: barplot of the metric used to determine the graphical model parameters for the 15 best performing parameter combinations <br> 
 <!-- ROADMAP -->
 ## Roadmap
 

@@ -14,7 +14,6 @@ SamplePath: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD014913
 ParametersFile: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD014913_cowpox_BR/PXD014913_cowpox_BR.par'
 
 #PeptideShaker and SearchGUI directories
-#PeptideShaker and SearchGUI directories
 PeptideShakerDir : '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.2.9/'
 SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.14/'
 

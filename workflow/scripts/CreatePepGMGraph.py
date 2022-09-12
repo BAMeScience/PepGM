@@ -16,7 +16,7 @@ parser.add_argument('--out', type = str, required = True,
                     help = 'Output directory')
 parser.add_argument('--sourceDB',type = str, nargs ='?', const ='',
                     help = 'Name of the DB queried through Entrez.')
-parser.add_argument('--APIkey', type = int, help = 'your NCBI API key if you have one')
+parser.add_argument('--APIkey', help = 'your NCBI API key if you have one')
 parser.add_argument ('--APImail', help = ' e-mail connected to your NCBI API key' )
 args = parser.parse_args()
 

@@ -1,8 +1,8 @@
 configfile: 'config/config.yaml'
 
 
-EntrezMail = config['APImail']
-EntrezKey = config['APIkey']
+APImail = config['APImail']
+APIkey = config['APIkey']
 
 DataDirectory = config['DataDir']
 DatabaseDirectory = config ['DatabaseDir']

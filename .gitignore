@@ -1,6 +1,8 @@
 results/*
 !results/.gitkeep
 
+config/*
+
 **/Databases
 **/SampleData
 **/ncbi_dumpfiles

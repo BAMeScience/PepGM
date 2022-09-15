@@ -162,9 +162,9 @@ If you decide to create your API key, you wil need to specify it aswell as the e
 As PepGM relies on SearchGUI to perform the database search, a SearchGUI parameters file, specifying the database search parameters, has to be provided. The easiest way for generating that file is through the GUI provided by SearchGUI. Should this not be usable for your setup, the CLI to set SearchGUI parameters is described [here](http://compomics.github.io/projects/searchgui#user-defined-modifications)
 
 ### Using the graphical user interface
-The Graphical User Interface (GUI) is designed to run Snakemake workflows without modifying 
-a configuration file in a text editor. The config file is automatically generated when pressing
-the Run button. 
+The Graphical user interface (GUI) is designed to run Snakemake workflows without modifying 
+the configuration file in a text editor. A config file is generated when pressing
+the Read button. Make sure to press the read button when editing the config file in between runs.
 
 <details>
   <summary>Details on frames</summary>

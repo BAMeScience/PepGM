@@ -41,8 +41,10 @@ rule CreateFactorGraph:
         DBname=ReferenceDBName,
         sourceDB=sourceDB,
         ResultsDir=ResultsDir
+        APImail = APImail
+        APIkey = APIkey
     log: ResultsDir + SampleName + '/{DBname}.log'
-    shell: 'python3 workflow/scripts/CreatePepGMGraph.py --sourceDB {params.sourceDB} --targetTaxa {input[1]}  --PSM_Report {input[0]} --PeptideMapPath ' + ResultsDir + '{params.samplename}/Mapped_Taxa_Proteins.json --out {output} &>> {log}'
+    shell: 'python3 workflow/scripts/CreatePepGMGraph.py --APIkey {params.APIkey} --APImail {params.APImail} --sourceDB {params.sourceDB} --targetTaxa {input[1]}  --PSM_Report {input[0]} --PeptideMapPath ' + ResultsDir + '{params.samplename}/Mapped_Taxa_Proteins.json --out {output} &>> {log}'
 
 
 rule RunPepGM:

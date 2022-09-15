@@ -69,15 +69,15 @@ PepGM is a probabilistic graphical model embedded into a snakemake workflow for 
 developed by the the eScience group at BAM (Federal Institute for Materials Research and Testing).
 
 The PepGM workflow includes the following steps:
+
 0. Optional host and cRAP filtering step
-1. SearchDB cleanup : cRAP DB ist added, host is added (if wanted), duplicate entries are removed using seqkit. generation of target-decoy DB using searchCLI <br>
-2. Peptide search using searchCLI + PeptideShaker. Generation of a a peptide list <br>
-3. All descendant strain of the target taxa are queried in the NCBI protein DB (possibility to filter swissprot only/all/refseq onlyetc) through the NCBI API. scripts: CreatePepGMGraph.py and FactorGraphGeneration.py<br>
-4. Donwloaded protein recordes are digested using cp-dt and queried again the protein ID list to generate a bipartite taxon-peptide graph scripts: CreatePepGMGraph.py and FactorGraphGeneration.py<br>
-5. The bipartite graph is transformed into a factor graph using convolution trees and conditional probability table factors (CPD). scripts: CreatePepGMGraph.py and FactorGraphGeneration.py<br>
-6. For different sets of CPD parameters, the belief propagation algorithm is run until convergence to obtain the posterior probabilites of the taxa. scripts: belief_propagation.py and PepGM.py <br>
-7. Through an  empirically deduced metric, the ideal parameter set is inferred. script GridSearchAnalysis.py <br>
-8. For this ideal parameter set, we output a results barchart and phylogenetic tree view showcasing the 15 best scoring tax. scripts: BarPlotResults, PhyloTreeView.py<br> 
+1. SearchDB cleanup : cRAP DB ist added, host is added (if wanted), duplicate entries are removed using [seqkit](https://bioinf.shenwei.me/seqkit/). generation of target-decoy DB using searchCLI. Susequent peptide search using searchCLI + PeptideShaker. Generation of a a peptide list <br>
+2. All descendant strains of the target taxa are queried in the NCBI protein DB  through the NCBI API. scripts: GetTargets.py, CreatePepGMGraph.py and FactorGraphGeneration.py<br>
+3. Downloaded protein recordes are digested and queried against the protein ID list to generate a bipartite taxon-peptide graph. scripts: CreatePepGMGraph.py and FactorGraphGeneration.py<br>
+4. The bipartite graph is transformed into a factor graph using convolution trees and conditional probability table factors (CPD). scripts: CreatePepGMGraph.py and FactorGraphGeneration.py<br>
+5. For different sets of CPD parameters, the belief propagation algorithm is run until convergence to obtain the posterior probabilites of the taxa. scripts: belief_propagation.py and PepGM.py <br>
+6. Through an  empirically deduced metric, the ideal parameter set is inferred. script GridSearchAnalysis.py <br>
+7. For this ideal parameter set, we output a results barchart and phylogenetic tree view showcasing the 15 best scoring tax. scripts: BarPlotResults, PhyloTreeView.py<br> 
 
 <div align="center">
   <a href=https://git.bam.de/tholstei/pepgm/>
@@ -87,7 +87,8 @@ The PepGM workflow includes the following steps:
 
 If you find PepGM helpful for your research, please cite: insert citation
 
-PepGM uses convolution trees. The code for the convolution trees was developed and is described in: [https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507)
+PepGM uses convolution trees. The code for the convolution trees was developed and is described in: [https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507)<br>
+PepGM uses a version of the belief propagatin algorithm with a graphical network architecture previously described in [https://pubs.acs.org/doi/10.1021/acs.jproteome.9b00566](https://pubs.acs.org/doi/10.1021/acs.jproteome.9b00566)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -113,7 +114,7 @@ Download the necessary files at the following link:
 * PeptideShaker : [http://compomics.github.io/projects/searchgui](http://compomics.github.io/projects/searchgui)
 
 PepGM is a snakemake workflow. Installing snakemake requires mamba.
-PepGM was tested using snakemake 
+PepGM was tested using snakemake 5.10.0. 
 
 To install mamba:
   ```sh
@@ -126,25 +127,54 @@ conda activate <your_env>
 mamba create -c conda-forge -c bioconda -n <your_snakemake_env> snakemake
 ```
 
+
 ### Installation
 
-1. Clone the repo 
+Clone the repo 
    ```sh
    git clone https://github.com/BAMeScience/PepGM.git
    ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
+In accordance with the Snakemake recommendations, we suggest to save your data in the 'resources' folder. All outputs will be saved in the 'results' folder.
+
+### Preparation
+
+We recommend using the RefSeq Viral database as a general reference database. It can be downloaded from the NCBI ftp using the following commands:
+  ```sh
+  wget ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/\*.protein.faa.gz &&
+  gzip -d viral.*.protein.faa.gz &&
+  cat viral.*.protein.faa> refseq_viral.fasta &&
+  rm viral.*.protein.faa
+  ```
+
+PepGM uses the NCBI Entrez API. We recommend you create an account with NCBI and generate your own API key, which enable a faster download of strain-level protoemes required by PepGM.<br>
+Find out how to obtain your NCBI API key [here](https://support.nlm.nih.gov/knowledgebase/article/KA-05317/en-us). <br>
+If you decide to create your API key, you wil need to specify it aswell as the e-mail it is associated to in the config file (or the GUI, depending on whether you use the command line or not).
+
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
 
 <!-- USAGE EXAMPLES -->
-## Usage
+## Execution
+
+### Generating a SearchGUI parameters file
+As PepGM relies on SearchGUI to perform the database search, a SearchGUI parameters file, specifying the database search parameters, has to be provided. The easiest way for generating that file is through the GUI provided by SearchGUI. Should this not be usable for your setup, the CLI to set SearchGUI parameters is described [here](http://compomics.github.io/projects/searchgui#user-defined-modifications)
 
 ### Using the graphical user interface
+The Graphical user interface (GUI) is designed to run Snakemake workflows without modifying 
+the configuration file in a text editor. A config file is generated when pressing
+the Read button. Make sure to press the read button when editing the config file in between runs.
+
+<details>
+  <summary>Details on frames</summary>
+   Config file panel <br>
+   Run panel <br>
+   Input files panel <br>
+   Input directories panel <br>
+   SearchGUI settings <br>
+   PepGM settings <br>
+</details>
 
 <div align="center">
   <a href=https://git.bam.de/tholstei/pepgm/>
@@ -157,6 +187,24 @@ mamba create -c conda-forge -c bioconda -n <your_snakemake_env> snakemake
 
 ### Through the command line
 
+PepGM can also be run from the command line. To run the snakemake workflow, you need to be in your PepGM repository and have the Snakemake conda environment activated. Additionally, your .json format config file needs to be up to date. Run the following command 
+```sh
+  snakemake --use-conda --conda-frontend conda --cores <n_cores> 
+  ```
+Where n_cores is the number of cores you want snakemake to use. 
+
+An example of a config file can be found under config/config.yaml
+
+### Output files
+
+All PepGM output files are saved into the specified results folder. The output files include the following : <br>
+- PepGM_Results.csv: a csv file with the values ID, score, type (contains all taxids under 'ID' and all probabilities under 'score' that were attributed by PepGM) <br>
+- PepGM_ResultsPlot.png : barplot of the 15 highest scoring taxa <br>
+- PhyloTreeView.png : 15 highest scoring taxa projected onto the taxonomic tree together with their score <br>
+- One output folder for each taxon prior that contains the PepGM results ( as .png plot and csv file) for all possible parameter combination <br>
+- _mapped_taxids_weights.csv: csv file of all taxids that had at least one protein map to them and their weight 
+- _PepGM_graph.graphml: graphml file of the graphical model (without convolution tree factors). Usefulo to visualize the graph structure and peptide-taxon connections <br>
+- paramcheck.png: barplot of the metric used to determine the graphical model parameters for the 15 best performing parameter combinations <br> 
 <!-- ROADMAP -->
 ## Roadmap
 

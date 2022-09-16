@@ -148,7 +148,7 @@ We recommend using the RefSeq Viral database as a general reference database. It
 
 PepGM uses the NCBI Entrez API. We recommend you create an account with NCBI and generate your own API key, which enable a faster download of strain-level protoemes required by PepGM.<br>
 Find out how to obtain your NCBI API key [here](https://support.nlm.nih.gov/knowledgebase/article/KA-05317/en-us). <br>
-If you decide to create your API key, you wil need to specify it aswell as the e-mail it is associated to in the config file (or the GUI, depending on whether you use the command line or not).
+If you decide to create your API key, you wil need to specify it as well as the e-mail it is associated to in the config file (or the GUI, depending on whether you use the command line or not).
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -163,21 +163,33 @@ As PepGM relies on SearchGUI to perform the database search, a SearchGUI paramet
 
 ### Using the graphical user interface
 The Graphical user interface (GUI) is designed to run Snakemake workflows without modifying 
-the configuration file manually in a text editor. A config file is generated when pressing
-the Read button. Make sure to press the read button when editing the config file in between runs.
+the configuration file manually in a text editor. Write a config file from scratch or edit an existing config file.
+When modifying the config file in between runs, make sure to press the Read button before running. 
 
 <div align="center">
-  <a href=https://git.bam.de/tholstei/pepgm/>
-    <img src="images/gui.png" alt="gui" width="300">
+    <img src="images/gui.png" alt="gui" width="600">
 </div>
 
 <details>
-  <summary>Details on frames</summary>
-    <details> <summary>Config file panel <br> </summary> </details>
-    <details> <summary>Run panel <br> </summary> </details>
+  <summary>Details on frames</summary> <br>
+    <details> <summary>Run panel <br> </summary> 
+    Provide details of your PepGM run. Details are used to fill wildcards that locate input
+    such as raw spectra or reference database files in the PepGM directory. Thus, use file basenames i.e., without file 
+    suffix, or rename accordingly. <br><br>
+    Run: Run name to create a folder in the results directory.  <br>
+    Sample: Sample name that will be used to create a subfolder in the run directory. <br> 
+    Reference: Name of reference database (recommended: refseqViral). <br>
+    Host: Trivial host name. <br>
+    Scientific host: Scientific host name. Retain (scientific) host names from public libraries such as 
+    <a href="http://www.proteomexchange.org/">ProteomeXchange</a> or 
+    <a href="https://www.ebi.ac.uk/pride/">PRIDE</a>. <br>
+    Add host and crap database: Search database is extended by a host and
+    <a href="https://www.thegpm.org/crap/">cRAP</a> database. <br><br> </details>
     <details> <summary>Input panel <br> </summary> </details>
     <details> <summary>Search panel <br> </summary> </details>
     <details> <summary>PepGM panel <br><br> </summary> </details>
+    <details> <summary>Config file panel <br> </summary> </details>
+
 </details>
 
 

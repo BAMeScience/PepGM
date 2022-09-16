@@ -169,22 +169,22 @@ When modifying the config file in between runs, make sure to press the Read butt
 <div align="center">
     <img src="images/gui.png" alt="gui" width="600">
 </div>
-
+<br><br>
 <details>
   <summary>Details on frames</summary> <br>
     <details> <summary>Run panel <br> </summary> 
     Provide details of your PepGM run. Details are used to fill wildcards that locate input
     such as raw spectra or reference database files in the PepGM directory. Thus, use file basenames i.e., without file 
     suffix, or rename accordingly. <br><br>
-    Run: Run name to create a folder in the results directory.  <br>
-    Sample: Sample name that will be used to create a subfolder in the run directory. <br> 
-    Reference: Name of reference database (recommended: refseqViral). <br>
-    Host: Trivial host name. <br>
-    Scientific host: Scientific host name. Retain (scientific) host names from public libraries such as 
+    **Run**: Run name to create a folder in the results directory.  <br>
+    **Sample**: Sample name that will be used to create a subfolder in the run directory. <br> 
+    **Reference**: Name of reference database (recommended: refseqViral). <br>
+    **Host**: Trivial host name. <br>
+    **Scientific host**: Scientific host name. Retain (scientific) host names from public libraries such as 
     <a href="http://www.proteomexchange.org/">ProteomeXchange</a> or 
     <a href="https://www.ebi.ac.uk/pride/">PRIDE</a>. <br>
-    Add host and crap database: Search database is extended by a host and
-    <a href="https://www.thegpm.org/crap/">cRAP</a> database. <br><br> </details>
+    **Add host and crap database**: Search database is extended by a host and
+    <a href="https://www.thegpm.org/crap/">cRAP</a> database.  <br><br> </details>
     <details> <summary>Input panel <br> </summary> </details>
     <details> <summary>Search panel <br> </summary> </details>
     <details> <summary>PepGM panel <br><br> </summary> </details>

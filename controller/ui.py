@@ -3,13 +3,14 @@ import subprocess
 import sys
 import webbrowser
 from os.path import exists as file_exists
+from pathlib import Path
 
 import PySimpleGUI as sg
 import yaml
 from yaml.loader import SafeLoader
 
-import layout
 import const
+import layout
 
 
 def run_command(cmd, timeout=None, window=None):
@@ -29,7 +30,7 @@ def run_command(cmd, timeout=None, window=None):
 
 def parse_config(configs, config_file_path="../config/config.yaml"):
     """
-    Parse configuration from GUI into config file.
+    Write configuration from GUI into config file.
     :param configs: list, configuration as retrieved from GUI
     :param config_file_path: str, path to config file
     """
@@ -73,13 +74,16 @@ def parse_config(configs, config_file_path="../config/config.yaml"):
 
 
 if __name__ == "__main__":
+    ### PRELIMINARIES
     sg.theme("SystemDefaultForReal")
-    # load settings if config file is present
-    # file has to have name 'config.yaml'
-    if file_exists("../config/config.yaml"):
-        # load yaml
-        with open("../config/config.yaml") as f:
-            prev_configs = yaml.load(f, Loader=SafeLoader)
+    # config file has to be in the config directory
+    config_file= Path("../config/config.yaml")
+
+    if not config_file.exists():
+        scaffold = layout.setup()
+    else:
+        # load previous configurations
+        prev_configs = yaml.load(config_file.read_text(), Loader=SafeLoader)
         # auto fill input
         scaffold = layout.setup(prev_configs["ExperimentName"], prev_configs["SampleName"], prev_configs["HostName"],
                                 prev_configs["ScientificHostName"], prev_configs["ReferenceDBName"],
@@ -92,9 +96,6 @@ if __name__ == "__main__":
                                 prev_configs["TaxaInPlot"], prev_configs["TaxaInProteinCount"],
                                 prev_configs["sourceDB"], prev_configs["APImail"],
                                 prev_configs["APIkey"])
-    # set up fresh GUI else
-    else:
-        scaffold = layout.setup()
     # initialize window
     window = sg.Window(title="Run PepGM", layout=scaffold, resizable=True, scaling=True, grab_anywhere=True,
                        auto_size_text=True, auto_size_buttons=True)
@@ -106,6 +107,7 @@ if __name__ == "__main__":
         if event == 'Run':
             cores = int(values["core_number"])
             snakemake_cmd = f"cd ..; snakemake --cores {cores} -p"
+            print("Your snakemake command: \n")
             print(snakemake_cmd)
             run_command(cmd=snakemake_cmd, window=window)
         # dry run button
@@ -118,6 +120,7 @@ if __name__ == "__main__":
             parse_config(configs)
         # help pages are on GitHub
         if event == 'Help':
+            print("You will be redirected to the GitHub help pages.")
             webbrowser.open("https://github.com/BAMeScience/PepGM/blob/master/readme.md")
         # exit
         if event == 'Exit':

@@ -1,16 +1,13 @@
 """ Build GUI layout. """
 from PySimpleGUI import Col, Input, Frame, FolderBrowse, FileBrowse, Slider, InputText, Text, Combo, Radio, theme
 
-theme("SystemDefaultForReal")
-
-
 def build(ConfigName, ExperimentName, SampleName, HostName, ScientificHostName, ReferenceDBName, SamplePath,
           ParametersFile, DataDir, DatabaseDir, PeptideShakerDir, SearchGUIDir, Alpha, Beta, prior, psmFDR,
           peptideFDR, proteinFDR, TaxaInPlot, TaxaInProteinCount, sourceDB, APImail, APIkey):
     # configuration frame
-    config_frame = Col([[InputText(key="config_file_name", default_text=ConfigName, expand_x=True),
-                         InputText(key="APImail", default_text=APImail),
-                         InputText(key="APIkey", default_text=APIkey)]])
+    config_frame = Col([[Text("API mail"),
+                         InputText(key="APImail", default_text=APImail, text_color="grey"), Text('API key'),
+                         InputText(key="APIkey", default_text=APIkey, text_color="grey")]])
     # run frame
     run_frame = Col([
         [InputText(key="ExperimentName", default_text=ExperimentName, expand_x=True, enable_events=True)],

@@ -74,7 +74,6 @@ def parse_config(configs, config_file_path="../config/config.yaml"):
 
 
 if __name__ == "__main__":
-    ### PRELIMINARIES
     sg.theme("SystemDefaultForReal")
     # config file has to be in the config directory
     config_file= Path("../config/config.yaml")

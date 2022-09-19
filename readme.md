@@ -20,14 +20,6 @@
   <p align="center">
     A probabilistic graphical model for taxonomic inference of viral proteome samples with associated confidence scores
     <br />
-    <a href="https://github.com/BAMeScience/repo_name"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/BAMeScience/repo_name">View Demo</a>
-    ·
-    <a href="https://github.com/BAMeScience/repo_name/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/BAMeScience/repo_name/issues">Request Feature</a>
   </p>
 </div>
 
@@ -284,10 +276,8 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Tanja Holstein - [@HolsteinTanja](https://twitter.com/HolsteinTanja) - tanja.holstein@bam.de
-Franziska Kistner - [@tba](https://twitter.com/tba) - franziska.kistner@bam.de
-
-Project Link: [https://github.com/BAMeScience/repo_name](https://github.com/BAMeScience/repo_name)
+Tanja Holstein - [@HolsteinTanja](https://twitter.com/HolsteinTanja) - tanja.holstein@bam.de <br>
+Franziska Kistner - [LinkedIn](https://www.linkedin.com/in/franziska-kistner-58a57b18b) - franziska.kistner@bam.de
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -295,7 +285,6 @@ Project Link: [https://github.com/BAMeScience/repo_name](https://github.com/BAMe
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
-
 * [tba](tba)
 * [tba](tba)
 * [tba](tba)

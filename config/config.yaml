@@ -1,0 +1,41 @@
+""" Exemplary configuration file. Use as template. """
+
+### RUN ###
+ExperimentName: 'Cowpox_cowpox_removed' # Run
+SampleName: 'PXD014913_cowpox_BR'  # Sample
+ReferenceDBName: 'refseqViral' # Reference
+HostName: 'human' # Host
+ScientificHostName: "'homo sapiens'" # Scientific host
+FilterSpectra: False       # Filter host spectra and crap
+AddHostandCrapToDB: True   # Add host and crap to the search db
+
+
+### INPUT ###
+SamplePath: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD014913_cowpox_BR/PXD014913_cowpox_BR.mgf' # Sample spectra
+ParametersFile: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD014913_cowpox_BR/PXD014913_cowpox_BR.par' # Parameter file
+DataDir: 'resources/SampleData/' # Sample
+DatabaseDir: 'resources/Databases/' # Database
+PeptideShakerDir : '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.2.9/' # Peptide Shaker
+SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.14/' # SearchGUI
+ResultsDir: 'results/'
+ResourcesDir: 'resources/'
+TaxidMapping: 'taxidMapping/'
+
+### SEARCH PANEL ###
+searchengines: '-xtandem'
+peptideFDR: '5'
+proteinFDR: '5'
+psmFDR: '5'
+
+
+### CONFIG PANEL ###
+PIkey: ''
+APImail: ''
+
+### PepGM PANEL ###
+TaxaInPlot: 15
+TaxaInProteinCount: 15
+sourceDB: 'all[FILT]'
+Alpha: [0.01,0.05,0.1,0.2,0.4,0.6] # Alpha
+Beta: [0.01,0.05,0.1,0.2,0.4,0.5,0.7] # Beta
+prior: [0.1,0.3,0.5] # prior

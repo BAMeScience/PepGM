@@ -156,7 +156,54 @@ If you decide to create your API key, you wil need to specify it as well as the 
 
 
 <!-- USAGE EXAMPLES -->
-## Execution
+## Usage
+
+### Configuration file 
+PepGM needs a configuration file in `yaml` format to set up the workflow. 
+An exemplary configuration file is provided in `config/config.yaml`. Do not change its location.
+<details>
+  <summary>Details </summary> <br>
+    <details> <summary>Run panel <br> </summary> 
+    Set up the workflow of your PepGM run by providing parameters that fill wildcards to locate input files
+    such as raw spectra or reference database files. Name and pa Thus, use file basenames i.e., without file 
+    suffix, that your files already have or rename them accordingly. <br><br>
+    Run: Run name to create a folder in the results directory.  <br>
+    Sample: Sample name to create a subfolder in the run directory. <br> 
+    Reference: Name of reference database (recommended: refseqViral). <br>
+    Host: Trivial host name. <br>
+    Scientific host: Scientific host name. Retain (scientific) host names from public libraries such as 
+    <a href="http://www.proteomexchange.org/">ProteomeXchange</a> or 
+    <a href="https://www.ebi.ac.uk/pride/">PRIDE</a>. <br>
+    Add host and crap database: Search database is extended by a host and
+    <a href="https://www.thegpm.org/crap/">cRAP</a> database. Mutually exclusive to Filter Spectra.  <br><br> </details>
+    <details> <summary>Input panel <br> </summary> 
+    Specify input file and directory paths. <br><br>
+    Sample spectra: Path to raw spectra file. <br>   
+    Parameter: Path to SearchGUI parameter file. <br>
+    Sample data: Path to directory that contains sample raw spectra files. <br>
+    Database: Path to directory that contains the reference database. <br>
+    Peptide Shaker: Path to directory that contains the Peptide Shaker binary. <br>
+    Search GUI (folder): Path to directory that contains the SearchGUI binary. <br><br>
+    The following paths are part of the recommended project structure for Snakemake workflows. Find out more about
+    reproducible Snakemake workflows
+    <a href="https://snakemake.readthedocs.io/en/stable/snakefiles/deployment.html">here</a>. <br>
+    Resources: Relative path to resources folder <br>
+    Results: Relative path to results folder <br>
+    TaxID mapping: Relative path to folder that contains mapped taxIDs. <br> <br>
+    </details>
+    <details> <summary>Search panel <br> </summary> 
+    Choose a search engine that SearchGUI is using and the desired FDR levels. <br><br>
+    </details>
+    <details> <summary>PepGM panel <br></summary>
+    Grid search: Choose increments for alpha, beta and prior that are to be included in the grid search to tune
+    graphical model parameters. Do not put a comma between values. <br>
+    Results plotting: Number of taxa in the final strain identification barplot. <br><br> 
+    </details>
+    <details> <summary>Config file panel <br> </summary>    
+    Provide your NCBI API mail and key.
+    </details>
+
+</details>
 
 ### Generating a SearchGUI parameters file
 As PepGM relies on SearchGUI to perform the database search, a SearchGUI parameters file, specifying the database search parameters, has to be provided. The easiest way for generating that file is through the GUI provided by SearchGUI. Should this not be usable for your setup, the CLI to set SearchGUI parameters is described [here](http://compomics.github.io/projects/searchgui#user-defined-modifications)
@@ -164,33 +211,11 @@ As PepGM relies on SearchGUI to perform the database search, a SearchGUI paramet
 ### Using the graphical user interface
 The Graphical user interface (GUI) is designed to run Snakemake workflows without modifying 
 the configuration file manually in a text editor. Write a config file from scratch or edit an existing config file.
-When modifying the config file in between runs, make sure to press the Read button before running. 
-
+When modifying the config file in between runs, make sure to press the Read button before running.
 <div align="center">
     <img src="images/gui.png" alt="gui" width="600">
 </div>
 <br><br>
-<details>
-  <summary>Details on frames</summary> <br>
-    <details> <summary>Run panel <br> </summary> 
-    Provide details of your PepGM run. Details are used to fill wildcards that locate input
-    such as raw spectra or reference database files in the PepGM directory. Thus, use file basenames i.e., without file 
-    suffix, or rename accordingly. <br><br>
-    **Run**: Run name to create a folder in the results directory.  <br>
-    **Sample**: Sample name that will be used to create a subfolder in the run directory. <br> 
-    **Reference**: Name of reference database (recommended: refseqViral). <br>
-    **Host**: Trivial host name. <br>
-    **Scientific host**: Scientific host name. Retain (scientific) host names from public libraries such as 
-    <a href="http://www.proteomexchange.org/">ProteomeXchange</a> or 
-    <a href="https://www.ebi.ac.uk/pride/">PRIDE</a>. <br>
-    **Add host and crap database**: Search database is extended by a host and
-    <a href="https://www.thegpm.org/crap/">cRAP</a> database.  <br><br> </details>
-    <details> <summary>Input panel <br> </summary> </details>
-    <details> <summary>Search panel <br> </summary> </details>
-    <details> <summary>PepGM panel <br><br> </summary> </details>
-    <details> <summary>Config file panel <br> </summary> </details>
-
-</details>
 
 
 
@@ -198,13 +223,13 @@ When modifying the config file in between runs, make sure to press the Read butt
 
 ### Through the command line
 
-PepGM can also be run from the command line. To run the snakemake workflow, you need to be in your PepGM repository and have the Snakemake conda environment activated. Additionally, your .json format config file needs to be up to date. Run the following command 
+PepGM can also be run from the command line. To run the snakemake workflow, 
+you need to be in your PepGM repository and have the Snakemake conda environment activated. 
+Run the following command 
 ```sh
   snakemake --use-conda --conda-frontend conda --cores <n_cores> 
   ```
 Where n_cores is the number of cores you want snakemake to use. 
-
-An example of a config file can be found under config/config.yaml
 
 ### Output files
 

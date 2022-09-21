@@ -20,14 +20,6 @@
   <p align="center">
     A probabilistic graphical model for taxonomic inference of viral proteome samples with associated confidence scores
     <br />
-    <a href="https://github.com/BAMeScience/repo_name"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/BAMeScience/repo_name">View Demo</a>
-    ·
-    <a href="https://github.com/BAMeScience/repo_name/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/BAMeScience/repo_name/issues">Request Feature</a>
   </p>
 </div>
 
@@ -148,7 +140,7 @@ We recommend using the RefSeq Viral database as a general reference database. It
 
 PepGM uses the NCBI Entrez API. We recommend you create an account with NCBI and generate your own API key, which enable a faster download of strain-level protoemes required by PepGM.<br>
 Find out how to obtain your NCBI API key [here](https://support.nlm.nih.gov/knowledgebase/article/KA-05317/en-us). <br>
-If you decide to create your API key, you wil need to specify it aswell as the e-mail it is associated to in the config file (or the GUI, depending on whether you use the command line or not).
+If you decide to create your API key, you wil need to specify it as well as the e-mail it is associated to in the config file (or the GUI, depending on whether you use the command line or not).
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -156,30 +148,66 @@ If you decide to create your API key, you wil need to specify it aswell as the e
 
 
 <!-- USAGE EXAMPLES -->
-## Execution
+## Usage
+
+### Configuration file 
+PepGM needs a configuration file in `yaml` format to set up the workflow. 
+An exemplary configuration file is provided in `config/config.yaml`. Do not change its location.
+<details>
+  <summary>Details </summary> <br>
+    <details> <summary>Run panel <br> </summary> 
+    Set up the workflow of your PepGM run by providing parameters that fill wildcards to locate input files
+    such as raw spectra or reference database files. Name and pa Thus, use file basenames i.e., without file 
+    suffix, that your files already have or rename them accordingly. <br><br>
+    Run: Run name to create a folder in the results directory.  <br>
+    Sample: Sample name to create a subfolder in the run directory. <br> 
+    Reference: Name of reference database (recommended: refseqViral). <br>
+    Host: Trivial host name. <br>
+    Scientific host: Scientific host name. Retain (scientific) host names from public libraries such as 
+    <a href="http://www.proteomexchange.org/">ProteomeXchange</a> or 
+    <a href="https://www.ebi.ac.uk/pride/">PRIDE</a>. <br>
+    Add host and crap database: Search database is extended by a host and
+    <a href="https://www.thegpm.org/crap/">cRAP</a> database. Mutually exclusive to Filter Spectra.  <br><br> </details>
+    <details> <summary>Input panel <br> </summary> 
+    Specify input file and directory paths. <br><br>
+    Sample spectra: Path to raw spectra file. <br>   
+    Parameter: Path to SearchGUI parameter file. <br>
+    Sample data: Path to directory that contains sample raw spectra files. <br>
+    Database: Path to directory that contains the reference database. <br>
+    Peptide Shaker: Path to directory that contains the Peptide Shaker binary. <br>
+    Search GUI (folder): Path to directory that contains the SearchGUI binary. <br><br>
+    The following paths are part of the recommended project structure for Snakemake workflows. Find out more about
+    reproducible Snakemake workflows
+    <a href="https://snakemake.readthedocs.io/en/stable/snakefiles/deployment.html">here</a>. <br>
+    Resources: Relative path to resources folder <br>
+    Results: Relative path to results folder <br>
+    TaxID mapping: Relative path to folder that contains mapped taxIDs. <br> <br>
+    </details>
+    <details> <summary>Search panel <br> </summary> 
+    Choose a search engine that SearchGUI is using and the desired FDR levels. <br><br>
+    </details>
+    <details> <summary>PepGM panel <br></summary>
+    Grid search: Choose increments for alpha, beta and prior that are to be included in the grid search to tune
+    graphical model parameters. Do not put a comma between values. <br>
+    Results plotting: Number of taxa in the final strain identification barplot. <br><br> 
+    </details>
+    <details> <summary>Config file panel <br> </summary>    
+    Provide your NCBI API mail and key.
+    </details>
+
+</details>
 
 ### Generating a SearchGUI parameters file
 As PepGM relies on SearchGUI to perform the database search, a SearchGUI parameters file, specifying the database search parameters, has to be provided. The easiest way for generating that file is through the GUI provided by SearchGUI. Should this not be usable for your setup, the CLI to set SearchGUI parameters is described [here](http://compomics.github.io/projects/searchgui#user-defined-modifications)
 
 ### Using the graphical user interface
-The Graphical User Interface (GUI) is designed to run Snakemake workflows without modifying 
-a configuration file in a text editor. The config file is automatically generated when pressing
-the Run button. 
-
-<details>
-  <summary>Details on frames</summary>
-   Config file panel <br>
-   Run panel <br>
-   Input files panel <br>
-   Input directories panel <br>
-   SearchGUI settings <br>
-   PepGM settings <br>
-</details>
-
+The Graphical user interface (GUI) is designed to run Snakemake workflows without modifying 
+the configuration file manually in a text editor. Write a config file from scratch or edit an existing config file.
+When modifying the config file in between runs, make sure to press the Read button before running.
 <div align="center">
-  <a href=https://git.bam.de/tholstei/pepgm/>
-    <img src="images/GUI_surface.png" alt="worklfow scheme" width="300">
+    <img src="images/gui.png" alt="gui" width="600">
 </div>
+<br><br>
 
 
 
@@ -187,13 +215,13 @@ the Run button.
 
 ### Through the command line
 
-PepGM can also be run from the command line. To run the snakemake workflow, you need to be in your PepGM repository and have the Snakemake conda environment activated. Additionally, your .json format config file needs to be up to date. Run the following command 
+PepGM can also be run from the command line. To run the snakemake workflow, 
+you need to be in your PepGM repository and have the Snakemake conda environment activated. 
+Run the following command 
 ```sh
   snakemake --use-conda --conda-frontend conda --cores <n_cores> 
   ```
 Where n_cores is the number of cores you want snakemake to use. 
-
-An example of a config file can be found under config/config.yaml
 
 ### Output files
 
@@ -248,10 +276,8 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Tanja Holstein - [@HolsteinTanja](https://twitter.com/HolsteinTanja) - tanja.holstein@bam.de
-Franziska Kistner - [@tba](https://twitter.com/tba) - franziska.kistner@bam.de
-
-Project Link: [https://github.com/BAMeScience/repo_name](https://github.com/BAMeScience/repo_name)
+Tanja Holstein - [@HolsteinTanja](https://twitter.com/HolsteinTanja) - tanja.holstein@bam.de <br>
+Franziska Kistner - [LinkedIn](https://www.linkedin.com/in/franziska-kistner-58a57b18b) - franziska.kistner@bam.de
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -259,7 +285,6 @@ Project Link: [https://github.com/BAMeScience/repo_name](https://github.com/BAMe
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
-
 * [tba](tba)
 * [tba](tba)
 * [tba](tba)

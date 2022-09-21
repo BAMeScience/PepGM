@@ -1,7 +1,8 @@
 rule catDatabase:
-     input: ResourcesDir + TaxidMapping + "protacc2taxids00",
-     ResourcesDir + TaxidMapping + "protacc2taxids01",
-     ResourcesDir + TaxidMapping + "protacc2taxids02"
+     input: 
+          ResourcesDir + TaxidMapping + "protacc2taxids00",
+          ResourcesDir + TaxidMapping + "protacc2taxids01",
+          ResourcesDir + TaxidMapping + "protacc2taxids02"
 
      output: ResourcesDir + TaxidMapping + "protacc2taxids_virus.txt"
 

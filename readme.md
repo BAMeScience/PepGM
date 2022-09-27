@@ -60,6 +60,8 @@
 PepGM is a probabilistic graphical model embedded into a snakemake workflow for taxonomic inference of viral proteome samples. PepGM was 
 developed by the the eScience group at BAM (Federal Institute for Materials Research and Testing).
 
+Our preprint is out now! You can read it [here](https://www.biorxiv.org/content/10.1101/2022.09.21.508832v1).
+
 The PepGM workflow includes the following steps:
 
 0. Optional host and cRAP filtering step

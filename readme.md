@@ -237,7 +237,7 @@ All PepGM output files are saved into the specified results folder. The output f
 - paramcheck.png: barplot of the metric used to determine the graphical model parameters for the 15 best performing parameter combinations <br> 
 
 ## Toy example
-We have provided a toy example (Cowpox virus Brighton Red) to ease the first steps with PepGM. You will find a reduced 
+We have provided a toy example (<a href="https://www.ebi.ac.uk/pride/archive/projects/PXD014913">Cowpox virus Brighton Red</a>) to ease the first steps with PepGM. You will find a reduced 
 viral reference database only containing peptides from cowpow and cowpox-related strains,
 a SearchGUI parameter file and the host and cRAP peptide sequence database in `/resources`. The cowpox MS2
 spectra can be downloaded 

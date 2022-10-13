@@ -40,4 +40,4 @@ Taxongraph.CreateTaxonPeptidegraphFromPSMresults(args.PSM_Report,args.PeptideMap
 Factorgraph = FactorGraph()
 Factorgraph.ConstructFromTaxonGraph(Taxongraph)
 CTFactorgraph = GenerateCTFactorGraphs(Factorgraph)
-#CTFactorgraph.SaveToGraphML(args.out)
+CTFactorgraph.SaveToGraphML(args.out)

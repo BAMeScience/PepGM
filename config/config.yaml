@@ -1,22 +1,24 @@
-""" Exemplary configuration file. Use as template. """
+### CONFIG PANEL ###
+APIkey: '2a1c4ba4755da2d72691d5a6198b22712408'
+APImail: 'franziska.kistner@bam.de'
 
 ### RUN ###
-ExperimentName: 'Cowpox_cowpox_removed' # Run
-SampleName: 'PXD014913_cowpox_BR'  # Sample
-ReferenceDBName: 'refseqViral' # Reference
-HostName: 'human' # Host
+ExperimentName: 'toy' # Run name
+SampleName: 'Cowpox'  # Sample name (subfolder)
+ReferenceDBName: 'minimal_refseqViral_for_cowpox' # Reference database name
+HostName: 'human' # Host name
 ScientificHostName: "'homo sapiens'" # Scientific host
 FilterSpectra: False       # Filter host spectra and crap
-AddHostandCrapToDB: True   # Add host and crap to the search db
+AddHostandCrapToDB: True   # Add host and crap to the search database (if True, crap.fasta has to be provided)
 
 
 ### INPUT ###
-SamplePath: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD014913_cowpox_BR/PXD014913_cowpox_BR.mgf' # Sample spectra
-ParametersFile: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD014913_cowpox_BR/PXD014913_cowpox_BR.par' # Parameter file
+SamplePath: '/home/fkistner/pepgm/resources/toyExample/spectra_PXD014913_cowpox_minimal_example.mgf' # Sample spectra
+ParametersFile: '/home/fkistner/pepgm/resources/toyExample/parfile_searchgui_PXD014913_cowpox_minimal_example.par' # Parameter file
 DataDir: 'resources/SampleData/' # Sample
-DatabaseDir: 'resources/Databases/' # Database
-PeptideShakerDir : '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.2.9/' # Peptide Shaker
-SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.14/' # SearchGUI
+DatabaseDir: 'resources/Database/' # Database
+PeptideShakerDir : '/home/fkistner/pepgm/bin/PeptideShaker-2.2.9/' # Peptide Shaker
+SearchGUIDir: '/home/fkistner/pepgm/bin/SearchGUI-4.1.14/' # SearchGUI
 ResultsDir: 'results/'
 ResourcesDir: 'resources/'
 TaxidMapping: 'taxidMapping/'
@@ -26,11 +28,6 @@ searchengines: '-xtandem'
 peptideFDR: '5'
 proteinFDR: '5'
 psmFDR: '5'
-
-
-### CONFIG PANEL ###
-PIkey: ''
-APImail: ''
 
 ### PepGM PANEL ###
 TaxaInPlot: 15

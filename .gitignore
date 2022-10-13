@@ -28,3 +28,6 @@ workflow/Sars_strains.snakefile
 .vscode/
 ./config/*
 .idea/*
+
+
+/resources/toyExample/spectra_PXD014913_cowpox_minimal_example.mgf

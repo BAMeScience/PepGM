@@ -202,7 +202,7 @@ An exemplary configuration file is provided in `config/config.yaml`. Do not chan
 ### Generating a SearchGUI parameters file
 As PepGM relies on SearchGUI to perform the database search, a SearchGUI parameters file, specifying the database search parameters, has to be provided. The easiest way for generating that file is through the GUI provided by SearchGUI. Should this not be usable for your setup, the CLI to set SearchGUI parameters is described [here](http://compomics.github.io/projects/searchgui#user-defined-modifications)
 
-### Using the graphical user interface
+### Using the graphical user interface (under development)
 The Graphical user interface (GUI) is designed to run Snakemake workflows without modifying 
 the configuration file manually in a text editor. Write a config file from scratch or edit an existing config file.
 When modifying the config file in between runs, make sure to press the Read button before running.
@@ -235,6 +235,16 @@ All PepGM output files are saved into the specified results folder. The output f
 - _mapped_taxids_weights.csv: csv file of all taxids that had at least one protein map to them and their weight 
 - _PepGM_graph.graphml: graphml file of the graphical model (without convolution tree factors). Usefulo to visualize the graph structure and peptide-taxon connections <br>
 - paramcheck.png: barplot of the metric used to determine the graphical model parameters for the 15 best performing parameter combinations <br> 
+
+## Toy example
+We have provided a toy example (Cowpox virus Brighton Red) to ease the first steps with PepGM. You will find a reduced 
+viral reference database only containing peptides from cowpow and cowpox-related strains,
+a SearchGUI parameter file and the host and cRAP peptide sequence database in `/resources`. The cowpox MS2
+spectra can be downloaded 
+<a href="https://ftp.pride.ebi.ac.uk/pride/data/archive/2020/05/PXD014913/CPXV-0,1MOI-supernatant-HEp-24h.mgf">here</a> (PRIDE ftp archive).
+Download the spectra file to `/resources/toyExample/` and adopt the file name in corresponding
+configuration parameter (refseqViral).
+
 <!-- ROADMAP -->
 ## Roadmap
 

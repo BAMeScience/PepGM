@@ -1,10 +1,10 @@
 ### CONFIG PANEL ###
-APIkey: '2a1c4ba4755da2d72691d5a6198b22712408'
-APImail: 'franziska.kistner@bam.de'
+APIkey: ''
+APImail: ''
 
 ### RUN ###
-ExperimentName: 'toy' # Run name
-SampleName: 'Cowpox'  # Sample name (subfolder)
+ExperimentName: 'toyExample' # Run name
+SampleName: 'cowpox'  # Sample name (subfolder)
 ReferenceDBName: 'minimal_refseqViral_for_cowpox' # Reference database name
 HostName: 'human' # Host name
 ScientificHostName: "'homo sapiens'" # Scientific host
@@ -13,12 +13,12 @@ AddHostandCrapToDB: True   # Add host and crap to the search database (if True, 
 
 
 ### INPUT ###
-SamplePath: '/home/fkistner/pepgm/resources/toyExample/spectra_PXD014913_cowpox_minimal_example.mgf' # Sample spectra
-ParametersFile: '/home/fkistner/pepgm/resources/toyExample/parfile_searchgui_PXD014913_cowpox_minimal_example.par' # Parameter file
+SamplePath: '' # Sample spectra
+ParametersFile: '' # Parameter file
 DataDir: 'resources/SampleData/' # Sample
 DatabaseDir: 'resources/Database/' # Database
-PeptideShakerDir : '/home/fkistner/pepgm/bin/PeptideShaker-2.2.9/' # Peptide Shaker
-SearchGUIDir: '/home/fkistner/pepgm/bin/SearchGUI-4.1.14/' # SearchGUI
+PeptideShakerDir : '' # Peptide Shaker
+SearchGUIDir: '' # SearchGUI
 ResultsDir: 'results/'
 ResourcesDir: 'resources/'
 TaxidMapping: 'taxidMapping/'

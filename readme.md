@@ -99,8 +99,12 @@ PepGM uses a version of the belief propagatin algorithm with a graphical network
 * Your spectrum file in .mgf format
 * A reference database in fasta format (see <a href="#preparation">Preparation</a>) <br>
 * A searchGUI .par parameters file with the database search parameters that can be generated using searchGUI
-<p align="right">(<a href="#top">back to top</a>)</p>
 
+Additonally, you need:
+* NCBI Entrez account
+* 
+
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -147,11 +151,11 @@ We recommend using the RefSeq Viral database as a general reference database. It
   rm viral.*.protein.faa
   ```
 
-PepGM uses the NCBI Entrez API. We recommend you create an account with NCBI and generate your own API key, which enable a faster download of strain-level protoemes required by PepGM.<br>
+PepGM uses the NCBI Entrez API. 
+We recommend you create an account with NCBI and generate your own API key, 
+which enable a faster download of strain-level protoemes required by PepGM.<br>
 Find out how to obtain your NCBI API key [here](https://support.nlm.nih.gov/knowledgebase/article/KA-05317/en-us). <br>
-If you decide to create your API key, you wil need to specify it as well as the e-mail it is associated to in the config file (or the GUI, depending on whether you use the command line or not).
-
-
+If you decide to create your API key, insert your details into the config file.
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
@@ -209,8 +213,8 @@ An exemplary configuration file is provided in `config/config.yaml`. Do not chan
 ### Generating a SearchGUI parameters file
 As PepGM relies on SearchGUI to perform the database search, a SearchGUI parameters file, specifying the database search parameters, has to be provided. The easiest way for generating that file is through the GUI provided by SearchGUI. Should this not be usable for your setup, the CLI to set SearchGUI parameters is described [here](http://compomics.github.io/projects/searchgui#user-defined-modifications)
 
-### Using the graphical user interface (under development)
-The Graphical user interface (GUI) is developed to run Snakemake workflows without modifying 
+### Using the graphical user interface
+The graphical user interface (GUI) is developed to run Snakemake workflows without modifying 
 the configuration file manually in a text editor. You can write a config file from scratch or edit an existing config file.
 When modifying the config file in between runs, make sure to press the Write button before running.
 <div align="center">

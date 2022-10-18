@@ -33,7 +33,6 @@
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
-        <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
     <li><a href="#input">Input</a></li>
@@ -42,6 +41,7 @@
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
+        <li><a href="#preparation">Preparation</a></li>
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
@@ -80,11 +80,13 @@ The PepGM workflow includes the following steps:
     </a>
 </div>
 
-If you find PepGM helpful for your research, please cite: <br>
+<br>
 
-PepGM: A probabilistic graphical model for taxonomic inference of viral proteome samples with associated confidence scores
-Tanja Holstein, Franziska Kistner, Lennart Martens, Thilo Muth
-bioRxiv 2022.09.21.508832; doi: https://doi.org/10.1101/2022.09.21.508832
+If you find PepGM helpful for your research, please cite: <br>
+_PepGM: A probabilistic graphical model for taxonomic inference of viral proteome samples with associated confidence scores  <br>_
+Tanja Holstein, Franziska Kistner, Lennart Martens, Thilo Muth <br>
+bioRxiv 2022.09.21.508832 <br>
+doi: https://doi.org/10.1101/2022.09.21.508832
 
 PepGM uses convolution trees. The code for the convolution trees was developed and is described in: [https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0091507)<br>
 PepGM uses a version of the belief propagatin algorithm with a graphical network architecture previously described in [https://pubs.acs.org/doi/10.1021/acs.jproteome.9b00566](https://pubs.acs.org/doi/10.1021/acs.jproteome.9b00566)
@@ -95,7 +97,7 @@ PepGM uses a version of the belief propagatin algorithm with a graphical network
 
 ## Input
 * Your spectrum file in .mgf format
-* A fasta reference
+* A reference database in fasta format (see <a href="#preparation">Preparation</a>) <br>
 * A searchGUI .par parameters file with the database search parameters that can be generated using searchGUI
 <p align="right">(<a href="#top">back to top</a>)</p>
 

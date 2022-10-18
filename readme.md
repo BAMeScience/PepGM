@@ -1,5 +1,6 @@
 <div id="top"></div>
 
+
 <!-- PROJECT SHIELDS -->
 <!--
 *** I'm using markdown "reference style" links for readability.
@@ -48,7 +49,6 @@
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
 
@@ -57,10 +57,11 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
+### Our preprint is out now! You can read it [here](https://www.biorxiv.org/content/10.1101/2022.09.21.508832v1).
+
 PepGM is a probabilistic graphical model embedded into a snakemake workflow for taxonomic inference of viral proteome samples. PepGM was 
 developed by the the eScience group at BAM (Federal Institute for Materials Research and Testing).
 
-Our preprint is out now! You can read it [here](https://www.biorxiv.org/content/10.1101/2022.09.21.508832v1).
 
 The PepGM workflow includes the following steps:
 
@@ -159,15 +160,15 @@ An exemplary configuration file is provided in `config/config.yaml`. Do not chan
   <summary>Details </summary> <br>
     <details> <summary>Run panel <br> </summary> 
     Set up the workflow of your PepGM run by providing parameters that fill wildcards to locate input files
-    such as raw spectra or reference database files. Name and pa Thus, use file basenames i.e., without file 
+    such as raw spectra or reference database files. Thus, use file basenames i.e., without file 
     suffix, that your files already have or rename them accordingly. <br><br>
-    Run: Run name to create a folder in the results directory.  <br>
-    Sample: Sample name to create a subfolder in the run directory. <br> 
-    Reference: Name of reference database (recommended: refseqViral). <br>
+    Run: Name of your run that is used to create a subfolder in `/results` <br>
+    Sample: Name of your sample that is used to create a subfolder in the run directory. <br> 
+    Reference: Name of reference database (e.g. human). <br>
     Host: Trivial host name. <br>
     Scientific host: Scientific host name. Retain (scientific) host names from public libraries such as 
     <a href="http://www.proteomexchange.org/">ProteomeXchange</a> or 
-    <a href="https://www.ebi.ac.uk/pride/">PRIDE</a>. <br>
+    <a href="https://www.ebi.ac.uk/pride/">PRIDE</a> (e.g. homo sapiens). <br>
     Add host and crap database: Search database is extended by a host and
     <a href="https://www.thegpm.org/crap/">cRAP</a> database. Mutually exclusive to Filter Spectra.  <br><br> </details>
     <details> <summary>Input panel <br> </summary> 
@@ -176,7 +177,7 @@ An exemplary configuration file is provided in `config/config.yaml`. Do not chan
     Parameter: Path to SearchGUI parameter file. <br>
     Sample data: Path to directory that contains sample raw spectra files. <br>
     Database: Path to directory that contains the reference database. <br>
-    Peptide Shaker: Path to directory that contains the Peptide Shaker binary. <br>
+    Peptide Shaker: Path to directory that contains the PeptideShaker binary. <br>
     Search GUI (folder): Path to directory that contains the SearchGUI binary. <br><br>
     The following paths are part of the recommended project structure for Snakemake workflows. Find out more about
     reproducible Snakemake workflows
@@ -203,9 +204,9 @@ An exemplary configuration file is provided in `config/config.yaml`. Do not chan
 As PepGM relies on SearchGUI to perform the database search, a SearchGUI parameters file, specifying the database search parameters, has to be provided. The easiest way for generating that file is through the GUI provided by SearchGUI. Should this not be usable for your setup, the CLI to set SearchGUI parameters is described [here](http://compomics.github.io/projects/searchgui#user-defined-modifications)
 
 ### Using the graphical user interface (under development)
-The Graphical user interface (GUI) is designed to run Snakemake workflows without modifying 
-the configuration file manually in a text editor. Write a config file from scratch or edit an existing config file.
-When modifying the config file in between runs, make sure to press the Read button before running.
+The Graphical user interface (GUI) is developed to run Snakemake workflows without modifying 
+the configuration file manually in a text editor. You can write a config file from scratch or edit an existing config file.
+When modifying the config file in between runs, make sure to press the Write button before running.
 <div align="center">
     <img src="images/gui.png" alt="gui" width="600">
 </div>
@@ -227,14 +228,19 @@ Where n_cores is the number of cores you want snakemake to use.
 
 ### Output files
 
-All PepGM output files are saved into the specified results folder. The output files include the following : <br>
-- PepGM_Results.csv: a csv file with the values ID, score, type (contains all taxids under 'ID' and all probabilities under 'score' that were attributed by PepGM) <br>
-- PepGM_ResultsPlot.png : barplot of the 15 highest scoring taxa <br>
-- PhyloTreeView.png : 15 highest scoring taxa projected onto the taxonomic tree together with their score <br>
-- One output folder for each taxon prior that contains the PepGM results ( as .png plot and csv file) for all possible parameter combination <br>
-- _mapped_taxids_weights.csv: csv file of all taxids that had at least one protein map to them and their weight 
-- _PepGM_graph.graphml: graphml file of the graphical model (without convolution tree factors). Usefulo to visualize the graph structure and peptide-taxon connections <br>
-- paramcheck.png: barplot of the metric used to determine the graphical model parameters for the 15 best performing parameter combinations <br> 
+All PepGM output files are saved into the results folder and include the following: <br>
+
+Main results: <br>
+- PepGM_Results.csv: Table with values ID, score, type (contains all taxids under 'ID' and all probabilities under 'score' that were attributed by PepGM) <br>
+- PepGM_ResultsPlot.png: Posterior probabilities of n (default: 15) highest scoring taxa <br>
+- PhyloTreeView.png : n (default: 1 5) highest scoring taxa including their score visualized in a taxonomic tree <br>
+
+Additional (intermediate): <br>
+- Intermediate results folder sorted by their prior value for all possible grid search parameter combinations
+- mapped_taxids_weights.csv: csv file of all taxids that had at least one protein map to them and their weight 
+- PepGM_graph.graphml: graphml file of the graphical model (without convolution tree factors). Useful to visualize the graph structure and peptide-taxon connections <br>
+- paramcheck.png: barplot of the metric used to determine the graphical model parameters for n (default: 15) best performing parameter combinations <br>
+- log files for bug fixing
 
 ## Toy example
 We have provided a toy example (<a href="https://www.ebi.ac.uk/pride/archive/projects/PXD014913">Cowpox virus Brighton Red</a>) to ease the first steps with PepGM. You will find a reduced 
@@ -292,17 +298,6 @@ Tanja Holstein - [@HolsteinTanja](https://twitter.com/HolsteinTanja) - tanja.hol
 Franziska Kistner - [LinkedIn](https://www.linkedin.com/in/franziska-kistner-58a57b18b) - franziska.kistner@bam.de
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-* [tba](tba)
-* [tba](tba)
-* [tba](tba)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 
 
 <!-- MARKDOWN LINKS & IMAGES -->

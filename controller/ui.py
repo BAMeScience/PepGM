@@ -1,8 +1,8 @@
 """"Main for GUI."""
 import subprocess
 import sys
+import os
 import webbrowser
-from os.path import exists as file_exists
 from pathlib import Path
 
 import PySimpleGUI as sg
@@ -11,6 +11,8 @@ from yaml.loader import SafeLoader
 
 import const
 import layout
+
+import snakemake
 
 
 def run_command(cmd, timeout=None, window=None):
@@ -75,8 +77,8 @@ def parse_config(configs, config_file_path="../config/config.yaml"):
 
 if __name__ == "__main__":
     sg.theme("SystemDefaultForReal")
-    # config file has to be in the config directory
-    config_file= Path("../config/config.yaml")
+    # get config file path
+    config_file = Path(os.path.normpath(os.path.join(os.path.dirname(__file__), '../config/config.yaml')))
 
     if not config_file.exists():
         scaffold = layout.setup()
@@ -123,4 +125,7 @@ if __name__ == "__main__":
             webbrowser.open("https://github.com/BAMeScience/PepGM/blob/master/readme.md")
         # exit
         if event == 'Exit':
+            break
+        # close window event (X)
+        if event == sg.WINDOW_CLOSED:
             break

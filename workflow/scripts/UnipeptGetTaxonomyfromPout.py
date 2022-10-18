@@ -1,11 +1,14 @@
 #from https://gitlab.com/rki_bioinformatics/gnomo/-/blob/master/scripts/unipept-get-peptinfo.py
 
-import urllib.request
+
+import requests
 import json
-import argparse
 import re
 import re
 import os.path
+from ete3 import NCBITaxa
+
+ncbi = NCBITaxa()
 
 #code adapted from pout to prot
 def Poutparser(pout_file, fdr_threshold, decoy_flag):
@@ -65,77 +68,43 @@ def PepListNoMissedCleavages(peptide):
     return peptides
 
 
+def generatePostRequest(peptides,TargetTaxa):
+    '''
+    Generates POST request (json) from petide and target taxon
+    :param peptides: list of peptides to query in Unipept
+    :param TargetTaxa: list of one or more taxa to include in the Unipept query
+    '''
+    
+    AllTargetTaxa = []
+    for Taxon in TargetTaxa:
+        AllTargetTaxa.append(Taxon)
+        AllTargetTaxa.extend(ncbi.get_descendant_taxa(Taxon))
+    
+    request = {"peptides":peptides, "taxa":AllTargetTaxa}
 
-
-def generateGetRequest(peptides):
-    """
-    Given a list of Unipept peptides, it generates a list of Unipept Get Requests
-    :param peptides: Unipept peptides
-    :return: list of get requests for Unipept
-    """
-    request_list = list()
-    char_count = 74  # number of chars minimum per request
-    request = "http://api.unipept.ugent.be/api/v1/peptinfo.json?"
-    for peptide in peptides:
-        if (len(peptide) + 9 + char_count) < 2048:
-            request += "input[]={}&".format(peptide)
-            char_count += 9 + len(peptide)
-        else:
-            request += "equate_il=true&extra=true&names=true"
-            request_list.append(request)
-            request = "http://api.unipept.ugent.be/api/v1/peptinfo.json?" + "input[]={}&".format(peptide)
-            char_count = 74 + 9 + len(peptide)
-
-    if len(request) != 49:  # first part of request
-        request += "equate_il=true&extra=true"
-        request_list.append(request)
-
-
-    return request_list
+    return request
 
 
 
-def getInfoFromUnipept(request_dict, result_file):
+def PostInfoFromUnipept(request_json, out_file):
     """
     Send all requests, get for each peptide the phylum, family, genus and collection of EC-numbers
     :param request_list: list of Get Requests
     :param result_file: csv file with Unipept info (phylum, family, genus and collection of EC-numbers)
     :return: None
     """
-
-    unipept_list = list()
-    requests = []
     
-    requests = generateGetRequest(request_dict.keys())
-    
+    url = "https://sherlock.ugent.be/mpa/pept2filtered.json"
+    request = requests.post(url,json.dumps(request_json),headers={'content-type':'application/json'})
 
-    for element in requests:
-        unipept_json = urllib.request.urlopen(element).read()
-        unipept_list.append(json.loads(unipept_json.decode('utf-8')))
-
-    
-    tmp = open(result_file, "w")
-    tmp.close()
+    with open(out_file, 'w') as f_out:
+        print(request.text,file=f_out)
 
 
-    with open(result_file, "a") as f_out:
-        print('peptide,','lca_id,','phylum_id,','family_id,','genus_id,','species_id,','ec,','score,','number of psms',file=f_out)
-        for response in unipept_list:
-            for element in response:
-                lca_id = element['taxon_id']
-                phylum_id = element["phylum_id"]
-                family_id = element["family_id"]
-                genus_id = element["genus_id"]
-                species_id = element["species_id"]
-                try:
-                    ec_list = list()
-                    for i in element['ec']:
-                        ec_list.append(i['ec_number'].strip())
-                    ec = ";".join(ec_list)
-                except:
-                    ec = ""
-                print("{},{},{},{},{},{},{},{},{}".format(element["peptide"].strip(), lca_id, phylum_id, family_id, genus_id, species_id, ec, 
-                        1-float(request_dict[element["peptide"].strip()][0]),request_dict[element["peptide"].strip()][1]), file=f_out)
+
+
+
+
 
 
 if __name__=='__main__':
@@ -149,4 +118,9 @@ if __name__=='__main__':
         for pep in FullyTrypticPeptides:
             UnipeptPeptides[pep] = pep_score_psm[peptide]
 
-    out = getInfoFromUnipept(UnipeptPeptides,'test_unipept.csv' )
+    #out = getInfoFromUnipept(UnipeptPeptides,'test_unipept.csv' )
+    
+    request = generatePostRequest(list(UnipeptPeptides.keys()),[11118])
+
+
+    out = PostInfoFromUnipept(request,'test_unipept.json')

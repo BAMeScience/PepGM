@@ -1,7 +1,7 @@
 """"Main for GUI."""
+import os
 import subprocess
 import sys
-import os
 import webbrowser
 from pathlib import Path
 
@@ -11,8 +11,6 @@ from yaml.loader import SafeLoader
 
 import const
 import layout
-
-import snakemake
 
 
 def run_command(cmd, timeout=None, window=None):
@@ -30,49 +28,46 @@ def run_command(cmd, timeout=None, window=None):
     return retval, output
 
 
-def parse_config(configs, config_file_path="../config/config.yaml"):
+def parse_config(configurations, config_file_path, prev_configs):
     """
     Write configuration from GUI into config file.
-    :param configs: list, configuration as retrieved from GUI
+    :param configurations: list, configuration as retrieved from GUI
     :param config_file_path: str, path to config file
     """
-    with open(config_file_path, 'w') as config_file_out:
-        # iterate over all dictionary keys and entries that are retrieved from the GUI
-        for key, value in configs.items():
+    with open(config_file_path, "w") as config_file_out:
+        # iterate over all dictionary keys and entries
+        for param, value in configurations.items():
             # integer
-            if key in ["TaxaInPlot", "TaxaInProteinCount"]:
-                config_file_out.write("%s: %i\n" % (key, int(value)))
+            if param in ["TaxaInPlot", "TaxaInProteinCount"]:
+                config_file_out.write("%s: %i\n" % (param, int(value)))
             # bool
-            elif key in ["AddHostandCrapToDB", "FilterSpectra"]:
-                config_file_out.write("%s: %r\n" % (key, bool(value)))
+            elif param in ["AddHostandCrapToDB", "FilterSpectra"]:
+                config_file_out.write("%s: %r\n" % (param, bool(value)))
             # lists needs different formatting
-            elif key in ["Alpha", "Beta", "prior"]:
+            elif param in ["Alpha", "Beta", "prior"]:
+                # changed values
+                if "(" not in configurations[param]:
+                    values = [float(x) for x in configurations[param].split()]
+                # unchanged values
+                elif "(" in configurations[param]:
+                    values = configurations[param].replace("(", "").replace(")", "").split(",")
                 # gridsearch parameter have to be saved in a list with the following format
-                # [0.010000, 0.050000, 0.100000, 0.200000, 0.400000]
-                config_file_out.write("%s: [" % key)
-                # init
-                temp = []
-                digit = ""
-                # merge digits into a float
-                for element in configs[key]:
-                    if element == '(' or element == ')':
-                        continue
-                    if element.isdigit() or element == ".":
-                        digit = digit + element
-                    if element == ",":
-                        temp.append(float(digit))
-                        digit = ""
-                # write merged digits
-                for element in temp:
-                    config_file_out.write("%f," % element)
-                # write end of array
+                # [0.01, 0.05, 0.10, 0.20, 0.40]
+                # opening bracket
+                config_file_out.write("%s: [" % param)
+                for idx, val in enumerate(values):
+                    if idx is not len(values) - 1:
+                        # max 2 digits
+                        config_file_out.write("%.2f," % float(val))
+                    else:
+                        config_file_out.write("%.2f" % float(val))
+                # closing bracket
                 config_file_out.write("]\n")
-            # use bool format
-            elif key == "ScientificHostName":
-                config_file_out.write('%s: '"%s"'\n' % (key, value))
-            # use string format
+            elif param == "ScientificHostName":
+                # PepGM format requirement: " 'homo sapiens' "
+                config_file_out.write("%s: \"\'%s\'\" \n" % (param, value))
             else:
-                config_file_out.write("%s: '%s'\n" % (key, value))
+                config_file_out.write("%s: '%s'\n" % (param, value))
 
 
 if __name__ == "__main__":
@@ -85,7 +80,9 @@ if __name__ == "__main__":
     else:
         # load previous configurations
         prev_configs = yaml.load(config_file.read_text(), Loader=SafeLoader)
-        # auto fill input
+        # do not display single quotes
+        prev_configs["ScientificHostName"] = prev_configs["ScientificHostName"].replace("'", "")
+        # auto fill input from config file
         scaffold = layout.setup(prev_configs["ExperimentName"], prev_configs["SampleName"], prev_configs["HostName"],
                                 prev_configs["ScientificHostName"], prev_configs["ReferenceDBName"],
                                 prev_configs["SamplePath"],
@@ -97,6 +94,7 @@ if __name__ == "__main__":
                                 prev_configs["TaxaInPlot"], prev_configs["TaxaInProteinCount"],
                                 prev_configs["sourceDB"], prev_configs["APImail"],
                                 prev_configs["APIkey"])
+
     # initialize window
     window = sg.Window(title="Run PepGM", layout=scaffold, resizable=True, scaling=True, grab_anywhere=True,
                        auto_size_text=True, auto_size_buttons=True)
@@ -108,7 +106,7 @@ if __name__ == "__main__":
         if event == 'Run':
             cores = int(values["core_number"])
             snakemake_cmd = f"cd ..; snakemake --cores {cores} -p"
-            print("Your snakemake command: \n")
+            print("Your snakemake command: ")
             print(snakemake_cmd)
             run_command(cmd=snakemake_cmd, window=window)
         # dry run button
@@ -116,9 +114,9 @@ if __name__ == "__main__":
             snakemake_cmd = f"cd ..; snakemake -np"
             run_command(cmd=snakemake_cmd, window=window)
         # update config file
-        if event == "Read":
+        if event == "Write":
             configs = {key: val for key, val in values.items() if key in const.keys_to_keep}
-            parse_config(configs)
+            parse_config(configs, config_file, prev_configs)
         # help pages are on GitHub
         if event == 'Help':
             print("You will be redirected to the GitHub help pages.")

@@ -102,7 +102,6 @@ PepGM uses a version of the belief propagatin algorithm with a graphical network
 
 Additonally, you need:
 * NCBI Entrez account
-* 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

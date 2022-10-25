@@ -14,7 +14,7 @@ parser.add_argument('--PeptideMapPath',type=str, required =True,
                     help = 'Path to mapped taxon peptide pairs (json file).')
 parser.add_argument('--out', type = str, required = True,
                     help = 'Output directory')
-parser.add_argument('--sourceDB',type = str, nargs ='?', const ='',
+parser.add_argument('--sourceDB',type = str, nargs ='?', const ='', default="all[FILT]",
                     help = 'Name of the DB queried through Entrez.')
 parser.add_argument('--APIkey', type = str, help = 'your NCBI API key if you have one')
 parser.add_argument ('--APImail', help = ' e-mail connected to your NCBI API key' )

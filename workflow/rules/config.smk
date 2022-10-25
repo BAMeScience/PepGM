@@ -32,9 +32,6 @@ ScientificHostName = config['ScientificHostName']
 ReferenceDBName = config['ReferenceDBName']
 
 TaxaInPlot = config['TaxaInPlot']
-TaxaInProteinCount = config['TaxaInProteinCount']
-sourceDB = config['sourceDB']
-
 AlphaRange = config['Alpha']
 BetaRange = config['Beta']
 prior = config['prior']

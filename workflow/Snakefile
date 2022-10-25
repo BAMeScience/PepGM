@@ -39,11 +39,12 @@ rule CreateFactorGraph:
         samplename=SampleName,
         hostname=HostName,
         DBname=ReferenceDBName,
+        sourceDB=sourceDB,
         ResultsDir=ResultsDir,
         APImail = APImail,
         APIkey = APIkey
     log: ResultsDir + SampleName + '/{DBname}.log'
-    shell: 'python3 workflow/scripts/CreatePepGMGraph.py --APIkey {params.APIkey} --APImail {params.APImail} --targetTaxa {input[1]}  --PSM_Report {input[0]} --PeptideMapPath ' + ResultsDir + '{params.samplename}/Mapped_Taxa_Proteins.json --out {output} &>> {log}'
+    shell: 'python3 workflow/scripts/CreatePepGMGraph.py --APIkey {params.APIkey} --APImail {params.APImail} } --targetTaxa {input[1]}  --PSM_Report {input[0]} --PeptideMapPath ' + ResultsDir + '{params.samplename}/Mapped_Taxa_Proteins.json --out {output} &>> {log}'
 
 
 rule RunPepGM:
@@ -84,5 +85,6 @@ rule FindBestParameters:
 rule CountProteinsInJson:
     input: ResultsDir + SampleName + '/{taxonname}.json'
     output: ResultsDir + SampleName + '/{taxonname}_proteinCount.png'
+    params: NumberofResults=TaxaInProteinCount
     conda: 'envs/graphenv.yml'
-    shell: 'python3 workflow/scripts/CountProteins.py --ResultsFile {input} --out {output}'
+    shell: 'python3 workflow/scripts/CountProteins.py --ResultsFile {input} --NumberofResults {params.NumberofResults} --out {output}'

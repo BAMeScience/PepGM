@@ -110,15 +110,12 @@ Additonally, you need:
 
 ### Prerequisites
 
-PepGM is tested for Linux OS.
-
-PepGM uses SearchGUI-4.1.14 and PeptideShaker-2.2.9
-Download the necessary files at the following link:
-* SearchGUI : [http://compomics.github.io/projects/searchgui](http://compomics.github.io/projects/searchgui)
-* PeptideShaker : [http://compomics.github.io/projects/searchgui](http://compomics.github.io/projects/searchgui)
-
-PepGM is a snakemake workflow. Installing snakemake requires mamba.
-PepGM was tested using snakemake 5.10.0. 
+Make sure you have git installed and clone the repo:
+   ```sh
+   git clone https://github.com/BAMeScience/PepGM.git
+   ```
+PepGM is a snakemake workflow developed with snakemake 5.10.0. <br>
+Installing snakemake requires mamba.
 
 To install mamba:
   ```sh
@@ -130,48 +127,77 @@ To install snakemake:
 conda activate <your_env>
 mamba create -c conda-forge -c bioconda -n <your_snakemake_env> snakemake
 ```
+In accordance with the Snakemake recommendations, we suggest to save your sample data 
+in `resources` folder. All outputs will be saved in `results`.
 
+PepGM is tested for Linux OS and uses SearchGUI-4.1.14 and PeptideShaker-2.2.9 developed 
+by the CompOmics group at University of Ghent. <br>
 
-### Installation
+Download the necessary files at the following link:
+* SearchGUI : [http://compomics.github.io/projects/searchgui](http://compomics.github.io/projects/searchgui)
+* PeptideShaker : [http://compomics.github.io/projects/peptide-shaker.html](http://compomics.github.io/projects/peptide-shaker.html)
 
-Clone the repo 
-   ```sh
-   git clone https://github.com/BAMeScience/PepGM.git
-   ```
-In accordance with the Snakemake recommendations, we suggest to save your data in the 'resources' folder. All outputs will be saved in the 'results' folder.
+We suggest to create a new directory `bin` inside your PepGM 
+working directory and save the SearchGUI and PeptideShaker binaries there:
 
-### Preparation
+```shell
+mkdir ./bin && cd bin
+wget https://genesis.ugent.be/maven2/eu/isas/searchgui/SearchGUI/4.1.23/SearchGUI-4.1.23-mac_and_linux.tar.gz
+wget https://genesis.ugent.be/maven2/eu/isas/peptideshaker/PeptideShaker/2.2.16/PeptideShaker-2.2.16.zip
+tar -xvf SearchGUI-4.1.23-mac_and_linux.tar.gz && unzip PeptideShaker-2.2.16.zip
+```
+You can delete the .zip files afterwards:
+```shell
+rm *.tar.gz && rm *.zip
+```
+<p align="right">(<a href="#top">back to top</a>)</p>
 
-We recommend using the RefSeq Viral database as a general reference database. It can be downloaded from the NCBI ftp using the following commands:
+## Preparation
+
+### Downloading reference database
+We recommend using the RefSeq Viral database as a generic reference database. It can be downloaded from the NCBI ftp:
+
   ```sh
+  cd ./resources/Database
   wget ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/\*.protein.faa.gz &&
   gzip -d viral.*.protein.faa.gz &&
   cat viral.*.protein.faa> refseq_viral.fasta &&
   rm viral.*.protein.faa
   ```
-
-PepGM uses the NCBI Entrez API. 
-We recommend you create an account with NCBI and generate your own API key, 
-which enable a faster download of strain-level protoemes required by PepGM.<br>
+### Using the NCBI Entrez API 
+PepGM uses the NCBI Entrez API. <br>
+We strongly advise you to create an NCBI account with your own key due to drastic speed increase.
 Find out how to obtain your NCBI API key [here](https://support.nlm.nih.gov/knowledgebase/article/KA-05317/en-us). <br>
-If you decide to create your API key, insert your details into the config file.
+
+### Generating a SearchGUI parameters file
+As PepGM relies on SearchGUI to perform the database search, a SearchGUI parameters file, 
+specifying the database search parameters, has to be provided. 
+The easiest way to generate this file is via the GUI provided by SearchGUI. 
+Other than that, 
+the CLI instructions to set SearchGUI parameters are described 
+[here](http://compomics.github.io/projects/searchgui#user-defined-modifications).
+
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
 ### Configuration file 
 PepGM needs a configuration file in `yaml` format to set up the workflow. 
-An exemplary configuration file is provided in `config/config.yaml`. Do not change its location.
+An exemplary configuration file is provided in `config/config.yaml`. <br>
+Please insert your NCBI account details (mail & key) and provide the required absolute paths to
+* SamplePath
+* ParametersFile
+* SearchGUI & PeptideShaker binaries (SearchGUIDir & PeptideShakerDir)
+
+Do not change the config file location.
 <details>
-  <summary>Details </summary> <br>
+  <summary>Details on the configuration parameters </summary> <br>
     <details> <summary>Run panel <br> </summary> 
     Set up the workflow of your PepGM run by providing parameters that fill wildcards to locate input files
     such as raw spectra or reference database files. Thus, use file basenames i.e., without file 
     suffix, that your files already have or rename them accordingly. <br><br>
-    Run: Name of your run that is used to create a subfolder in `/results` <br>
+    Run: Name of your run that is used to create a subfolder in the results directory. <br>
     Sample: Name of your sample that is used to create a subfolder in the run directory. <br> 
     Reference: Name of reference database (e.g. human). <br>
     Host: Trivial host name. <br>
@@ -209,21 +235,12 @@ An exemplary configuration file is provided in `config/config.yaml`. Do not chan
 
 </details>
 
-### Generating a SearchGUI parameters file
-As PepGM relies on SearchGUI to perform the database search, a SearchGUI parameters file, specifying the database search parameters, has to be provided. The easiest way for generating that file is through the GUI provided by SearchGUI. Should this not be usable for your setup, the CLI to set SearchGUI parameters is described [here](http://compomics.github.io/projects/searchgui#user-defined-modifications)
-
 ### Using the graphical user interface
 The graphical user interface (GUI) is developed to run Snakemake workflows without modifying 
-the configuration file manually in a text editor. You can write a config file from scratch or edit an existing config file.
+the configuration file manually in a text editor. <br>
+You can write a config file from scratch or edit an existing config file.
 When modifying the config file in between runs, make sure to press the Write button before running.
-<div align="center">
-    <img src="images/gui.png" alt="gui" width="600">
-</div>
-<br><br>
-
-
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+<br>
 
 ### Through the command line
 
@@ -233,7 +250,8 @@ Run the following command
 ```sh
   snakemake --use-conda --conda-frontend conda --cores <n_cores> 
   ```
-Where n_cores is the number of cores you want snakemake to use. 
+Where `n_cores` is the number of cores you want snakemake to use. 
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 ### Output files
 
@@ -259,6 +277,7 @@ spectra can be downloaded
 <a href="https://ftp.pride.ebi.ac.uk/pride/data/archive/2020/05/PXD014913/CPXV-0,1MOI-supernatant-HEp-24h.mgf">here</a> (PRIDE ftp archive).
 Download the spectra file to `/resources/toyExample/` and adopt the file name in corresponding
 configuration parameter (refseqViral).
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- ROADMAP -->
 ## Roadmap

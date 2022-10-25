@@ -31,3 +31,4 @@ workflow/Sars_strains.snakefile
 
 
 /resources/toyExample/spectra_PXD014913_cowpox_minimal_example.mgf
+/bin/

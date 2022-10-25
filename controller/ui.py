@@ -91,13 +91,11 @@ if __name__ == "__main__":
                                 prev_configs["Beta"],
                                 prev_configs["prior"], prev_configs["psmFDR"], prev_configs["peptideFDR"],
                                 prev_configs["proteinFDR"],
-                                prev_configs["TaxaInPlot"], prev_configs["TaxaInProteinCount"],
-                                prev_configs["sourceDB"], prev_configs["APImail"],
-                                prev_configs["APIkey"])
+                                prev_configs["TaxaInPlot"], prev_configs["APImail"], prev_configs["APIkey"])
 
     # initialize window
     window = sg.Window(title="Run PepGM", layout=scaffold, resizable=True, scaling=True, grab_anywhere=True,
-                       auto_size_text=True, auto_size_buttons=True)
+                       auto_size_text=True, auto_size_buttons=True, finalize=True)
     # event loop
     while True:
         event, values = window.Read()

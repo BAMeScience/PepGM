@@ -111,7 +111,7 @@ rule ExecuteXTandem:
         taxon = XTandemDir+'tandem.taxonomy.xml'
     output:
         XTandemOutput
-    conda: 'envs/graphenv.yml'
+    conda: '/home/tholstei/repos/PepGM_all/PepGM/workflow/envs/graphenv.yml'
     #threads:
      #   THREADS_MAX
     #benchmark:

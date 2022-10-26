@@ -2,7 +2,7 @@ configfile: 'config/config.yaml'
 
 DataDirectory = config['DataDir']
 DatabaseDirectory = config ['DatabaseDir']
-ResultsDir = config['ResultsDir'] + config['ExperimentName'] +'/'
+ResultsDir = config['ResultsDir'] + config['ExperimentName'] +'/'+config['SampleName']+'/'
 XTandemDir = config['ResultsDir'] + config['ExperimentName'] +'/'+config['SampleName']+'/XTandem/'
 MS2RescoreDir = config['ResultsDir'] + config['ExperimentName'] +'/'+config['SampleName']+'/MS2Rescore/'
 ResourcesDir = config['ResourcesDir']
@@ -57,3 +57,8 @@ RescoreFeatures = config['RescoreFeatures']
 RunPercolator = config['RunPercolator']
 FragModel = config['FragModel']
 mods = config['Mods']
+
+#UnipeptQueryParameter
+TaxaNumber = config['TaxaNumber']
+targetTaxa = config['targetTaxa']
+MinPepScore = config['MinPepScore']

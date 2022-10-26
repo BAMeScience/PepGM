@@ -77,6 +77,7 @@ def generatePostRequest(peptides,TargetTaxa):
     
     AllTargetTaxa = []
     for Taxon in TargetTaxa:
+        print(TargetTaxa)
         AllTargetTaxa.append(Taxon)
         AllTargetTaxa.extend(ncbi.get_descendant_taxa(Taxon))
     
@@ -96,7 +97,8 @@ def PostInfoFromUnipept(request_json, out_file):
     
     url = "https://sherlock.ugent.be/mpa/pept2filtered.json"
     request = requests.post(url,json.dumps(request_json),headers={'content-type':'application/json'})
-
+    
+    
     with open(out_file, 'w') as f_out:
         print(request.text,file=f_out)
 
@@ -108,7 +110,7 @@ def PostInfoFromUnipept(request_json, out_file):
 
 
 if __name__=='__main__':
-    pout_file = '/home/tholstei/repos/PepGM_all/PepGM/results/Xtandem_rescore_test/PXD018594_Sars_CoV_2/MS2Rescore/rescore.pin_searchengine_ms2pip_rt_features.pout'
+    pout_file = '/home/tholstei/repos/PepGM_all/PepGM/results/Xtandem_rescore_test/PXD018594_Sars_CoV_2/MS2Rescore/rescored_searchengine_ms2pip_rt_features.pout'
     pep_score_psm = Poutparser(pout_file,0.05,'')
 
 
@@ -119,7 +121,7 @@ if __name__=='__main__':
             UnipeptPeptides[pep] = pep_score_psm[peptide]
 
     #out = getInfoFromUnipept(UnipeptPeptides,'test_unipept.csv' )
-    
+    print(list(UnipeptPeptides.keys()))
     request = generatePostRequest(list(UnipeptPeptides.keys()),[11118])
 
 

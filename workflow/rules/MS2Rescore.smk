@@ -42,13 +42,12 @@ rule createMS2RescoreConfig:
 
 
 rule RunMS2Rescore:
-     input:
-          XTandemOutput,
-          MS2RescoreDir+'config.json', 
-          InputSpectrum 
-     params:
-          OutputName = 'rescored'
-     conda: 'envs/graphenv.yml'
-     output: MS2RescoreDir+'{params.OutputName}_searchengine_ms2pip_rt_features.pout'
-     shell: 'ms2rescore -c {input[1]} -m {input[2]} {input[0]} -o {params.OutputName}'
+    input:
+        XTandemOutput,
+        MS2RescoreDir+'config.json', 
+        InputSpectrum 
+    conda: '/home/tholstei/repos/PepGM_all/PepGM/workflow/envs/graphenv.yml'
+    params: OutputName = MS2RescoreDir+'rescored'
+    output: MS2RescoreDir+'rescored_searchengine_ms2pip_rt_features.pout'
+    shell: 'ms2rescore -c {input[1]} -m {input[2]} {input[0]} -o {params.OutputName}'
 

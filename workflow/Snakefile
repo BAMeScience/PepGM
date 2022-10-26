@@ -7,6 +7,7 @@ include : WorkflowPath + '/rules/buildDatabase.smk'
 include : WorkflowPath + '/rules/filterHostCrap.smk'
 include : WorkflowPath + '/rules/XTandem.smk'
 include : WorkflowPath + '/rules/MS2Rescore.smk'
+include: WorkflowPath + '/rules/ParsePouttoUnipept.smk'
 
 
 rule all:
@@ -14,6 +15,7 @@ rule all:
           expand(ResultsDir + SampleName + '/Prior{Prior}/'+ReferenceDBName +'_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha = AlphaRange, beta = BetaRange, Prior = prior),
           ResultsDir +SampleName +'/paramcheck.png',
 #          DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
+
 
 
 rule getTargets:

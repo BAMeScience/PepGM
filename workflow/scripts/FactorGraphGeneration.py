@@ -483,7 +483,7 @@ if __name__== '__main__':
     Taxongraph = TaxonGraph()
     #Taxongraph.GetAllLeafTaxa(['adenoviridae'])
     #Taxongraph.FetchTaxonData('peptidemapapth')
-    Taxongraph.CreateTaxonPeptidegraphFromMzID('/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/human_refseq_Default_PSM_Report.txt','/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/herpesviridae.json',0.001)
+    Taxongraph.CreateFromUnipeptResponseCSV('/home/tholstei/repos/PepGM_all/PepGM/results/Xtandem_rescore_test/PXD018594_Sars_CoV_2/GraphDataframe.csv')
     #Taxongraph.CreateExample()
     Factorgraph = FactorGraph()
     Factorgraph.ConstructFromTaxonGraph(Taxongraph)

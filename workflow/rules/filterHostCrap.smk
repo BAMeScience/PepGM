@@ -16,7 +16,7 @@ rule RemoveDuplicatesHostandCrap:
 rule AddDecoysHostandCrap:
      input: DatabaseDirectory+ HostName+'+crap_UNI.fasta'
      output: DatabaseDirectory+ HostName+'+crap_UNI_concatenated_target_decoy.fasta'
-     shell: 'java -cp '+SearchGUIDir+'SearchGUI-4.1.14.jar eu.isas.searchgui.cmd.FastaCLI -in {input} -decoy' 
+     shell: 'java -cp '+SearchGUI+ 'eu.isas.searchgui.cmd.FastaCLI -in {input} -decoy' 
 
 rule SearchSpectraHostandCrap:
     input: 
@@ -27,7 +27,7 @@ rule SearchSpectraHostandCrap:
         samplename = SampleName,
         hostname = HostName,
     output:  ResultsDir+SampleName+'/SpectraFilter/'+ HostName+'_searchgui_out.zip'
-    shell: 'java -cp '+SearchGUIDir+'SearchGUI-4.1.14.jar eu.isas.searchgui.cmd.SearchCLI -spectrum_files {input[0]} -fasta_file {input[1]} -output_folder '+ ResultsDir +'{params.samplename}/SpectraFilter -id_params {input[2]} -output_default_name {params.hostname}_searchgui_out -psm_fdr 1 -peptide_fdr 1 -protein_fdr 1 '+searchengines+' 1'
+    shell: 'java -cp '+SearchGUI+' eu.isas.searchgui.cmd.SearchCLI -spectrum_files {input[0]} -fasta_file {input[1]} -output_folder '+ ResultsDir +'{params.samplename}/SpectraFilter -id_params {input[2]} -output_default_name {params.hostname}_searchgui_out -psm_fdr 1 -peptide_fdr 1 -protein_fdr 1 '+searchengines+' 1'
 
 rule RunPeptideShakerHostandCrap:
     input:
@@ -38,7 +38,7 @@ rule RunPeptideShakerHostandCrap:
         samplename = SampleName,
         hostname = HostName
     output: ResultsDir+SampleName+'/SpectraFilter/'+HostName+'.psdb'
-    shell: 'java -cp '+PeptideShakerDir+'PeptideShaker-2.2.9.jar eu.isas.peptideshaker.cmd.PeptideShakerCLI -reference {params.hostname} -fasta_file {input[2]} -identification_files {input[0]} -spectrum_files {input[1]} -out {output}'
+    shell: 'java -cp '+PeptideShaker+' eu.isas.peptideshaker.cmd.PeptideShakerCLI -reference {params.hostname} -fasta_file {input[2]} -identification_files {input[0]} -spectrum_files {input[1]} -out {output}'
 
 rule SimplePeptideListHostandCrap:
     input:  ResultsDir+SampleName+'/SpectraFilter/'+HostName+'.psdb'
@@ -47,7 +47,7 @@ rule SimplePeptideListHostandCrap:
         samplename = SampleName,
         hostname = HostName
 
-    shell: 'java -cp '+PeptideShakerDir+'PeptideShaker-2.2.9.jar eu.isas.peptideshaker.cmd.ReportCLI -in {input} -out_reports '+ResultsDir +'{params.samplename}/SpectraFilter -reports 3'
+    shell: 'java -cp '+PeptideShaker+' eu.isas.peptideshaker.cmd.ReportCLI -in {input} -out_reports '+ResultsDir +'{params.samplename}/SpectraFilter -reports 3'
 
 rule FilterSpectra:
     input: 

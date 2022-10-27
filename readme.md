@@ -130,6 +130,8 @@ mamba create -c conda-forge -c bioconda -n <your_snakemake_env> snakemake
 In accordance with the Snakemake recommendations, we suggest to save your sample data 
 in `resources` folder. All outputs will be saved in `results`.
 
+Additional dependencies necessary are Java and GCC.
+
 PepGM is tested for Linux OS and uses SearchGUI-4.1.14 and PeptideShaker-2.2.9 developed 
 by the CompOmics group at University of Ghent. <br>
 

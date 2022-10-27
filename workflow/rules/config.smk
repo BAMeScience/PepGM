@@ -14,8 +14,9 @@ SamplePath = config['SamplePath']
 ParametersFile = config['ParametersFile']
 
 
-PeptideShakerDir = config['PeptideShakerDir']
-SearchGUIDir = config['SearchGUIDir']
+PeptideShaker = config['PeptideShaker']
+SearchGUI = config['SearchGUI']
+
 
 searchengines = config['searchengines']
 peptideFDR = config['peptideFDR']

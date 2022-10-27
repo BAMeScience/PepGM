@@ -17,8 +17,8 @@ SamplePath: '' # Sample spectra
 ParametersFile: '' # Parameter file
 DataDir: 'resources/SampleData/' # Sample
 DatabaseDir: 'resources/Database/' # Database
-PeptideShakerDir : '' # Peptide Shaker
-SearchGUIDir: '' # SearchGUI
+PeptideShaker : '' # Peptide Shaker
+SearchGUI: '' # SearchGUI
 ResultsDir: 'results/'
 ResourcesDir: 'resources/'
 TaxidMapping: 'taxidMapping/'

@@ -1,11 +1,11 @@
-#rules to produce files needed when no host&crap filtering is perdormed, but host&crap are to be added to the search
+#rules to produce files needed when no host&crap filtering is performed, but host&crap are to be added to the search
 rule AddContaminantsandHostFull:
     input:
         DatabaseDirectory + 'crap.fasta',
         DatabaseDirectory + HostName + '.fasta',
         DatabaseDirectory + '{DBname}.fasta'
 
-    output: DatabaseDirectory + HostName + '+crap+{DBname}.fasta'
+    output: DatabaseDirectory + HostName + '+crap+{DBname,[A-Za-z]+}.fasta'
     shell: 'cat {input} > {output}'
 
 rule RemoveDuplicatesFull:
@@ -17,7 +17,7 @@ rule RemoveDuplicatesFull:
 rule AddDecoysFull:
     input: DatabaseDirectory + HostName + '+crap+{DBname,[A-Za-z]+}_UNI.fasta'
     output: DatabaseDirectory + HostName + '+crap+{DBname}_UNI_concatenated_target_decoy.fasta'
-    shell: 'java -cp ' + SearchGUIDir + 'SearchGUI-4.1.14.jar eu.isas.searchgui.cmd.FastaCLI -in {input} -decoy'
+    shell: 'java -cp ' + SearchGUI +' eu.isas.searchgui.cmd.FastaCLI -in {input} -decoy'
 
 
 #rules to produce files necessary for searching after filtering host spectra or to search all spectra but whithout host or crap DB added
@@ -31,7 +31,7 @@ rule RemoveDuplicates:
 rule AddDecoys:
     input: DatabaseDirectory + '{DBname}_UNI.fasta'
     output: DatabaseDirectory + '{DBname,^.[a-zA-Z]$}_UNI_concatenated_target_decoy.fasta'
-    shell: 'java -cp ' + SearchGUIDir + 'SearchGUI-4.1.14.jar eu.isas.searchgui.cmd.FastaCLI -in {input} -decoy'
+    shell: 'java -cp ' + SearchGUI +' eu.isas.searchgui.cmd.FastaCLI -in {input} -decoy'
 
 
 # check if spectrum should be filtered or not
@@ -66,7 +66,7 @@ rule SearchSpectra:
         ResultsDir=ResultsDir,
         DBname=ReferenceDBName
     output: ResultsDir + SampleName + '/{DBname}_searchgui_out.zip'
-    shell: 'cp config/config.yaml {params.ResultsDir}/{params.samplename}/  &&  java -cp ' + SearchGUIDir + 'SearchGUI-4.1.14.jar eu.isas.searchgui.cmd.SearchCLI -spectrum_files {input[0]} -fasta_file {input[1]} -output_folder ' + ResultsDir + '{params.samplename} -id_params {input[2]} -output_default_name {params.DBname}_searchgui_out -psm_fdr ' + psmFDR + ' -peptide_fdr ' + peptideFDR + ' -protein_fdr ' + proteinFDR + ' ' + searchengines + ' 1'
+    shell: 'cp config/config.yaml {params.ResultsDir}{params.samplename}/  &&  java -cp ' + SearchGUI +' eu.isas.searchgui.cmd.SearchCLI -spectrum_files {input[0]} -fasta_file {input[1]} -output_folder ' + ResultsDir + '{params.samplename} -id_params {input[2]} -output_default_name {params.DBname}_searchgui_out -psm_fdr ' + psmFDR + ' -peptide_fdr ' + peptideFDR + ' -protein_fdr ' + proteinFDR + ' ' + searchengines + ' 1'
 
 rule RunPeptideShaker:
     input:
@@ -77,7 +77,7 @@ rule RunPeptideShaker:
         samplename=SampleName,
         DBname=ReferenceDBName
     output: ResultsDir + SampleName + '/{DBname}.psdb'
-    shell: 'java -cp ' + PeptideShakerDir + 'PeptideShaker-2.2.9.jar eu.isas.peptideshaker.cmd.PeptideShakerCLI -reference {params.DBname} -fasta_file {input[2]} -identification_files {input[0]} -spectrum_files {input[1]} -out {output}'
+    shell: 'java -cp ' + PeptideShaker+' eu.isas.peptideshaker.cmd.PeptideShakerCLI -reference {params.DBname} -fasta_file {input[2]} -identification_files {input[0]} -spectrum_files {input[1]} -out {output}'
 
 rule SimplePeptideList:
     input: ResultsDir + SampleName + '/{DBname}.psdb'
@@ -85,4 +85,4 @@ rule SimplePeptideList:
     params:
         samplename=SampleName,
         DBname=ReferenceDBName
-    shell: 'java -cp ' + PeptideShakerDir + 'PeptideShaker-2.2.9.jar eu.isas.peptideshaker.cmd.ReportCLI -in {input} -out_reports ' + ResultsDir + '{params.samplename} -reports 3'
+    shell: 'java -cp ' + PeptideShaker+' eu.isas.peptideshaker.cmd.ReportCLI -in {input} -out_reports ' + ResultsDir + '{params.samplename} -reports 3'

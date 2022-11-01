@@ -214,8 +214,8 @@ Do not change the config file location.
     Parameter: Path to SearchGUI parameter file. <br>
     Sample data: Path to directory that contains sample raw spectra files. <br>
     Database: Path to directory that contains the reference database. <br>
-    Peptide Shaker: Path to directory that contains the PeptideShaker binary. <br>
-    Search GUI (folder): Path to directory that contains the SearchGUI binary. <br><br>
+    Peptide Shaker: Path to PeptideShaker binary (.jar). <br>
+    Search GUI (folder): Path to SearchGUI binary (.jar). <br><br>
     The following paths are part of the recommended project structure for Snakemake workflows. Find out more about
     reproducible Snakemake workflows
     <a href="https://snakemake.readthedocs.io/en/stable/snakefiles/deployment.html">here</a>. <br>

@@ -61,4 +61,4 @@ mods = config['Mods']
 #UnipeptQueryParameter
 TaxaNumber = config['TaxaNumber']
 targetTaxa = config['targetTaxa']
-MinPepScore = config['MinPepScore']
+FDR = config['FDR']

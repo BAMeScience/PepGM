@@ -5,9 +5,9 @@ rule ParseToUnipeptCSV:
     params: 
           NumberofTaxa = TaxaNumber,
           targetTaxa = targetTaxa,
-          MinScore = MinPepScore
+          FDR = FDR
     output: 
           ResultsDir + 'UnipeptResponse.json',
           ResultsDir + 'GraphDataframe.csv'
-    conda: '/home/tholstei/repos/PepGM_all/PepGM/workflow/envs/graphenv.yml'   
-    shell: "python3 workflow/scripts/WeightTaxa.py --UnipeptResponseFile {output[0]} --out {output[1]} --TaxonomyQuery {params.targetTaxa} --NumberOfTaxa {params.NumberofTaxa} --MinScore {params.MinScore} --PoutFile {input} " 
+    conda: 'envs/graphenv.yml'   
+    shell: "python3 workflow/scripts/WeightTaxa.py --UnipeptResponseFile {output[0]} --out {output[1]} --TaxonomyQuery {params.targetTaxa} --NumberOfTaxa {params.NumberofTaxa} --FDR {params.FDR} --PoutFile {input} " 

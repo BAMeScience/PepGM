@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--UnipeptResponseFile', type = str, required = True, help = 'path to Unipept response .json file')
 parser.add_argument('--TaxonomyQuery', required = True, help = 'taxa to query in Unipept. If querying all taxa, put [1]') 
 parser.add_argument('--NumberOfTaxa', type = int, required = True, help = 'number of taxa to include in the output' )
-parser.add_argument('--MinScore', type = float, required = True, help = 'min peptide score for the peptide to be included in the search')
+parser.add_argument('--FDR', type = float, required = True, help = 'min peptide score for the peptide to be included in the search')
 parser.add_argument('--PoutFile', type = str, required = True, help = 'path to percolator(ms2rescore) Pout file')
 parser.add_argument('--out', type = str, required = True, help = 'path to csv out file')
 
@@ -48,8 +48,12 @@ def WeightAllTaxaFromJson(JsonPath,PeptScoreDict,MaxTax):
         return UnipeptFrame[UnipeptFrame['taxa'].isin(TopTaxa.taxa[0:MaxTax])]
    
 
+
+
+
 #get peptides, spsms and score from pout file into dicitonary shape
-pep_score_psm = Unipept.Poutparser(args.PoutFile,args.MinScore,'')
+#careful: the ms2rescore 'score' is the posterior error probability!!
+pep_score_psm = Unipept.Poutparser(args.PoutFile,args.FDR,'')
 UnipeptPeptides = dict()
 for peptide in pep_score_psm.keys():
     FullyTrypticPeptides = Unipept.PepListNoMissedCleavages(peptide)

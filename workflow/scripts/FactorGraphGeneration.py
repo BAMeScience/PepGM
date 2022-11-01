@@ -257,9 +257,14 @@ class TaxonGraph(nx.Graph):
     def CreateFromUnipeptResponseCSV(self,CSVpath):
 
         UnipeptResponse = pd.read_csv(CSVpath)
-        self = nx.from_pandas_edgelist(UnipeptResponse, 'sequence', 'taxa')
-        PeptideAttributes = UnipeptResponse.set_index('sequence').to_dict(orient = 'index')
-        PeptideNodes = tuple((pep,{'InitialBelief_0':1-UnipeptResponse[],'InitialBelief_1':PepScoreDict[pep]/100, 'category':'peptide'})  for pep in UnipeptResponse.sequence)
+        newGraph = nx.from_pandas_edgelist(UnipeptResponse, 'sequence', 'taxa')
+        PeptideAttributes = UnipeptResponse.apply(lambda row: (row["sequence"], {'InitialBelief_0': row["score"],'InitialBelief_1': 1-row['score'],'category':'peptide'}) ,axis=1)
+        TaxaAttributes = UnipeptResponse.apply(lambda row: (row["taxa"], {'category':'taxon'}) ,axis=1)
+        self.add_edges_from(newGraph.edges)
+        self.add_nodes_from(PeptideAttributes)
+        self.add_nodes_from(TaxaAttributes)
+
+        
 
 
 

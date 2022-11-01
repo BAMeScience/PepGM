@@ -24,7 +24,7 @@ def ComputeMetric(resultsfolder, host, output, weightsfile):
     :param resultsfolder: str, path to PepGM resultsfolder
     :param host: str, host to be excluded from the parameter checked taxa
     :param output: str, name of the output .png file 
-    :param weightsfile: str, path to the .csv file containing potential taxids and their weights
+    :param weightsfile: str, path to the .csv file with Unipept output
     
     """
     
@@ -37,20 +37,18 @@ def ComputeMetric(resultsfolder, host, output, weightsfile):
     WeightCoeffs = []
 
     #file with weights of taxids
-    Weights = pd.read_csv(weightsfile)
+    Weights = pd.read_csv(weightsfile,usecols=['taxa','weight'])
+    Weights = Weights.groupby(['taxa']).sum().reset_index()
     Maxweight = Weights.max()['weight']
     AllTaxidsToAdd = []
-    #remove 'no match' line from weight DF
-    Weights = Weights[Weights.taxid.isin(['no match'])==False]
-    Weights.drop(Weights[Weights.taxid.isin(['no match'])].index, inplace=True)
     #add descendant taxa into weight dataframe
-    for Taxid in Weights['taxid']:
+    for Taxid in Weights['taxa']:
         TaxidsToAdd = ncbi.get_descendant_taxa(Taxid)
-        TaxidsToAdd = [[txd,float((Weights.loc[Weights['taxid']==Taxid]['weight']).to_string(index=False))]for txd in TaxidsToAdd]
+        TaxidsToAdd = [[txd,float((Weights.loc[Weights['taxa']==Taxid]['weight']).to_string(index=False))]for txd in TaxidsToAdd]
         AllTaxidsToAdd.append(TaxidsToAdd[:])
        
     AllTaxidsToAdd = [txd_1 for txd in AllTaxidsToAdd for txd_1 in txd]
-    AllWeights = pd.concat([Weights, pd.DataFrame(AllTaxidsToAdd,columns = ['taxid','weight'])],axis =0)
+    AllWeights = pd.concat([Weights, pd.DataFrame(AllTaxidsToAdd,columns = ['taxa','weight'])],axis =0)
 
         
 
@@ -74,7 +72,7 @@ def ComputeMetric(resultsfolder, host, output, weightsfile):
                     #compute the metric
                     
                     #what's the weight of the highest scoring taxid?
-                    Weight = AllWeights.loc[AllWeights['taxid']==int(TaxIDS.ID.head(1).item())]['weight'].head(1).item()
+                    Weight = AllWeights.loc[AllWeights['taxa']==int(TaxIDS.ID.head(1).item())]['weight'].head(1).item()
                     WeightCoeff = Weight/Maxweight
                     WeightCoeffs.append(WeightCoeff)
     

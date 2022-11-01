@@ -1,0 +1,448 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d3" for="node" attr.name="ParentNumber" attr.type="int"/>
+<key id="d2" for="node" attr.name="category" attr.type="string"/>
+<key id="d1" for="node" attr.name="InitialBelief_1" attr.type="double"/>
+<key id="d0" for="node" attr.name="InitialBelief_0" attr.type="double"/>
+<graph edgedefault="undirected"><node id="ADETQALPQR">
+  <data key="d0">0.00107182</data>
+  <data key="d1">0.99892818</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="ADETQALPQR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="2697049">
+  <data key="d2">taxon</data>
+</node>
+<node id="AYNVTQAFGR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="FDNPVLPFNDGVYFASTEK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="FLPFQQFGR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="FQTLLALHR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="GFYAEGSR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">3</data>
+</node>
+<node id="GGSQASSR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">3</data>
+</node>
+<node id="LNQLESK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">3</data>
+</node>
+<node id="LQDVVNQNAQALNTLVK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">2</data>
+</node>
+<node id="MAGNGGDAALALLLLDR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="NTQEVFAQVK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">3</data>
+</node>
+<node id="QQTVTLLPAADLDDFSK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="RPQGLPNNTASWFTALTQHGK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">3</data>
+</node>
+<node id="TFPPTEPK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="TQLPPAYTNSFTR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="TTNGDFLHFLPR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="VAGDSGFAAYSR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="VGGNYNYLYR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="VYSTGSNVFQTR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="WYFYYLGTGPEAGLPYGANK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="AYNVTQAFGR">
+  <data key="d0">0.00046878199999999994</data>
+  <data key="d1">0.999531218</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="FDNPVLPFNDGVYFASTEK">
+  <data key="d0">0.000785427</data>
+  <data key="d1">0.999214573</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="FLPFQQFGR">
+  <data key="d0">0.0581866</data>
+  <data key="d1">0.9418134</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="FQTLLALHR">
+  <data key="d0">0.000418633</data>
+  <data key="d1">0.999581367</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="GFYAEGSR">
+  <data key="d0">0.0175849</data>
+  <data key="d1">0.9824151</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="GGSQASSR">
+  <data key="d0">0.000420768</data>
+  <data key="d1">0.999579232</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="LNQLESK">
+  <data key="d0">0.0222772</data>
+  <data key="d1">0.9777228</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="LQDVVNQNAQALNTLVK">
+  <data key="d0">0.00048316699999999995</data>
+  <data key="d1">0.999516833</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="MAGNGGDAALALLLLDR">
+  <data key="d0">0.0222772</data>
+  <data key="d1">0.9777228</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="NTQEVFAQVK">
+  <data key="d0">0.000202256</data>
+  <data key="d1">0.999797744</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="QQTVTLLPAADLDDFSK">
+  <data key="d0">0.000210532</data>
+  <data key="d1">0.999789468</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="RPQGLPNNTASWFTALTQHGK">
+  <data key="d0">0.00019659700000000002</data>
+  <data key="d1">0.999803403</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="TFPPTEPK">
+  <data key="d0">0.0737379</data>
+  <data key="d1">0.9262621</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="TQLPPAYTNSFTR">
+  <data key="d0">0.000156374</data>
+  <data key="d1">0.999843626</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="TTNGDFLHFLPR">
+  <data key="d0">0.00442897</data>
+  <data key="d1">0.99557103</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="VAGDSGFAAYSR">
+  <data key="d0">0.0447258</data>
+  <data key="d1">0.9552742</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="VGGNYNYLYR">
+  <data key="d0">0.035769300000000004</data>
+  <data key="d1">0.9642307</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="VYSTGSNVFQTR">
+  <data key="d0">0.00202629</data>
+  <data key="d1">0.99797371</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="WYFYYLGTGPEAGLPYGANK">
+  <data key="d0">0.00011717200000000001</data>
+  <data key="d1">0.999882828</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="AGFAGDDAPR">
+  <data key="d0">0.000248875</data>
+  <data key="d1">0.999751125</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="AGFAGDDAPR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="11775">
+  <data key="d2">taxon</data>
+</node>
+<node id="DSYVGDEAQSK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="HQGVMVGMGQK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="LADFGLAR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="VAPEEHPVLLTEAPLNPK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="DSYVGDEAQSK">
+  <data key="d0">0.00428792</data>
+  <data key="d1">0.99571208</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="HQGVMVGMGQK">
+  <data key="d0">0.00428792</data>
+  <data key="d1">0.99571208</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="LADFGLAR">
+  <data key="d0">0.0699337</data>
+  <data key="d1">0.9300663</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="VAPEEHPVLLTEAPLNPK">
+  <data key="d0">0.000111335</data>
+  <data key="d1">0.999888665</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="EEGDLGPVYGFQWR">
+  <data key="d0">0.00129741</data>
+  <data key="d1">0.99870259</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="EEGDLGPVYGFQWR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="10380">
+  <data key="d2">taxon</data>
+</node>
+<node id="ELYDK">
+  <data key="d0">0.00238004</data>
+  <data key="d1">0.99761996</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="ELYDK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="649596">
+  <data key="d2">taxon</data>
+</node>
+<node id="349344">
+  <data key="d2">taxon</data>
+</node>
+<node id="389167">
+  <data key="d2">taxon</data>
+</node>
+<node id="GLQTPR">
+  <data key="d0">0.018768200000000002</data>
+  <data key="d1">0.9812318</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="GLQTPR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="12538">
+  <data key="d2">taxon</data>
+</node>
+<node id="LLTEEEYR">
+  <data key="d0">0.0764297</data>
+  <data key="d1">0.9235703</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="LLTEEEYR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="43358">
+  <data key="d2">taxon</data>
+</node>
+<node id="QGVEDAFYTLVR">
+  <data key="d0">0.017987200000000002</data>
+  <data key="d1">0.9820128</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="QGVEDAFYTLVR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">2</data>
+</node>
+<node id="11807">
+  <data key="d2">taxon</data>
+</node>
+<node id="11815">
+  <data key="d2">taxon</data>
+</node>
+<node id="SSVPGVR">
+  <data key="d0">0.0224706</data>
+  <data key="d1">0.9775294</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="SSVPGVR CPD">
+  <data key="d2">factor</data>
+  <data key="d3">6</data>
+</node>
+<node id="98832">
+  <data key="d2">taxon</data>
+</node>
+<node id="107417">
+  <data key="d2">taxon</data>
+</node>
+<node id="518987">
+  <data key="d2">taxon</data>
+</node>
+<node id="11550">
+  <data key="d2">taxon</data>
+</node>
+<node id="11522">
+  <data key="d2">taxon</data>
+</node>
+<node id="11523">
+  <data key="d2">taxon</data>
+</node>
+<node id="TLTGK">
+  <data key="d0">0.00030000700000000003</data>
+  <data key="d1">0.999699993</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="TLTGK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">3</data>
+</node>
+<node id="262177">
+  <data key="d2">taxon</data>
+</node>
+<node id="928301">
+  <data key="d2">taxon</data>
+</node>
+<node id="10778">
+  <data key="d2">taxon</data>
+</node>
+<node id="VGGQSDGSNGQSVEGLLK">
+  <data key="d0">0.0227108</data>
+  <data key="d1">0.9772892</data>
+  <data key="d2">peptide</data>
+</node>
+<node id="VGGQSDGSNGQSVEGLLK CPD">
+  <data key="d2">factor</data>
+  <data key="d3">1</data>
+</node>
+<node id="654902">
+  <data key="d2">taxon</data>
+</node>
+<edge source="ADETQALPQR" target="ADETQALPQR CPD"/>
+<edge source="ADETQALPQR CPD" target="2697049"/>
+<edge source="2697049" target="AYNVTQAFGR CPD"/>
+<edge source="2697049" target="FDNPVLPFNDGVYFASTEK CPD"/>
+<edge source="2697049" target="FLPFQQFGR CPD"/>
+<edge source="2697049" target="FQTLLALHR CPD"/>
+<edge source="2697049" target="GFYAEGSR CPD"/>
+<edge source="2697049" target="GGSQASSR CPD"/>
+<edge source="2697049" target="LNQLESK CPD"/>
+<edge source="2697049" target="LQDVVNQNAQALNTLVK CPD"/>
+<edge source="2697049" target="MAGNGGDAALALLLLDR CPD"/>
+<edge source="2697049" target="NTQEVFAQVK CPD"/>
+<edge source="2697049" target="QQTVTLLPAADLDDFSK CPD"/>
+<edge source="2697049" target="RPQGLPNNTASWFTALTQHGK CPD"/>
+<edge source="2697049" target="TFPPTEPK CPD"/>
+<edge source="2697049" target="TQLPPAYTNSFTR CPD"/>
+<edge source="2697049" target="TTNGDFLHFLPR CPD"/>
+<edge source="2697049" target="VAGDSGFAAYSR CPD"/>
+<edge source="2697049" target="VGGNYNYLYR CPD"/>
+<edge source="2697049" target="VYSTGSNVFQTR CPD"/>
+<edge source="2697049" target="WYFYYLGTGPEAGLPYGANK CPD"/>
+<edge source="AYNVTQAFGR CPD" target="AYNVTQAFGR"/>
+<edge source="FDNPVLPFNDGVYFASTEK CPD" target="FDNPVLPFNDGVYFASTEK"/>
+<edge source="FLPFQQFGR CPD" target="FLPFQQFGR"/>
+<edge source="FQTLLALHR CPD" target="FQTLLALHR"/>
+<edge source="GFYAEGSR CPD" target="GFYAEGSR"/>
+<edge source="GFYAEGSR CPD" target="349344"/>
+<edge source="GFYAEGSR CPD" target="389167"/>
+<edge source="GGSQASSR CPD" target="GGSQASSR"/>
+<edge source="GGSQASSR CPD" target="349344"/>
+<edge source="GGSQASSR CPD" target="389167"/>
+<edge source="LNQLESK CPD" target="LNQLESK"/>
+<edge source="LNQLESK CPD" target="349344"/>
+<edge source="LNQLESK CPD" target="389167"/>
+<edge source="LQDVVNQNAQALNTLVK CPD" target="LQDVVNQNAQALNTLVK"/>
+<edge source="LQDVVNQNAQALNTLVK CPD" target="349344"/>
+<edge source="MAGNGGDAALALLLLDR CPD" target="MAGNGGDAALALLLLDR"/>
+<edge source="NTQEVFAQVK CPD" target="NTQEVFAQVK"/>
+<edge source="NTQEVFAQVK CPD" target="349344"/>
+<edge source="NTQEVFAQVK CPD" target="389167"/>
+<edge source="QQTVTLLPAADLDDFSK CPD" target="QQTVTLLPAADLDDFSK"/>
+<edge source="RPQGLPNNTASWFTALTQHGK CPD" target="RPQGLPNNTASWFTALTQHGK"/>
+<edge source="RPQGLPNNTASWFTALTQHGK CPD" target="349344"/>
+<edge source="RPQGLPNNTASWFTALTQHGK CPD" target="389167"/>
+<edge source="TFPPTEPK CPD" target="TFPPTEPK"/>
+<edge source="TQLPPAYTNSFTR CPD" target="TQLPPAYTNSFTR"/>
+<edge source="TTNGDFLHFLPR CPD" target="TTNGDFLHFLPR"/>
+<edge source="VAGDSGFAAYSR CPD" target="VAGDSGFAAYSR"/>
+<edge source="VGGNYNYLYR CPD" target="VGGNYNYLYR"/>
+<edge source="VYSTGSNVFQTR CPD" target="VYSTGSNVFQTR"/>
+<edge source="WYFYYLGTGPEAGLPYGANK CPD" target="WYFYYLGTGPEAGLPYGANK"/>
+<edge source="AGFAGDDAPR" target="AGFAGDDAPR CPD"/>
+<edge source="AGFAGDDAPR CPD" target="11775"/>
+<edge source="11775" target="DSYVGDEAQSK CPD"/>
+<edge source="11775" target="HQGVMVGMGQK CPD"/>
+<edge source="11775" target="LADFGLAR CPD"/>
+<edge source="11775" target="VAPEEHPVLLTEAPLNPK CPD"/>
+<edge source="DSYVGDEAQSK CPD" target="DSYVGDEAQSK"/>
+<edge source="HQGVMVGMGQK CPD" target="HQGVMVGMGQK"/>
+<edge source="LADFGLAR CPD" target="LADFGLAR"/>
+<edge source="VAPEEHPVLLTEAPLNPK CPD" target="VAPEEHPVLLTEAPLNPK"/>
+<edge source="EEGDLGPVYGFQWR" target="EEGDLGPVYGFQWR CPD"/>
+<edge source="EEGDLGPVYGFQWR CPD" target="10380"/>
+<edge source="ELYDK" target="ELYDK CPD"/>
+<edge source="ELYDK CPD" target="649596"/>
+<edge source="GLQTPR" target="GLQTPR CPD"/>
+<edge source="GLQTPR CPD" target="12538"/>
+<edge source="LLTEEEYR" target="LLTEEEYR CPD"/>
+<edge source="LLTEEEYR CPD" target="43358"/>
+<edge source="QGVEDAFYTLVR" target="QGVEDAFYTLVR CPD"/>
+<edge source="QGVEDAFYTLVR CPD" target="11807"/>
+<edge source="QGVEDAFYTLVR CPD" target="11815"/>
+<edge source="SSVPGVR" target="SSVPGVR CPD"/>
+<edge source="SSVPGVR CPD" target="98832"/>
+<edge source="SSVPGVR CPD" target="107417"/>
+<edge source="SSVPGVR CPD" target="518987"/>
+<edge source="SSVPGVR CPD" target="11550"/>
+<edge source="SSVPGVR CPD" target="11522"/>
+<edge source="SSVPGVR CPD" target="11523"/>
+<edge source="TLTGK" target="TLTGK CPD"/>
+<edge source="TLTGK CPD" target="262177"/>
+<edge source="TLTGK CPD" target="928301"/>
+<edge source="TLTGK CPD" target="10778"/>
+<edge source="VGGQSDGSNGQSVEGLLK" target="VGGQSDGSNGQSVEGLLK CPD"/>
+<edge source="VGGQSDGSNGQSVEGLLK CPD" target="654902"/>
+</graph></graphml>

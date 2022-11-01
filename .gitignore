@@ -26,7 +26,7 @@ workflow/scripts/__pycache__/*
 workflow/Sars_strains.snakefile
 .snakemake/
 .vscode/
-./config/*
+./config/my_config.yaml
 .idea/*
 
 

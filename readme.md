@@ -277,7 +277,7 @@ viral reference database only containing peptides from cowpow and cowpox-related
 a SearchGUI parameter file and the host and cRAP peptide sequence database in `/resources`. The cowpox MS2
 spectra can be downloaded 
 <a href="https://ftp.pride.ebi.ac.uk/pride/data/archive/2020/05/PXD014913/CPXV-0,1MOI-supernatant-HEp-24h.mgf">here</a> (PRIDE ftp archive).
-Download the spectra file to `/resources/toyExample/` and adopt the file name in corresponding
+Download the spectra file to `/resources/SampleData/` and adopt the rerference database file basename in corresponding
 configuration parameter (refseqViral).
 <p align="right">(<a href="#top">back to top</a>)</p>
 

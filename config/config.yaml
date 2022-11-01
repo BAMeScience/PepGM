@@ -1,38 +1,26 @@
-### CONFIG PANEL ###
-APIkey: ''
-APImail: ''
-
-### RUN ###
-ExperimentName: 'toyExample' # Run name
-SampleName: 'cowpox'  # Sample name (subfolder)
-ReferenceDBName: 'minimal_refseqViral_for_cowpox' # Reference database name
-HostName: 'human' # Host name
-ScientificHostName: "'homo sapiens'" # Scientific host
-FilterSpectra: False       # Filter host spectra and crap
-AddHostandCrapToDB: True   # Add host and crap to the search database (if True, crap.fasta has to be provided)
-
-
-### INPUT ###
-SamplePath: '' # Sample spectra
-ParametersFile: '' # Parameter file
-DataDir: 'resources/SampleData/' # Sample
-DatabaseDir: 'resources/Database/' # Database
-PeptideShaker : '' # Peptide Shaker
-SearchGUI: '' # SearchGUI
-ResultsDir: 'results/'
+APImail: 'tanja.holstein@bam.de'
+APIkey: 'cbd119d8a7d988bc27f5b0a722a7c861f408'
+ExperimentName: 'toyExample'
+SampleName: 'cowpox'
+HostName: 'human'
+ReferenceDBName: 'minRefSeqViral'
+ScientificHostName: "'homo sapiens'" 
+FilterSpectra: False
+AddHostandCrapToDB: True
+SamplePath: '/home/fkistner/pepgm/resources/SampleData/spectra_searchgui_PXD014913_cowpox_minimal_example.mgf'
+ParametersFile: '/home/fkistner/pepgm/resources/SampleData/parfile_searchgui_PXD014913_cowpox_minimal_example.par'
+DataDir: 'resources/SampleData/'
+DatabaseDir: 'resources/Database/'
+PeptideShaker: '/home/fkistner/pepgm/bin/PeptideShaker-2.2.16/PeptideShaker-2.2.16.jar'
+SearchGUI: '/home/fkistner/pepgm/bin/SearchGUI-4.1.23/SearchGUI-4.1.23.jar'
 ResourcesDir: 'resources/'
+ResultsDir: 'results/'
 TaxidMapping: 'taxidMapping/'
-
-### SEARCH PANEL ###
 searchengines: '-xtandem'
-peptideFDR: '5'
-proteinFDR: '5'
-psmFDR: '5'
-
-### PepGM PANEL ###
+psmFDR: '5.0'
+peptideFDR: '5.0'
+proteinFDR: '5.0'
 TaxaInPlot: 15
-TaxaInProteinCount: 15
-sourceDB: 'all[FILT]'
-Alpha: [0.01,0.05,0.1,0.2,0.4,0.6] # Alpha
-Beta: [0.01,0.05,0.1,0.2,0.4,0.5,0.7] # Beta
-prior: [0.1,0.3,0.5] # prior
+Alpha: [0.01,0.05,0.10,0.20,0.40,0.60]
+Beta: [0.01,0.05,0.10,0.20,0.40,0.50,0.70]
+prior: [0.10,0.30,0.50]

@@ -2,7 +2,6 @@ results/*
 !results/.gitkeep
 
 **/Databases
-**/SampleData
 **/ncbi_dumpfiles
 **/XTandem
 **/taxadb

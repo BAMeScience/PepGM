@@ -15,6 +15,7 @@ rule createMS2RescoreConfig:
         lines.append('"pipeline":'+RescorePipeline+',')
         lines.append('"feature_sets":'+RescoreFeatures+',')
         lines.append('"run_percolator":'+RunPercolator+',')
+        lines.append('"id_decoy_pattern": "DECOY",')
         lines.append('"num_cpu":'+'1'+',')
         lines.append('"config_file":null,')
         lines.append('"tmp_path":null,')

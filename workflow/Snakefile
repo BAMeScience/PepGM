@@ -2,7 +2,7 @@
 #configuration
 WorkflowPath = os.path.dirname(os.path.realpath(workflow.snakefile))
 include: WorkflowPath +'/rules/config.smk'
-include : WorkflowPath + '/rules/searchgui+pepshaker.smk'
+include : WorkflowPath + '/rules/CurateDatabase.smk'
 include : WorkflowPath + '/rules/buildDatabase.smk'
 include : WorkflowPath + '/rules/filterHostCrap.smk'
 include : WorkflowPath + '/rules/XTandem.smk'
@@ -23,10 +23,9 @@ rule CreateFactorGraph:
           samplename = SampleName,
           hostname = HostName,
           DBname = ReferenceDBName,
-          sourceDB = sourceDB,
           ResultsDir = ResultsDir
      log: ResultsDir +'{DBname}.log'
-     shell: 'python3 workflow/scripts/CreatePepGMGraph.py --sourceDB {params.sourceDB} --UnipeptCSV {input} --out {output} &>> {log}'
+     shell: 'python3 workflow/scripts/CreatePepGMGraph.py --UnipeptCSV {input} --out {output} &>> {log}'
 
 
 rule RunPepGM:

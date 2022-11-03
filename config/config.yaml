@@ -11,7 +11,7 @@ SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.1-mac_and_linux/
 
 
 #Name of folder for the PepGM run in the results folder
-ExperimentName: 'Xtandem_rescore_test'
+ExperimentName: 'Xtandem_rescore_decoy_test'
 
 #parameters for SearchGUI Search
 searchengines: '-xtandem'
@@ -27,12 +27,12 @@ search_engine : "xtandem"
 xtandem_default: "/home/tholstei/repos/PepGM_all/PepGM/resources/XTandem/xtandem_default.xml" # X!Tandem default configuration file
 xtandem_fmme: 0.5 #Fragment mass tolerance (default=0.4)
 xtandem_fmmeu: 'DA' #Fragment mass tolerance unit (default="DA")
-xtandem_pmmep: 100 #Precursor mass tolerance plus (default=100)
-xtandem_pmmem: 100 # Precursor mass tolerance minus (default=100)
+xtandem_pmmep: 4.5 #Precursor mass tolerance plus (default=100)
+xtandem_pmmem: 4.5 # Precursor mass tolerance minus (default=100)
 xtandem_pmmeu: 'ppm' #Precursor mass tolerance unit (default="ppm")
 xtandem_mods_fixed: '57@C' #Fixed modifications, comma separated (default="57@C")
-xtandem_mods_variable: '' # Variable modifications, e.g. "16@M", comma separated (default=None)
-xtandem_mods_variable_nterm: '' #Variable N-terminal modifications, e.g."+42.0@[", comma separated (default=None)
+xtandem_mods_variable: '15.99@M,' # Variable modifications, e.g. "16@M", comma separated (default=None)
+xtandem_mods_variable_nterm: '+42@[' #Variable N-terminal modifications, e.g."+42.0@[", comma separated (default=None)
 xtandem_add_params: {} #Additional parameters for X!Tandem as json dictionary{"param1" : "value", "param2" : "value", ...} which will be added to thextandem_input.xml
 
 #ms2rescore parameters
@@ -55,10 +55,10 @@ FDR: 0.01
 
 #sample specific parameters
 SpectraFileType: '.mgf' #'.mgf' or '.mzML'
-SampleName: 'PXD002936_avian_bronchitis'  #needs to be the name of your spectrum file and the folder where you have that file
+SampleName: 'PXD003013_Cowpox_BR'  #needs to be the name of your spectrum file and the folder where you have that file
 ReferenceDBName: 'refseqViral'
-HostName: 'chicken'
-ScientificHostName: '"gallus gallus"'
+HostName: 'human'
+ScientificHostName: '"homo sapiens"'
 
 
 #PepGM parameters

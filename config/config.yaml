@@ -11,7 +11,7 @@ SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.1-mac_and_linux/
 
 
 #Name of folder for the PepGM run in the results folder
-ExperimentName: 'Xtandem_rescore_decoy_test'
+ExperimentName: 'Xtandem_rescore_decoy_test_full_Uniprot'
 
 #parameters for SearchGUI Search
 searchengines: '-xtandem'

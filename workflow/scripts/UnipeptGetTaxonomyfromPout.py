@@ -95,7 +95,7 @@ def PostInfoFromUnipept(request_json, out_file):
     :return: None
     """
     
-    url = "https://sherlock.ugent.be/mpa/pept2filtered.json"
+    url = "http://api.unipept.ugent.be/mpa/pept2filtered.son"
     request = requests.post(url,json.dumps(request_json),headers={'content-type':'application/json'})
     
     

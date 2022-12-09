@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from PySimpleGUI import Col, FolderBrowse, FileBrowse, Slider, InputText, Text, Combo, Radio, Frame, Input, Button
 import os
 import subprocess
@@ -19,12 +17,41 @@ config_keys = ['ExperimentName', 'SampleName', 'HostName', 'ReferenceDBName', 'S
 
 
 def build_frames(experiment, sample, host, host_scientific, ref_database, path_sample, path_parameter,
-                 path_data, path_database, peptide_shaker, search_gui, alpha, beta, prior, psm_fdr, peptide_fdr,
-                 protein_fdr, n_taxa, mail, key):
-    # CONFIG FRAME
+                 path_data, path_database, path_peptide_shaker, path_search_gui, alpha, beta, prior, psm_fdr,
+                 peptide_fdr, protein_fdr, n_taxa, mail, key):
+    """
+    Create PySimpleGUI frames.
+    Parameters
+    ----------
+    experiment : str, given name for your experiment that will create a subfolder in /results.
+    sample : str, given name for your sample
+    host : str, host name
+    host_scientific : str, scientific (latin) host name
+    ref_database : str, reference database name
+    path_sample : str, path to sample spectra files
+    path_parameter : str, path to your parameter file
+    path_data : str, path to folder that contains sample
+    path_database : str, path to folder that contains database
+    path_peptide_shaker : str, path to PeptideShaker binary
+    path_search_gui : str, path to SearchGUI binary
+    alpha : lst, list of alpha candidates for grid search
+    beta : lst, list of beta candidates for grid search
+    prior : lst, list of prior probability candidates for grid search
+    peptide_fdr : str, peptide false discovery rate
+    protein_fdr : str, protein false discovery rate
+    n_taxa : int, upper limit of taxa to display in the results plot
+    mail : str, mail credentials for logging into NCBI
+    key : str, key for logging into NCBI
+
+    Returns
+    -
+    -------
+
+    """
+    # config frame
     config_frame = Col([[Text("API mail", size=(12, 1)), InputText(key="APImail", default_text=mail, text_color="grey"),
                          Text('API key', size=(12, 1)), InputText(key="APIkey", default_text=key, text_color="grey")]])
-    # RUN FRAME
+    # run frame
     run_frame = Col([
         [InputText(key="ExperimentName", default_text=experiment, expand_x=True, enable_events=True)],
         [Text("Sample", size=(12, 1)),
@@ -37,7 +64,8 @@ def build_frames(experiment, sample, host, host_scientific, ref_database, path_s
          Input(key="ScientificHostName", default_text=host_scientific, expand_x=True)],
         [Radio('Filter spectra', default=False, key="FilterSpectra", group_id=1),
          Radio('Add host and crap databases', default=True, key="AddHostandCrapToDB", group_id=1)]])
-    # INPUT FRAMES
+
+    # input frame
     input_file_frame = Col([
         [Text("Sample spectra", size=(20, 1)), InputText(key="SamplePath", default_text=path_sample, size=(90, 1)),
          FileBrowse()],
@@ -49,13 +77,14 @@ def build_frames(experiment, sample, host, host_scientific, ref_database, path_s
          [Text("Database", size=(20, 1)), Input(key="DatabaseDir", default_text=path_database, size=(90, 1)),
           FolderBrowse()],
          [Text("Peptide Shaker", size=(20, 1)),
-          Input(key="PeptideShaker", default_text=peptide_shaker, size=(90, 1)), FolderBrowse()],
-         [Text("Search GUI", size=(20, 1)), Input(key="SearchGUI", default_text=search_gui, size=(90, 1)),
+          Input(key="PeptideShaker", default_text=path_peptide_shaker, size=(90, 1)), FolderBrowse()],
+         [Text("Search GUI", size=(20, 1)), Input(key="SearchGUI", default_text=path_search_gui, size=(90, 1)),
           FolderBrowse()],
          [Text("Resources", size=(20, 1)), Input(key="ResourcesDir", default_text="resources/", size=(90, 1))],
          [Text("Results", size=(20, 1)), Input(key="ResultsDir", default_text="results/", size=(90, 1))],
          [Text("TaxID mapping", size=(20, 1)), Input(key="TaxidMapping", default_text="taxidMapping/", size=(90, 1))]])
-    # PEPGM FRAME
+
+    # pepgm frame
     gridsearch_frame = Col([[Text("Alpha", size=(12, 2)), InputText(default_text=alpha, key="Alpha")],
                             [Text("Beta", size=(12, 2)), Input(default_text=beta, key="Beta")],
                             [Text("Prior", size=(12, 2)), Input(default_text=prior, key="prior")]])
@@ -76,18 +105,19 @@ def build_frames(experiment, sample, host, host_scientific, ref_database, path_s
                            [Frame("FDR calculation", [[fdr_frame]], expand_x=True, expand_y=True)]], expand_x=True,
                           expand_y=True)
 
-    return config_frame, run_frame, input_file_frame, input_dir_frame, pepgm_frame, \
-           searchgui_frame
+    return config_frame, run_frame, input_file_frame, input_dir_frame, pepgm_frame, searchgui_frame
 
 
 def setup_layout(experiment="", sample="", host="", host_scientific="", ref_database="", path_sample="",
                  path_parameter="", path_data="", path_database="", peptide_shaker="", search_gui="",
                  alpha=[0.01, 0.05, 0.1, 0.2, 0.4, 0.6], beta=[0.01, 0.05, 0.1, 0.2, 0.4, 0.5, 0.7],
                  prior=[0.1, 0.3, 0.5], psm_fdr=1, peptide_fdr=1, protein_fdr=1, n_taxa=15, key="", mail=""):
+
     config_frame, run_frame, input_file_frame, input_dir_frame, pepgm_frame, searchgui_frame = build_frames(
         experiment, sample, host, host_scientific, ref_database, path_sample, path_parameter, path_data, path_database,
         peptide_shaker, search_gui, list(alpha), list(beta), list(prior), psm_fdr, peptide_fdr, protein_fdr, n_taxa,
         key, mail)
+
     scaffold = [[Frame("Configuration details", [[config_frame]], expand_x=True)],
                 [Frame("Run details", [[run_frame]], tooltip="Run configuration", expand_x=True)],
                 [Frame("Input paths", [[input_file_frame], [input_dir_frame]], expand_x=True)],
@@ -102,9 +132,16 @@ def setup_layout(experiment="", sample="", host="", host_scientific="", ref_data
 
 def parse_config(configurations, path_config):
     """
-    Write configuration from GUI into config file.
-    :param configurations: list, configuration as retrieved from GUI
-    :param path_config: str, path to config file
+    Parse configurations into output file in yaml syntax.
+    Parameters
+    ----------
+    configurations : lst, list of configuration parameters that are read from the GUI
+    path_config : str, path to configuration file
+
+    Returns
+    -
+    -------
+
     """
     with open(path_config, "w") as config_file_out:
         # iterate over all dictionary keys and entries
@@ -142,18 +179,18 @@ def parse_config(configurations, path_config):
                 config_file_out.write("%s: '%s'\n" % (param, value))
 
 
-def main():
+if __name__ == '__main__':
     sg.theme("SystemDefaultForReal")
-    # wd = os.path.dirname(os.path.realpath(workflow.snakefile))
     # get config file path
     config_file = Path(os.path.normpath(os.path.join(os.path.dirname(__file__), '../config/config.yaml')))
 
     if not config_file.exists():
+        # use empty layout
         scaffold = setup_layout()
     else:
         # load previous configurations
         prev_configs = yaml.load(config_file.read_text(), Loader=SafeLoader)
-        # do not display single quotes
+        # do not save single quotes
         prev_configs["ScientificHostName"] = prev_configs["ScientificHostName"].replace("'", "")
         # auto fill input from config file
         scaffold = setup_layout(prev_configs["ExperimentName"], prev_configs["SampleName"], prev_configs["HostName"],
@@ -174,34 +211,25 @@ def main():
         input_key_list = [key for key, value in window.key_dict.items()]
         # run button
         if event == 'Run':
-            cores = int(values["core_number"])
-
-            # print("Your snakemake command: ")
-            # run_command(snakemake_cmd)
-            snakemake_cmd = 'cd ..; snakemake --use-conda --conda-frontend conda --cores 30'
-            # subprocess.Popen([f'{snakemake_cmd}'], shell=True)
-            # subprocess.Popen(snakemake_cmd, shell=True)
+            snakemake_cmd = f'cd ..; snakemake --use-conda --conda-frontend conda --cores {int(values["core_number"])}'
             subprocess.Popen([f'{snakemake_cmd}'], shell=True)
-        # dry run button
+
         if event == 'Dry run':
             snakemake_cmd = f"cd ..; snakemake -np"
-            run_command(cmd=snakemake_cmd, window=window)
-        # update config file
+            subprocess.Popen([f'{snakemake_cmd}'], shell=True)
+
         if event == "Write":
-            print("Write configs successfull.")
+            print("Write configs successfully.")
+            # filter configurations
             configs = {key: val for key, val in values.items() if key in config_keys}
             parse_config(configs, config_file)
-        # help pages are on GitHub
+
         if event == 'Help':
             print("You will be redirected to the GitHub help pages.")
             webbrowser.open("https://github.com/BAMeScience/PepGM/blob/master/readme.md")
-        # exit
+
         if event == 'Exit':
             break
-        # close window event (X)
+
         if event == sg.WINDOW_CLOSED:
             break
-
-
-if __name__ == "__main__":
-    main()

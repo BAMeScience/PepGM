@@ -1,13 +1,13 @@
-APImail: 'tanja.holstein@bam.de'
+APImail: 'ytanja.holstein@bam.de'
 APIkey: 'cbd119d8a7d988bc27f5b0a722a7c861f408'
-ExperimentName: 'toyExample'
+ExperimentName: 'psl'
 SampleName: 'cowpox'
 HostName: 'human'
 ReferenceDBName: 'minRefSeqViral'
 ScientificHostName: "'homo sapiens'" 
 FilterSpectra: False
 AddHostandCrapToDB: True
-SamplePath: '/home/fkistner/pepgm/resources/SampleData/spectra_searchgui_PXD014913_cowpox_minimal_example.mgf'
+SamplePath: '/home/fkistner/pepgm/resources/SampleData/spectrafile_PXD014913_cowpox_minimal_example.mgf'
 ParametersFile: '/home/fkistner/pepgm/resources/SampleData/parfile_searchgui_PXD014913_cowpox_minimal_example.par'
 DataDir: 'resources/SampleData/'
 DatabaseDir: 'resources/Database/'

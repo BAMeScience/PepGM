@@ -163,7 +163,7 @@ We recommend using the RefSeq Viral database as a generic reference database. It
   cd ./resources/Database
   wget ftp://ftp.ncbi.nlm.nih.gov/refseq/release/viral/\*.protein.faa.gz &&
   gzip -d viral.*.protein.faa.gz &&
-  cat viral.*.protein.faa> refseq_viral.fasta &&
+  cat viral.*.protein.faa> refSeqViral.fasta &&
   rm viral.*.protein.faa
   ```
 ### Using the NCBI Entrez API 
@@ -277,8 +277,18 @@ viral reference database only containing peptides from cowpow and cowpox-related
 a SearchGUI parameter file and the host and cRAP peptide sequence database in `/resources`. The cowpox MS2
 spectra can be downloaded 
 <a href="https://ftp.pride.ebi.ac.uk/pride/data/archive/2020/05/PXD014913/CPXV-0,1MOI-supernatant-HEp-24h.mgf">here</a> (PRIDE ftp archive).
-Download the spectra file to `/resources/SampleData/` and adopt the rerference database file basename in corresponding
-configuration parameter (refseqViral).
+Download the spectra file to `/resources/SampleData/`
+
+```
+wget https://ftp.pride.ebi.ac.uk/pride/data/archive/2020/05/PXD014913/CPXV-0,1MOI-supernatant-HEp-24h.mgf
+mv CPXV-0,1MOI-supernatant-HEp-24h.mgf spectrafile_PXD014913_cowpox_minimal_example.mgf
+    
+```
+
+and adopt the reference database file basename in corresponding configuration parameter to minRefSeqViral. Finally, 
+insert your API key and mail and replace the path to SamplePath, ParameterFile, SearchGUI and PeptideShaker with your
+individual locations.
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- ROADMAP -->

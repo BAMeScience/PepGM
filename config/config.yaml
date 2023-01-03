@@ -1,22 +1,23 @@
-APImail: ''
-APIkey: ''
-ExperimentName: ''
-SampleName: ''
-HostName: ''
-ReferenceDBName: ''
-ScientificHostName: ''
+APImail: '' # provide API mail (optional but recommended)
+APIkey: '' # provide API key (optional but recommended)
+ExperimentName: 'ToyExample'
+SampleName: 'PXD014913_Cowpox_Minimal_Example.mgf'
+HostName: 'human'
+ReferenceDBName: 'minRefSeqViral'
+ScientificHostName: '"homo sapiens"'
 FilterSpectra: False
 AddHostandCrapToDB: True
-SamplePath: ''
-ParametersFile: ''
+
+SamplePath: '/path/to/resources/SampleData/spectrafile_PXD014913_cowpox_minimal_example.mgf' # replace  path
+ParametersFile: '/path/to/resources/SampleData/parfile_searchgui_PXD014913_cowpox_minimal_example.par' # replace path
 DataDir: 'resources/SampleData/'
 DatabaseDir: 'resources/Database/'
-PeptideShaker: ''
-SearchGUI: ''
+PeptideShaker: '/path/to/bin/PeptideShaker-2.2.16/PeptideShaker-2.2.16.jar' # replace path
+SearchGUI: '/path/to/bin/SearchGUI-4.1.23/SearchGUI-4.1.23.jar' # replace path
 ResourcesDir: 'resources/'
 ResultsDir: 'results/'
 TaxidMapping: 'taxidMapping/'
-searchengines:
+searchengines: '-xtandem'
 psmFDR: '5.0'
 peptideFDR: '5.0'
 proteinFDR: '5.0'

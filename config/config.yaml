@@ -6,12 +6,20 @@ ResourcesDir: 'resources/'
 TaxidMapping: 'taxidMapping/'
 
 #PeptideShaker and SearchGUI directories
+#paths to directories
+DataDir: 'resources/SampleData/'
+DatabaseDir: 'resources/Databases/'
+ResultsDir: 'results/'
+ResourcesDir: 'resources/'
+TaxidMapping: 'taxidMapping/'
+
+#PeptideShaker and SearchGUI directories
 PeptideShakerDir : '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.1.1/'
 SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.1-mac_and_linux/SearchGUI-4.1.1/'
 
 
 #Name of folder for the PepGM run in the results folder
-ExperimentName: 'Xtandem_rescore_decoy_test_full_Uniprot'
+ExperimentName: 'Xtandem_rescore_decoy_test_full_Uniprot_nohost_unipept'
 
 #parameters for SearchGUI Search
 searchengines: '-xtandem'
@@ -24,15 +32,18 @@ AddHostandCrapToDB: True
 
 #xtandem parameters
 search_engine : "xtandem"
+xtandem_mods_variable : "16@M"
+xtandem_pmmep : 5
+xtandem_pmmem : 5
 xtandem_default: "/home/tholstei/repos/PepGM_all/PepGM/resources/XTandem/xtandem_default.xml" # X!Tandem default configuration file
 xtandem_fmme: 0.5 #Fragment mass tolerance (default=0.4)
 xtandem_fmmeu: 'DA' #Fragment mass tolerance unit (default="DA")
-xtandem_pmmep: 4.5 #Precursor mass tolerance plus (default=100)
-xtandem_pmmem: 4.5 # Precursor mass tolerance minus (default=100)
+xtandem_pmmep: 5 #Precursor mass tolerance plus (default=100)
+xtandem_pmmem: 5 # Precursor mass tolerance minus (default=100)
 xtandem_pmmeu: 'ppm' #Precursor mass tolerance unit (default="ppm")
-xtandem_mods_fixed: '57@C' #Fixed modifications, comma separated (default="57@C")
-xtandem_mods_variable: '15.99@M,' # Variable modifications, e.g. "16@M", comma separated (default=None)
-xtandem_mods_variable_nterm: '+42@[' #Variable N-terminal modifications, e.g."+42.0@[", comma separated (default=None)
+xtandem_mods_fixed: '57@C,15.99@M' #Fixed modifications, comma separated (default="57@C")
+xtandem_mods_variable: '0.984@N,0.984@Q' # Variable modifications, e.g. "16@M", comma separated (default=None)
+xtandem_mods_variable_nterm: '' #Variable N-terminal modifications, e.g."+42.0@[", comma separated (default=None)
 xtandem_add_params: {} #Additional parameters for X!Tandem as json dictionary{"param1" : "value", "param2" : "value", ...} which will be added to thextandem_input.xml
 
 #ms2rescore parameters
@@ -41,7 +52,9 @@ RescoreFeatures: '[["searchengine", "ms2pip", "rt"]]' #[["searchengine", "ms2pip
 RunPercolator: 'true' #boolean
 FragModel: '"HCD"' #fragmentation model used for ms2pip http://compomics.github.io/projects/ms2pip_c#specialized-prediction-models
 Mods: 
-      [["Carbamidomethyl", 4,57.021464,'"C"', 'false', 'false'],
+      [["Deamidated", 7, 0.984016, '"Q"', 'false', 'false'],
+       ["Deamidated", 7, 0.984016, '"N"', 'false', 'false'],
+       ["Carbamidomethyl", 4,57.021464,'"C"', 'false', 'false'],
        ["Oxidated", 35, 15.9949146, '"M"','true','false'],
        ["Acetyl", 1, 42.010565,'null','true','false'],
        ["Gln->pyro-Glu",28,-17.026549, '"Q"', 'true', 'false'],
@@ -55,11 +68,10 @@ FDR: 0.01
 
 #sample specific parameters
 SpectraFileType: '.mgf' #'.mgf' or '.mzML'
-SampleName: 'PXD003013_Cowpox_BR'  #needs to be the name of your spectrum file and the folder where you have that file
+SampleName: 'PXD018594_Sars_CoV_2'  #needs to be the name of your spectrum file and the folder where you have that file
 ReferenceDBName: 'refseqViral'
-HostName: 'human'
-ScientificHostName: '"homo sapiens"'
-
+HostName: 'chlorocebus'
+ScientificHostName: 'chlorocebus'
 
 #PepGM parameters
 TaxaInPlot: 15       #how many taxa should appear in the final results barplot
@@ -70,4 +82,5 @@ sourceDB: 'all[FILT]' #choose from entrez query DBs to filter the protein DB wit
 Alpha: [0.01,0.05,0.1,0.2,0.4,0.6] #increments of parameter alpha to use for the grid earch
 Beta: [0.01,0.05,0.1,0.2,0.4,0.5,0.7] #range of parameter beta to use for the grid search
 prior: [0.1,0.3,0.5]
+
 

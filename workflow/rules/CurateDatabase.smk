@@ -14,6 +14,8 @@ rule RemoveDuplicatesFull:
      conda: 'envs/graphenv.yml'
      shell:  'seqkit rmdup -s {input} > {output}'
 
+
+     
 rule AddDecoysFull:
      input: DatabaseDirectory+HostName+'+crap+'+ReferenceDBName+'_UNI.fasta'
      output: 
@@ -35,6 +37,14 @@ rule AddDecoys:
      output: 
           DatabaseDirectory+HostName+ReferenceDBName+'_UNI_concatenated_target_decoy.fasta',
           DatabaseDirectory+HostName+ReferenceDBName+'_UNI_decoy.fasta'
+     conda: 'envs/decoy.yml'
+     shell: 'decoypyrat {input} -o {output[1]} -d DECOY && cat {input} {output[1]} > {output[0]}'
+
+rule AddDecoysNohostNoCrap:
+     input: DatabaseDirectory+ReferenceDBName+'_UNI.fasta'
+     output: 
+          DatabaseDirectory+ReferenceDBName+'_UNI_concatenated_target_decoy.fasta',
+          DatabaseDirectory+ReferenceDBName+'_UNI_decoy.fasta'
      conda: 'envs/decoy.yml'
      shell: 'decoypyrat {input} -o {output[1]} -d DECOY && cat {input} {output[1]} > {output[0]}'
 

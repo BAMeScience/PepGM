@@ -11,7 +11,7 @@ SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.1-mac_and_linux/
 
 
 #Name of folder for the PepGM run in the results folder
-ExperimentName: 'Xtandem_rescore_decoy_test_full_Uniprot'
+ExperimentName: 'Xtandem_rescore_decoy_test_full_Uniprot_with_host_less_taxa'
 
 #parameters for SearchGUI Search
 searchengines: '-xtandem'
@@ -48,9 +48,12 @@ Mods:
        ["Glu->pyro-Glu", 27, -18.010565, '"E"', 'true',  'false'],
        ["Ammonia-loss", 385, -17.026549, '"C"', 'true','false']] #needs to be a lists of lists with name, unimod accession, mass shift, amino acid, n term (bool), c term (bool)
 
+
+
+
 #UnipeptQueryParameters
-TaxaNumber: 30
-targetTaxa: 10239   #comma separated taxa to be included in Unipept query 
+TaxaNumber: 20
+targetTaxa: 10239,9606   #comma separated taxa to be included in Unipept query 
 FDR: 0.01
 
 #sample specific parameters
@@ -60,8 +63,6 @@ ReferenceDBName: 'refseqViral'
 HostName: 'human'
 ScientificHostName: '"homo sapiens"'
 
-
-#PepGM parameters
 TaxaInPlot: 15       #how many taxa should appear in the final results barplot
 TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barplot
 sourceDB: 'all[FILT]' #choose from entrez query DBs to filter the protein DB with 

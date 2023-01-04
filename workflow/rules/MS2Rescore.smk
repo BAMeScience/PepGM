@@ -50,6 +50,7 @@ rule RunMS2Rescore:
     conda: 'envs/graphenv.yml'
     params: OutputName = MS2RescoreDir+'rescored'
     output: MS2RescoreDir+'rescored_searchengine_ms2pip_rt_features.pout'
+    log: MS2RescoreDir + 'ms2rescore.log'
     shell: 'cp config/config.yaml '+ResultsDir +' && ms2rescore -c {input[1]} -m {input[2]} {input[0]} -o {params.OutputName}'
 
 

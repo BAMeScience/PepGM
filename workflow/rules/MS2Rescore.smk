@@ -48,6 +48,7 @@ rule RunMS2Rescore:
         MS2RescoreDir+'config.json', 
         InputSpectrum 
     conda: 'envs/graphenv.yml'
+    log: MS2RescoreDir + 'ms2rescore.log'
     params: OutputName = MS2RescoreDir+'rescored'
     output: MS2RescoreDir+'rescored_searchengine_ms2pip_rt_features.pout'
     log: MS2RescoreDir + 'ms2rescore.log'

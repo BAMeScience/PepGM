@@ -1,10 +1,13 @@
 results/*
 !results/.gitkeep
+resources/*
+!resources/.gitkeep
 
 **/Databases
 **/ncbi_dumpfiles
 **/XTandem
 **/taxadb
+**/Strainfiles
 resources/taxidMapping/accessions_hashed.npy
 resources/taxidMapping/accessions.txt
 resources/taxidMapping/protacc2taxids_virus.txt

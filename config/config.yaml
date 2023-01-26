@@ -1,19 +1,19 @@
-APImail: '' # provide API mail (optional but recommended)
-APIkey: '' # provide API key (optional but recommended)
-ExperimentName: 'ToyExample'
-SampleName: 'PXD014913_Cowpox_Minimal_Example.mgf'
-HostName: 'human'
-ReferenceDBName: 'minRefSeqViral'
-ScientificHostName: '"homo sapiens"'
+APIkey: 'cbd119d8a7d988bc27f5b0a722a7c861f408'
+APImail: 'tanja.holstein@bam.de'
+ExperimentName: 'VMBenchmark_zerolookahead'
+SampleName: 'sars2'
+HostName: 'chlorocebus'
+ReferenceDBName: 'refseqViral'
+ScientificHostName: '"chlorocebus"'
 FilterSpectra: False
 AddHostandCrapToDB: True
 
-SamplePath: '/path/to/resources/SampleData/spectrafile_PXD014913_cowpox_minimal_example.mgf' # replace  path
-ParametersFile: '/path/to/resources/SampleData/parfile_searchgui_PXD014913_cowpox_minimal_example.par' # replace path
+SamplePath: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD025130_Sars_CoV_2/PXD025130_Sars_CoV_2.mgf' # replace  path
+ParametersFile: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD025130_Sars_CoV_2/PXD025130_Sars_CoV_2.par' # replace path
 DataDir: 'resources/SampleData/'
 DatabaseDir: 'resources/Database/'
-PeptideShaker: '/path/to/bin/PeptideShaker-2.2.16/PeptideShaker-2.2.16.jar' # replace path
-SearchGUI: '/path/to/bin/SearchGUI-4.1.23/SearchGUI-4.1.23.jar' # replace path
+PeptideShaker: '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.2.9/PeptideShaker-2.2.9.jar' # replace path
+SearchGUI: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.14/SearchGUI-4.1.14.jar' # replace path
 ResourcesDir: 'resources/'
 ResultsDir: 'results/'
 TaxidMapping: 'taxidMapping/'
@@ -25,3 +25,4 @@ TaxaInPlot: 15
 Alpha: [0.01,0.05,0.10,0.20,0.40,0.60]
 Beta: [0.01,0.05,0.10,0.20,0.40,0.50,0.70]
 prior: [0.10,0.30,0.50]
+

@@ -1,7 +1,7 @@
 APImail: '' # provide API mail (optional but recommended)
 APIkey: '' # provide API key (optional but recommended)
 ExperimentName: 'ToyExample'
-SampleName: 'PXD014913_Cowpox_Minimal_Example.mgf'
+SampleName: 'PXD014913_Cowpox_Minimal_Example'
 HostName: 'human'
 ReferenceDBName: 'minRefSeqViral'
 ScientificHostName: '"homo sapiens"'

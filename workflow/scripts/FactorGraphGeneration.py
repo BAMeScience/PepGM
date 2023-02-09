@@ -371,6 +371,7 @@ class TaxonGraph(nx.Graph):
                 self.add_edges_from(taxon_pep_edges)
 
 
+
     def CreateFromProteinCSV(self,CSVpath):
 
         ProteinCSV = pd.read_csv(CSVpath)
@@ -431,9 +432,10 @@ class FactorGraph(nx.Graph):
                 self.add_edges_from([(node[0]+' CPD',x) for x in neighbors])
                 self.add_edge(node[0]+' CPD',node[0])
                
-               
+    
                 
         return [self]
+    
 
     def ConstructFromTaxonGraph(self, TaxonPeptideGraph):
         ''''
@@ -450,6 +452,24 @@ class FactorGraph(nx.Graph):
                 self.add_edges_from([(node[0]+' CPD',x) for x in neighbors])
                 self.add_edge(node[0]+' CPD',node[0])
 
+
+
+    def AddArtificialPeptides(self,PepTuples,Taxid):
+        '''
+        Add the peptides given in PepTaxonTuples into the graph. This function was created to be able to artificially add peptides to the
+        graph that were not detected during the database search and evaluate their effects on sear results. 
+        During 'nornaml' pepGM use, it should not be called.
+        :input PepTuples: list of tuples with (peptide_to_add,{'InitialBelief_0': int,
+                                    'InitialBelief_1': int, 'category': 'peptide})
+        :input Taxid: taxid the artificial peptides will be added to
+        :out: none
+        '''        
+        taxon_pep_edges = tuple((Taxid, pep[0]) for pep in PepTuples)
+        self.add_nodes_from(PepTuples)
+        self.add_edges_from(taxon_pep_edges)
+
+
+        
 #separate the connected components in the subgraph
 def SeparateSubgraphs(graphIN,NodesToKeep):
     '''

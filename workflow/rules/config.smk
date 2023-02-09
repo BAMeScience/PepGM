@@ -13,6 +13,8 @@ ResultsDirStrain = config['ResultsDir']
 SamplePath = config['SamplePath']
 ParametersFile = config['ParametersFile']
 
+ProteinGM = config['ProteinGM']
+
 
 PeptideShaker = config['PeptideShaker']
 SearchGUI = config['SearchGUI']

@@ -17,6 +17,7 @@ parser.add_argument('--prior', type = float, required = True, help = 'prior assi
 args = parser.parse_args()
 
 CTFactorgraph = CTFactorGraph(args.GraphMLPath)
+CTFactorgraph.AddCTNodes()
 CTFactorgraph.FillInFactors(args.alpha,args.beta)
 CTFactorgraph.FillInPriors(args.prior)
 

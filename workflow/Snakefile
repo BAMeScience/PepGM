@@ -4,6 +4,8 @@ include: WorkflowPath + '/rules/config.smk'
 include: WorkflowPath + '/rules/searchgui+pepshaker.smk'
 include: WorkflowPath + '/rules/buildDatabase.smk'
 include: WorkflowPath + '/rules/filterHostCrap.smk'
+include: WorkflowPath + '/rules/protGM.smk'
+
 
 
 rule all:
@@ -18,7 +20,7 @@ rule getTargets:
     input:
         ResultsDir + SampleName + '/{DBname}_Default_PSM_Report.txt',
         ResourcesDir + TaxidMapping + 'accessions_hashed.npy',
-        ResourcesDir + TaxidMapping + 'taxids.txt'
+        ResourcesDir + TaxidMapping + 'taxids.txt',
     params:
         query=ResultsDir + SampleName + '/{DBname}_query_accessions.txt',
         samplename=SampleName,
@@ -26,7 +28,7 @@ rule getTargets:
         DBname=ReferenceDBName
     conda: 'envs/graphenv.yml'
     output:
-        ResultsDir + SampleName + '/{DBname}_mapped_taxids.txt',ResultsDir + SampleName + '/{DBname}_mapped_taxids_weights.csv'
+        ResultsDir + SampleName + '/{DBname}_mapped_taxids.txt',ResultsDir + SampleName + '/{DBname}_mapped_taxids_weights.csv',ResultsDir + SampleName + '/{DBname}_mapped_taxids_accessions.csv'
     shell: "python3 workflow/scripts/getTargets.py -rq {input[0]} -q {params.query} -d {input[1]} -t {input[2]} -r {output[0]} "
 
 
@@ -45,9 +47,30 @@ rule CreateFactorGraph:
     log: ResultsDir + SampleName + '/{DBname}.log'
     shell: 'python3 workflow/scripts/CreatePepGMGraph.py --APIkey {params.APIkey} --APImail {params.APImail} --targetTaxa {input[1]}  --PSM_Report {input[0]} --PeptideMapPath ' + ResultsDir + '{params.samplename}/Mapped_Taxa_Proteins.json --out {output} &>> {log}'
 
+rule CreateProteinFactorGraph:
+    input: ResultsDir + SampleName + '/{DBname}_protein_graph.csv'
+    output: ResultsDir + SampleName + '/{DBname}_PepGM_graph_protein.graphml'
+    conda: 'envs/graphenv.yml'
+    params:
+        samplename=SampleName,
+        hostname=HostName,
+        DBname=ReferenceDBName,
+        ResultsDir=ResultsDir,
+        APImail=APImail,
+        APIkey=APIkey
+    log: ResultsDir + SampleName + '/{DBname}.log'
+    shell: 'python3 workflow/scripts/CreatePepGMGraph.py --protGM True --APIkey {params.APIkey} --APImail {params.APImail}  --out {output} --proteinCSV {input} &>> {log}'
+
+def PepGMtoUse(condition):
+    if condition:
+        return ResultsDir + SampleName + '/{DBname}_PepGM_graph_protein.graphml'
+    else:
+        return ResultsDir + SampleName + '/{DBname}_PepGM_graph.graphml'
+
+
 
 rule RunPepGM:
-    input: ResultsDir + SampleName + '/{DBname}_PepGM_graph.graphml'
+    input: PepGMtoUse(ProteinGM)
     output: ResultsDir + SampleName + '/Prior{Prior}/{DBname}_PepGM_Results_a{alpha}_b{beta}_p{Prior}.csv'
     conda: 'envs/graphenv.yml'
     params:

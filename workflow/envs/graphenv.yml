@@ -38,7 +38,7 @@ dependencies:
     - filelock==3.5
     - jsonschema==4.4
     - llvmlite==0.38
-    - mmh3==3.0
+    - mmh3==3.0.0
     - nbformat==5.1
     - numba==0.55
     - psutil==5.9

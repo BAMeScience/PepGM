@@ -106,7 +106,7 @@ class ProteinPeptideGraph(nx.Graph):
 
 class TaxonGraph(nx.Graph):
     '''
-    class with functions to construct a peptide-taxon graph using entrez/ncbi mapping
+    class with functions to construct a peptide-taxon or peptide-protein graph using entrez/ncbi mapping
     '''
     def __init__(self):
         nx.Graph.__init__(self)
@@ -145,6 +145,12 @@ class TaxonGraph(nx.Graph):
             self.TaxidList = self.TaxidList+TaxidList
     
     def GetAllLeafTaxaFromTaxids(self, TaxidFile, StrainResolution = True):
+        '''
+        takes a list of input taxa and add all child taxa into the taxidList attribute
+        :input TaxidFile: str, path to tsv file with taxa to be included in graph
+        :input StrainResolution, bool, whether to build the graph with strain resolution or not
+        :output: none
+        '''
         
         with open(TaxidFile) as Taxids:
             
@@ -181,6 +187,10 @@ class TaxonGraph(nx.Graph):
         '''
         gets the proteins corresponding to the target taxa from entrez and saves them
         in a json document.
+        :input PeptideMapPath: str, path to resultsfile
+        :input sourceDB: str, describes which DB ncbi will search for the taxon protein recors
+        :output: json file with {taxon:proteins} mapping
+
         '''
     
         entrezDbName = 'protein'
@@ -214,6 +224,45 @@ class TaxonGraph(nx.Graph):
             
         with open(PeptideMapPath, 'w+') as savefile:        
             json.dump(saveLists,savefile)
+
+    def FetchTaxonDataToFasta(self, FastaPath, sourceDB):
+        '''
+        gets the proteins corresponding to the target taxa from entrez and saves them
+        in a json document.
+        :input PeptideMapPath: str, path to resultsfile
+        :input sourceDB: str, describes which DB ncbi will search for the taxon protein records
+        :output: fasta file with all strain specific sequences
+
+        '''
+    
+        entrezDbName = 'protein'
+
+        # options listed here https://www.ncbi.nlm.nih.gov/books/NBK49540/
+        #sourceDBOptions = ['refseq[filter]','swissprot[filter]','protein_all[PROP]'] 
+        
+        saveFastas= str()
+        for Taxid in self.TaxidList:
+
+            ncbiTaxId = str(Taxid) 
+
+            # Find entries matching the query (only swissprot registered proteins for now)
+            entrezQuery = sourceDB +' AND txid%s[ORGN]'%(ncbiTaxId) # AND 
+            searchResultHandle = Entrez.esearch(db=entrezDbName, term=entrezQuery, retmax = 1000)
+            print(entrezQuery)
+            searchResult = Entrez.read(searchResultHandle)
+            searchResultHandle.close()
+
+            #fetch corresponding proteins from NCBI entrez
+            if searchResult['Count'] != '0':
+
+                uidList = ','.join(searchResult['IdList'])
+                fastaEntry = (Entrez.efetch(db=entrezDbName, id=uidList, rettype='fasta',retmax = 1000).read())
+                saveFastas+= fastaEntry
+
+                
+
+        with open(FastaPath, 'w+') as savefile:        
+            savefile.write(saveFastas)
 
 
     def CreateTaxonPeptideGraph(self, map, min_score, min_pep_len=5, max_pep_len=30):
@@ -283,6 +332,56 @@ class TaxonGraph(nx.Graph):
                 # conserves peptide graph structure, score will come from DB search engines anyways
                 self.add_nodes_from(pep_nodes)
                 self.add_edges_from(taxon_pep_edges)
+    
+    def CreateTaxonProteingraphFromPSMresults(self, psm_report, map, min_score, min_pep_len=5, max_pep_len=30):
+        """
+        Initialize graphical model consisting of nodes (taxons, peptides) and edges (mapping).
+
+        :param map: str, path to taxon-peptide map
+        :param psm_report: str, path to psm report
+        :param min_score: int, score cutoff
+        :param min_pep_len: int, peptide length lower limit
+        :param max_pep_len: int, peptide length upper limit
+        """
+
+        # read proteinlists from file that recorded the NCBI matches
+        with open(map) as file:
+            mapped_prot_dict = json.load(file)
+
+        pepnames, pepscores = loadSimplePepScore(psm_report)
+        pepscore_dict = dict(zip(pepnames, pepscores))
+
+        for taxid, proteins in mapped_prot_dict.items():
+            self.add_node(taxid, category='taxon')
+            for seq in proteins:
+                # digest with trypsin and filter for length
+                digested_peps = [pep for pep in digest(seq) if min_pep_len <= len(pep) <= max_pep_len]
+                selected_peps = [pep for pep in pepnames if pep in digested_peps]
+                # initialize peptide nodes
+                pep_nodes = tuple((pep,
+                                   {'InitialBelief_0': 1 - pepscore_dict[pep] / 100,
+                                    'InitialBelief_1': pepscore_dict[pep] / 100, 'category': 'peptide'})
+                                  for pep in selected_peps if pepscore_dict[pep] > min_score)
+
+                taxon_pep_edges = tuple((taxid, pep[0]) for pep in pep_nodes)
+                # in this version, peptide nodes that already exist and are added again are ignored/
+                # if they attributes differ, they are overwritten.
+                # conserves peptide graph structure, score will come from DB search engines anyways
+                self.add_nodes_from(pep_nodes)
+                self.add_edges_from(taxon_pep_edges)
+
+
+    def CreateFromProteinCSV(self,CSVpath):
+
+        ProteinCSV = pd.read_csv(CSVpath)
+        newGraph = nx.from_pandas_edgelist(ProteinCSV , 'query accession', 'taxids')
+        PeptideAttributes = ProteinCSV.apply(lambda row: (row["query accession"], {'InitialBelief_0': 1-row["score"],'InitialBelief_1': row['score'],'category':'peptide'}) ,axis=1)
+        TaxaAttributes = ProteinCSV.apply(lambda row: (row["taxids"], {'category':'taxon'}) ,axis=1)
+        self.add_nodes_from(PeptideAttributes)
+        self.add_nodes_from(TaxaAttributes)
+        self.add_edges_from(ebunch_to_add=newGraph.edges)
+    
+        
 
 
 
@@ -497,18 +596,20 @@ def GenerateCTFactorGraphs(ListOfFactorGraphs,GraphType = 'Taxons'):
     return CTFactorgraph
 
 
-"""
+
 if __name__== '__main__':
+    
+    Entrez.email = 'tanja.holstein@bam.de'
+    Entrez.api_key = 'cbd119d8a7d988bc27f5b0a722a7c861f408'
     Taxongraph = TaxonGraph()
-    #Taxongraph.GetAllLeafTaxa(['adenoviridae'])
-    #Taxongraph.FetchTaxonData('peptidemapapth')
-    Taxongraph.CreateTaxonPeptidegraphFromMzID('/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/human_refseq_Default_PSM_Report.txt','/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/herpesviridae.json',0.001)
+    Taxongraph.GetAllLeafTaxaFromTaxids('/home/tholstei/repos/PepGM_all/PepGM/results/VMBenchmark/sars2/refseqViral_mapped_taxids.txt')
+    TaxonGraph.FetchTaxonDataToFasta(Taxongraph,'results_example.txt',"all[FILT]")
+    #Taxongraph.CreateTaxonPeptidegraphFromMzID('/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/human_refseq_Default_PSM_Report.txt','/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/herpesviridae.json',0.001)
     #Taxongraph.CreateExample()
-    Factorgraph = FactorGraph()
-    Factorgraph.ConstructFromTaxonGraph(Taxongraph)
+    #Factorgraph = FactorGraph()
+    #Factorgraph.ConstructFromTaxonGraph(Taxongraph)
 
     #Factorgraphs = Factorgraph.SeparateSubgraphs()
 
-    CTFactorgraphs = GenerateCTFactorGraphs(Factorgraph)
-    CTFactorgraphs.SaveToGraphML('/home/tholstei/repos/PepGM_all/PepGM/graph.graphml')
-"""
+    #CTFactorgraphs = GenerateCTFactorGraphs(Factorgraph)
+    #CTFactorgraphs.SaveToGraphML('/home/tholstei/repos/PepGM_all/PepGM/graph.graphml')

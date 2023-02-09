@@ -98,11 +98,16 @@ def score(df, taxids, output_path):
     :param output_path: str, output path
     :param subset: int, top <subset> scoring taxids
     """
+
     df['taxid'] = taxids
+    df_taxid_accessions = df[['taxid','accession']]
+    df_taxid_accessions.to_csv(output_path[:-4] + '_accessions.csv', index=False)
     df_score = df.groupby('taxid')['weight'].sum().reset_index()
     df_score = df_score.sort_values(by=['weight'], ascending=False)
     threshold = df_score.weight.median()
     top_scoring_df = df_score.loc[df_score["weight"] >= threshold]
+    if len(top_scoring_df.taxid.tolist())>50:
+        top_scoring_df=top_scoring_df.head(50)
     top_scoring_df.to_csv(output_path[:-4] + '_weights.csv', index=False)
     top_scoring_taxids = top_scoring_df.taxid.tolist()
     save(output_path, top_scoring_taxids)
@@ -116,7 +121,12 @@ if __name__ == "__main__":
     parser.add_argument('-r', '--path_to_mapped_taxids', help='path to results')
     parser.add_argument('-t', '--path_to_taxids', nargs='*')
     args = parser.parse_args()
-
+    
+    #path_to_raw_query = '/home/tholstei/repos/PepGM_all/PepGM/results/VMBenchmark/sars2/refseqViral_Default_PSM_Report.txt'
+    #path_to_query = '/home/tholstei/repos/PepGM_all/PepGM/results/VMBenchmark/sars2/refseqViral_query_accessions_test.txt'
+    #path_to_database= '/home/tholstei/repos/PepGM_all/PepGM/resources/taxidMapping/accessions_hashed.npy'
+    #path_to_mapped_taxids = '/home/tholstei/repos/PepGM_all/PepGM/results/VMBenchmark/sars2/refseqViral_mapped_taxids_test.txt'
+    #path_to_taxids = '/home/tholstei/repos/PepGM_all/PepGM/resources/taxidMapping/taxids.txt'
     # prepare
     df_accession = preprocess_query(args.path_to_raw_query, args.path_to_query)
     query_accessions = hash_query(args.path_to_query)

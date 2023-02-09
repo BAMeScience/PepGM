@@ -1,15 +1,16 @@
 APIkey: 'cbd119d8a7d988bc27f5b0a722a7c861f408'
 APImail: 'tanja.holstein@bam.de'
-ExperimentName: 'VMBenchmark_zerolookahead'
-SampleName: 'sars2'
-HostName: 'chlorocebus'
+ExperimentName: 'ProteinGM'
+SampleName: 'cowpox03013'
+HostName: 'human'
 ReferenceDBName: 'refseqViral'
-ScientificHostName: '"chlorocebus"'
+ScientificHostName: '"homo sapiens"'
 FilterSpectra: False
 AddHostandCrapToDB: True
+ProteinGM: True
 
-SamplePath: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD025130_Sars_CoV_2/PXD025130_Sars_CoV_2.mgf' # replace  path
-ParametersFile: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD025130_Sars_CoV_2/PXD025130_Sars_CoV_2.par' # replace path
+SamplePath: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD003013_Cowpox_BR/PXD003013_Cowpox_BR.mgf' # replace  path
+ParametersFile: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD003013_Cowpox_BR/PXD003013_Cowpox_BR.par' # replace path
 DataDir: 'resources/SampleData/'
 DatabaseDir: 'resources/Database/'
 PeptideShaker: '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.2.9/PeptideShaker-2.2.9.jar' # replace path

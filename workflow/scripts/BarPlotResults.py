@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser(description = 'generate BarPlot of PepGM result
 parser.add_argument('--ResultsFile', type = str, help = 'path(s) to your PepGM results CSV')
 parser.add_argument('--NumberofResults', type = int, default = 12, help = 'how many taxa you want to show up on the results plot')
 parser.add_argument('--out',type =str, help = 'path(s) to your results file')
+parser.add_argument('--host',type = str, help = 'nam of host to be filtered from barplots')
 
 args = parser.parse_args()
 
@@ -27,6 +28,9 @@ IDs = pd.read_csv(args.ResultsFile, names = ['ID','score','type'])
 TaxIDS = IDs.loc[IDs['type']=='taxon']
 TaxIDS.loc[:,'score'] = pd.to_numeric(TaxIDS['score'],downcast = 'float')
 TaxIDS = TaxIDS.sort_values('score')
+HostTaxid = ncbi.get_name_translator([args.host])[args.host][0]
+HostTaxidList = [str(i) for i in ncbi.get_descendant_taxa(HostTaxid)]+[str(HostTaxid)]
+TaxIDS.drop(TaxIDS[TaxIDS.ID.isin(HostTaxidList)].index, inplace=True)
 TaxaCheck = TaxIDS.ID.tolist()
 
 #translate taxids to scientific names

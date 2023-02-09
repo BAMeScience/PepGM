@@ -39,6 +39,11 @@ def ComputeMetric(resultsfolder, host, output, weightsfile):
     #file with weights of taxids
     Weights = pd.read_csv(weightsfile,usecols=['taxa','weight'])
     Weights = Weights.groupby(['taxa']).sum().reset_index()
+    #drop host taxids
+    HostTaxid = ncbi.get_name_translator([host])[host][0]
+    HostTaxidList = [str(i) for i in ncbi.get_descendant_taxa(HostTaxid)]+[str(HostTaxid)]
+    Weights = Weights[Weights.taxa.isin(HostTaxidList)==False]
+    Weights.drop(Weights[Weights.taxa.isin(HostTaxidList)].index, inplace=True)
     Maxweight = Weights.max()['weight']
     AllTaxidsToAdd = []
     #add descendant taxa into weight dataframe
@@ -58,10 +63,6 @@ def ComputeMetric(resultsfolder, host, output, weightsfile):
             for file in os.listdir(resultsfolder+ '/' + folders):
     
                 if file.endswith('.csv'):
-    
-                    
-                    HostTaxid = ncbi.get_name_translator([host])[host][0]
-                    HostTaxidList = [str(i) for i in ncbi.get_descendant_taxa(HostTaxid)]+[str(HostTaxid)]
             
                     Results = pd.read_csv(resultsfolder+ '/' + folders +'/' + file,names = ['ID','score','type'])
                     TaxIDS = Results.loc[Results['type']=='taxon']
@@ -69,6 +70,7 @@ def ComputeMetric(resultsfolder, host, output, weightsfile):
                     TaxIDS = TaxIDS.sort_values('score', ascending = False)
                     TaxIDS = TaxIDS[TaxIDS.ID.isin(HostTaxidList)==False]
                     TaxIDS.drop(TaxIDS[TaxIDS.ID.isin(HostTaxidList)].index, inplace=True)
+                    
                     #compute the metric
                     
                     #what's the weight of the highest scoring taxid?
@@ -82,7 +84,7 @@ def ComputeMetric(resultsfolder, host, output, weightsfile):
                     SumProportion = FirstSum/NextSum
                     SumProportions.append(SumProportion)
                     Entropy = entropy(TaxIDS[:10]['score'])
-                    Entropies.append(Entropy)
+
                   
     
                     #compute the pairwise taxonomic distance of the first 4 Taxa
@@ -91,16 +93,21 @@ def ComputeMetric(resultsfolder, host, output, weightsfile):
                     DistanceSum = (tree.get_distance(FourTaxa[0],FourTaxa[1]))**2+tree.get_distance(FourTaxa[1],FourTaxa[2])+tree.get_distance(FourTaxa[2],FourTaxa[3])
                     TaxDistances.append(DistanceSum)
                     Matching = (1/(Entropy))*SumProportion*(1/DistanceSum)*WeightCoeff
-    
-                    Metrics.append(Matching)
-    
-                    #get the corresponding parameters
-                    params = re.findall('\d+\.\d+',file)
-                    Params.append([params[0],params[1],params[2]])
+                    checkpoint= 3
+                    
+                    if not np.isnan(Matching) and Matching < 3000:
 
 
+                        Metrics.append(Matching)
+    
+                        #get the corresponding parameters
+                        params = re.findall('\d+\.\d+',file)
+                        Params.append([params[0],params[1],params[2]])
+
+     
     zipLists = zip(Metrics,Params)
     SortedPairs = sorted(zipLists,reverse= True)
+
     
     tuples = zip(*SortedPairs)
     Metrics,Params = [list(tuple) for tuple in tuples]
@@ -119,7 +126,12 @@ def ComputeMetric(resultsfolder, host, output, weightsfile):
 
 
 
-
+if __name__=='__main__':
+    resultsfolder = '/home/tholstei/repos/PepGM_all/PepGM/results/SearchGUI_full_Uniprot/PXD003013_Cowpox_BR'
+    host = 'homo sapiens'
+    output = '/home/tholstei/repos/PepGM_all/PepGM/results/SearchGUI_full_Uniprot/PXD003013_Cowpox_BR/paramchecktest.png'
+    weightsfile = '/home/tholstei/repos/PepGM_all/PepGM/results/SearchGUI_full_Uniprot/PXD003013_Cowpox_BR/GraphDataframe.csv'
+    ComputeMetric(resultsfolder, host, output, weightsfile)
     
 
 

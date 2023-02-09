@@ -2,12 +2,13 @@
 #configuration
 WorkflowPath = os.path.dirname(os.path.realpath(workflow.snakefile))
 include: WorkflowPath +'/rules/config.smk'
-include : WorkflowPath + '/rules/CurateDatabase.smk'
-include : WorkflowPath + '/rules/buildDatabase.smk'
+#include : WorkflowPath + '/rules/CurateDatabase.smk'
+#include : WorkflowPath + '/rules/buildDatabase.smk'
 include : WorkflowPath + '/rules/filterHostCrap.smk'
-include : WorkflowPath + '/rules/XTandem.smk'
-include : WorkflowPath + '/rules/MS2Rescore.smk'
+#include : WorkflowPath + '/rules/XTandem.smk'
+#include : WorkflowPath + '/rules/MS2Rescore.smk'
 include: WorkflowPath + '/rules/ParsePouttoUnipept.smk'
+include: WorkflowPath + '/rules/searchgui+pepshaker.smk'
 
 
 rule all:
@@ -44,9 +45,10 @@ rule BarPlotResults:
      input: ResultsDir +'Prior{Prior}/{DBname}_PepGM_Results_a{alpha}_b{beta}_p{Prior}.csv'
      output:  ResultsDir +'Prior{Prior}/{DBname}_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',
      conda: 'envs/graphenv.yml'
-     params: NumberofResults = TaxaInPlot
+     params: NumberofResults = TaxaInPlot,
+             host = ScientificHostName
      log : ResultsDir + 'Prior{Prior}/log/{DBname}_a{alpha}_b{beta}.log'
-     shell: 'python3 workflow/scripts/BarPlotResults.py --ResultsFile {input} --NumberofResults {params.NumberofResults} --out {output} &>> {log}'
+     shell: 'python3 workflow/scripts/BarPlotResults.py --host {params.host} --ResultsFile {input} --NumberofResults {params.NumberofResults} --out {output} &>> {log}'
 
 
 rule FindBestParameters:

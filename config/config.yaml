@@ -6,20 +6,12 @@ ResourcesDir: 'resources/'
 TaxidMapping: 'taxidMapping/'
 
 #PeptideShaker and SearchGUI directories
-#paths to directories
-DataDir: 'resources/SampleData/'
-DatabaseDir: 'resources/Databases/'
-ResultsDir: 'results/'
-ResourcesDir: 'resources/'
-TaxidMapping: 'taxidMapping/'
-
-#PeptideShaker and SearchGUI directories
-PeptideShakerDir : '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.1.1/'
-SearchGUIDir: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.1-mac_and_linux/SearchGUI-4.1.1/'
+PeptideShaker : '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.2.9/PeptideShaker-2.2.9.jar'
+SearchGUI: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.14/SearchGUI-4.1.14.jar'
 
 
 #Name of folder for the PepGM run in the results folder
-ExperimentName: 'Xtandem_rescore_decoy_test_full_Uniprot_nohost_unipept'
+ExperimentName: 'SearchGUI_full_Uniprot'
 
 #parameters for SearchGUI Search
 searchengines: '-xtandem'
@@ -63,18 +55,20 @@ Mods:
 
 
 
-
 #UnipeptQueryParameters
 TaxaNumber: 20
-targetTaxa: 10239,9606   #comma separated taxa to be included in Unipept query 
+targetTaxa: 10239,9606  #comma separated taxa to be included in Unipept query 
 FDR: 0.01
 
 #sample specific parameters
 SpectraFileType: '.mgf' #'.mgf' or '.mzML'
-SampleName: 'PXD018594_Sars_CoV_2'  #needs to be the name of your spectrum file and the folder where you have that file
+SampleName: 'PXD003013_Cowpox_BR'  #needs to be the name of your spectrum file and the folder where you have that file
 ReferenceDBName: 'refseqViral'
-HostName: 'chlorocebus'
-ScientificHostName: 'chlorocebus'
+HostName: 'human'
+ScientificHostName: "'homo sapiens'"
+
+SamplePath: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD003013_Cowpox_BR/PXD003013_Cowpox_BR.mgf' # replace  path
+ParametersFile: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD003013_Cowpox_BR/PXD003013_Cowpox_BR.par' # replace path
 
 #PepGM parameters
 TaxaInPlot: 15       #how many taxa should appear in the final results barplot

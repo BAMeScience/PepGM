@@ -52,3 +52,15 @@ mods = config['Mods']
 TaxaNumber = config['TaxaNumber']
 targetTaxa = config['targetTaxa']
 FDR = config['FDR']
+
+#when using searchGUI/PepShaker
+PeptideShaker = config['PeptideShaker']
+SearchGUI = config['SearchGUI']
+
+searchengines = config['searchengines']
+peptideFDR = config['peptideFDR']
+proteinFDR = config['proteinFDR']
+psmFDR = config['psmFDR']
+
+SamplePath = config['SamplePath']
+ParametersFile = config['ParametersFile']

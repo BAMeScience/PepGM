@@ -58,4 +58,4 @@ SaveReducedCSV(Resultsfile+'.csv', args.host, args.resultsfolder +'/PepGm_Result
 MoveBestResultsPlot(Resultsfile+'.png',args.resultsfolder+'/PepGM_ResultsPlot.png')
 
 #save a phylogenetic tree view of the PepGm results
-CreatePhyloTreeView(Resultsfile+'.csv',args.host, args.resultsfolder + '/PhyloTreeView.png')
+#CreatePhyloTreeView(Resultsfile+'.csv',args.host, args.resultsfolder + '/PhyloTreeView.png')

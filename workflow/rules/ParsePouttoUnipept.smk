@@ -1,7 +1,20 @@
 ###rule for parsing percolator file
 
+#rule UnipeptQuery:
+#    input: MS2RescoreDir+'rescored_searchengine_ms2pip_rt_features.pout'
+#    params: 
+#          NumberofTaxa = TaxaNumber,
+#          targetTaxa = targetTaxa,
+#          FDR = FDR
+#    log: ResultsDir + 'UnipeptResponse.log'
+#    output: 
+#          ResultsDir + 'UnipeptResponse.json',
+#          ResultsDir + 'UnipeptPeptides.json'
+#    conda: 'envs/graphenv.yml'   
+#    shell: "python3 workflow/scripts/UnipeptGetTaxonomyfromPout.py --UnipeptResponseFile {output[0]} --pep_out {output[1]} --TaxonomyQuery {params.targetTaxa} --NumberOfTaxa {params.NumberofTaxa} --FDR {params.FDR} --PoutFile {input} " 
+
 rule UnipeptQuery:
-    input: MS2RescoreDir+'rescored_searchengine_ms2pip_rt_features.pout'
+    input: ResultsDir + SampleName + '/Out_Default_PSM_Report.txt'
     params: 
           NumberofTaxa = TaxaNumber,
           targetTaxa = targetTaxa,
@@ -11,7 +24,7 @@ rule UnipeptQuery:
           ResultsDir + 'UnipeptResponse.json',
           ResultsDir + 'UnipeptPeptides.json'
     conda: 'envs/graphenv.yml'   
-    shell: "python3 workflow/scripts/UnipeptGetTaxonomyfromPout.py --UnipeptResponseFile {output[0]} --pep_out {output[1]} --TaxonomyQuery {params.targetTaxa} --NumberOfTaxa {params.NumberofTaxa} --FDR {params.FDR} --PoutFile {input} " 
+    shell: "python3 workflow/scripts/ParsePSMReportToUnipept.py --UnipeptResponseFile {output[0]} --pep_out {output[1]} --TaxonomyQuery {params.targetTaxa} --NumberOfTaxa {params.NumberofTaxa}  --PSMResultsFile {input} " 
 
 rule ParseToUnipeptCSV:
     input: 

@@ -59,9 +59,15 @@ def Poutparser(pout_file, fdr_threshold, decoy_flag):
                     pep_psm[peptide].add(psm_id)
                 # update pep_score
                 if peptide not in pep_score.keys():
-                    pep_score[peptide] = pep
+                    if float(pep) <0.001:
+                        pep_score[peptide] = '0.001'
+                    else:
+                        pep_score[peptide] = pep          #adjustement necessary to not have 0 and 1 fuck up probability calculations
                 else:
-                    pep_score[peptide] = min(pep,pep_score[peptide])
+                    if float(pep) <0.001:
+                        pep_score[peptide] = '0.001'
+                    else:
+                        pep_score[peptide] = min(pep,pep_score[peptide])
                 pep_score_psm[peptide] = [pep_score[peptide],len(pep_psm[peptide])]
             
     return pep_score_psm
@@ -88,11 +94,11 @@ def generatePostRequestChunks(peptides,TargetTaxa,chunksize=20):
     :param TargetTaxa: list of one or more taxa to include in the Unipept query
     :param chunksize: number of peptides to be requested from Unipept
     '''
-    
+    print('querying taxa ', TargetTaxa)
     AllTargetTaxa = []
     for Taxon in TargetTaxa:
         AllTargetTaxa.append(Taxon)
-        AllTargetTaxa.extend(ncbi.get_descendant_taxa(Taxon))
+        AllTargetTaxa.extend(ncbi.get_descendant_taxa(Taxon, collapse_subspecies=True))
     
     
     Listofpeptides = [peptides[i:i + chunksize] for i in range(0, len(peptides), chunksize)]

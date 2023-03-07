@@ -52,6 +52,7 @@ def WeightAllTaxaFromJson(JsonPath,PeptScoreDict,MaxTax,chunks = True):
 
     UnipeptFrameTaxaWeights = UnipeptFrame.groupby('taxa')['weight'].sum().reset_index()
     UnipeptFrameTaxaWeights = UnipeptFrameTaxaWeights.sort_values(by=['weight'], ascending=False)
+    UnipeptFrameTaxaWeights.to_csv('/home/tholstei/repos/PepGM_all/PepGM/results/Xtandem_rescore_decoy_test_full_Uniprot/CAMPI_SIHUMIx/fullweightframe.csv')
     threshold = UnipeptFrameTaxaWeights.weight.median()
     TopTaxa = UnipeptFrameTaxaWeights.loc[UnipeptFrameTaxaWeights["weight"] >= threshold]
 
@@ -71,6 +72,7 @@ def WeightAllTaxaFromJson(JsonPath,PeptScoreDict,MaxTax,chunks = True):
 
 #format and return dataframe with weighted taxa
 DF = WeightAllTaxaFromJson(args.UnipeptResponseFile,args.UnipeptPeptides,args.NumberOfTaxa)
+
 DF.to_csv(args.out)
 
 
@@ -79,10 +81,10 @@ DF.to_csv(args.out)
 
 
 
-#if __name__=='__main__':
+if __name__=='__main__':
 
-#InputFile = '/home/tholstei/repos/PepGM_all/PepGM/results/Xtandem_rescore_decoy_test_full_Uniprot/CAMPI_SIHUMIx/UnipeptResponse_fail1.json'
-    #DF = WeightAllTaxaFromJson('/home/tholstei/repos/PepGM_all/PepGM/results/Xtandem_rescore_decoy_test_full_Uniprot/PXD005104_Herpessimplex_1/UnipeptResponse.json','/home/tholstei/repos/PepGM_all/PepGM/results/Xtandem_rescore_decoy_test_full_Uniprot/PXD005104_Herpessimplex_1/UnipeptPeptides.json',30)
-    #print(DF)
+    InputFile = '/home/tholstei/repos/PepGM_all/PepGM/results/SIHUMIx_no_subspecies/CAMPI_SIHUMIx/UnipeptResponse.json'
+    DF = WeightAllTaxaFromJson(InputFile,'/home/tholstei/repos/PepGM_all/PepGM/results/SIHUMIx_no_subspecies/CAMPI_SIHUMIx/UnipeptPeptides.json',300)
+    DF.to_csv('/home/tholstei/repos/PepGM_all/PepGM/results/SIHUMIx_no_subspecies/CAMPI_SIHUMIx/differentGraphs300.csv')
 
 

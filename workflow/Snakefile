@@ -8,6 +8,7 @@ include : WorkflowPath + '/rules/filterHostCrap.smk'
 include : WorkflowPath + '/rules/XTandem.smk'
 include : WorkflowPath + '/rules/MS2Rescore.smk'
 include: WorkflowPath + '/rules/ParsePouttoUnipept.smk'
+#include: WorkflowPath + '/rules/searchgui+pepshaker.smk'
 
 
 rule all:

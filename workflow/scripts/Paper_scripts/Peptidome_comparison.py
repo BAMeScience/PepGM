@@ -84,11 +84,11 @@ def ComputeTaxonPeptidomeSimilarity(PeptidomeDict, ListOfFastaFiles, ListOfTaxa)
             peptides2 = GetPeptidesPerTaxon(sequences2)
             shared = len(peptides1.intersection(peptides2))
             try:
-                SimMax = shared / (len(peptides1))
+                SimMax = shared / max(len(peptides1), len(peptides2))
             except:
                 SimMax = 0
             try:
-                SimMin = SimMin = shared / (len(peptides1))
+                SimMin = shared / max(len(peptides1), len(peptides2))
             except:
                 SimMin = 0
 
@@ -131,62 +131,76 @@ def ComputeDetectedPeptidomeSimilarity(PeptidomeDict):
     return SimMatrixMax, SimMatrixMin, Taxa1, Taxa2
 
 
-if __name__ == "main":
-    # ListofTaxa = ['human adenovirus 2','human adenovirus 6', 'human adenovirus 5', 'simian adenovirus 34','human adenovirus 57']
-    # ListofFastas = ['/home/tholstei/repos/PepGM_all/PepGM/resources/Strainfiles/HUman_adenovirus_2.fasta','/home/tholstei/repos/PepGM_all/PepGM/resources/Strainfiles/human_adenovirus_5.fasta','/home/tholstei/repos/PepGM_all/PepGM/resources/Strainfiles/human_adenovirus_6.fasta',
-    # '/home/tholstei/repos/PepGM_all/PepGM/resources/Strainfiles/simian_adenovirus_34.fasta','/home/tholstei/repos/PepGM_all/PepGM/resources/Strainfiles/human_adenovirus_57.fasta']
+if __name__ == "__main__":
+    strain = ""
+    resources_basepath = ""
+    results_basepath = ""
 
-    # ListofTaxa=['Beaudette CK', 'Beaudette US', 'Beaudette', 'strain M41']
-    # ListofFastas = ['/home/tholstei/repos/PepGM_all/PepGM/resources/Strainfiles/beaudette_CK.fasta','/home/tholstei/repos/PepGM_all/PepGM/resources/Strainfiles/beaudette_US.fasta',
-    #               '/home/tholstei/repos/PepGM_all/PepGM/resources/Strainfiles/avian_beaudette.fasta','/home/tholstei/repos/PepGM_all/PepGM/resources/Strainfiles/avian_M41.fasta']
+    if strain == "hendra":
+        ListofTaxa = ['hendra virus horse', 'Nipah Henipavirus']
+        ListofFastas = [f'{resources_basepath}/hendra_horse.fasta',
+                        f'{resources_basepath}/nipah_henipavirus.fasta']
 
-    # ListofTaxa = ['Hendra virus horse', 'Nipah Henipavirus']
-    # ListofFastas = ['/home/fkistner/pepgm/resources/Strains/hendra_horse.fasta',
-    #                 '/home/fkistner/pepgm/resources/Strains/nipah_henipavirus.fasta']
+    elif strain == "adeno2":
+        ListofTaxa = ["Human adenovirus 2", "Human adenovirus 6", "Human adenovirus 5", "Simian Adenovirus 34",
+                      "Human Adenovirus 57"]
+        ListofFastas = [f'{resources_basepath}/HUman_adenovirus_2.fasta',
+                        f"{resources_basepath}/human_adenovirus_6.fasta",
+                        f"{resources_basepath}/human_adenovirus_5.fasta",
+                        f"{resources_basepath}/simian_adenovirus_34.fasta",
+                        f"{resources_basepath}/human_adenovirus_57.fasta"]
+    elif strain == "herpes":
+        ListofTaxa = ["Human alphaherpesvirus 1 strain 17",
+                      "Human alphaherpesvirus 1 strain RH2",
+                      "Human alphaherpesvirus1 strain KOS"]
+        ListofFastas = [f"{resources_basepath}/herpes_17.fasta",
+                        f"{resources_basepath}/herpes_RH2.fasta",
+                        f"{resources_basepath}/herpes_KOS.fasta"]
 
-    # ListofTaxa = ["Human adenovirus 2", "Human adenovirus 6", "Human adenovirus 5", "Simian Adenovirus 34", "Human Adenovirus 57"]
-    # ListofFastas = ['/home/fkistner/pepgm/resources/Strains/HUman_adenovirus_2.fasta',
-    #                 "/home/fkistner/pepgm/resources/Strains/human_adenovirus_6.fasta",
-    #                 "/home/fkistner/pepgm/resources/Strains/human_adenovirus_5.fasta",
-    #                 "/home/fkistner/pepgm/resources/Strains/simian_adenovirus_34.fasta",
-    #                 "/home/fkistner/pepgm/resources/Strains/human_adenovirus_57.fasta"]
+    elif strain == "cowpox014913":
+        ListofTaxa = ["Cowpox virus (Brighton Red)", "Acanthocystis turfacea chlorella virus 1",
+                      "Brazilian marseillevirus"]
+        ListofFastas = [f"{resources_basepath}/cowpox _BR.fasta",
+                        f"{resources_basepath}/acanthocystis.fasta",
+                        f"{resources_basepath}/brazilian.fasta"]
 
-    # ListofTaxa = ["Human alphaherpesvirus 1 strain 17",
-    #               "Human alphaherpesvirus 1 strain RH2",
-    #               "Human alphaherpesvirus1 strain KOS"]
-    # ListofFastas = ["/home/fkistner/pepgm/resources/Strains/herpes_17.fasta",
-    #                 "/home/fkistner/pepgm/resources/Strains/herpes_RH2.fasta",
-    #                 "/home/fkistner/pepgm/resources/Strains/herpes_KOS.fasta"]
-    #
-    # ListofTaxa = ["Cowpox virus (Brighton Red)", "Acanthocystis turfacea chlorella virus 1", "Brazilian marseillevirus"]
-    # ListofFastas = ["/home/fkistner/pepgm/resources/Strains/cowpox_014913.fasta",
-    #                 "/home/fkistner/pepgm/resources/Strains/acanthocystis.fasta",
-    #                 "/home/fkistner/pepgm/resources/Strains/brazilian.fasta"]
+    elif strain == "sars1":
+        ListofTaxa = ["SarS Coronavirus 2", "SarS Coronavirus Tor2", "Bat coronavirus BM48-31/BGR/2008"]
+        ListofFastas = [f"{resources_basepath}/sars-cov-2.fasta",
+                        f"{resources_basepath}/sars-cov-tor2.fasta",
+                        f"{resources_basepath}/bat_coronavirus.fasta"]
 
-    # ListofTaxa = ["SarS Coronavirus 2", "SarS Coronavirus Tor2", "Bat coronavirus BM48-31/BGR/2008"]
-    # ListofFastas =  ["/home/fkistner/pepgm/resources/Strains/sars-cov-2.fasta",
-    #                  "/home/fkistner/pepgm/resources/Strains/sars-cov-tor2.fasta",
-    #                  "/home/fkistner/pepgm/resources/Strains/bat_coronavirus.fasta"]
+    elif strain == "sars2":
+        ListofTaxa = ["SarS Coronavirus 2", "SarS Coronavirus Tor2", "Bat coronavirus BM48-31/BGR/2008",
+                      "Acanthamoeba polyphaga moumouvirus"]
+        ListofFastas = [f"{resources_basepath}/sars-cov-2.fasta",
+                        f"{resources_basepath}/sars-cov-tor2.fasta",
+                        f"{resources_basepath}/bat_coronavirus.fasta",
+                        f"{resources_basepath}/acanthamoeb.fasta"]
 
-    #
-    # ListofTaxa = ["Cowpox virus (Brighton Red)", "Orthopoxvirus Abatino"]
-    # ListofFastas = ["/home/fkistner/pepgm/resources/Strains/cowpox_003013.fasta",
-    #                 "/home/fkistner/pepgm/resources/Strains/orthopox_abatino.fasta"]
-    #
+    elif strain == "cowpox03013":
+        ListofTaxa = ["Cowpox virus (Brighton Red)", "Orthopoxvirus Abatino"]
+        ListofFastas = [f"{resources_basepath}/cowpox_003013.fasta",
+                        f"{resources_basepath}/orthopox_abatino.fasta"]
 
-    # ListofTaxa = ["Avian infectious bronchitis virus (strain Beaudette US)",
-    #               "Avian infectious bronchitis virus (strain Beaudette)",
-    #               "Avian infectious bronchitis virus (strain Beaudette CK)",
-    #               "Avian infectious bronchitis virus (strain Beaudette M41)"]
-    #
-    # ListofFastas = ["/home/fkistner/pepgm/resources/Strains/beaudette_US.fasta",
-    #                 "/home/fkistner/pepgm/resources/Strains/avian_beaudette.fasta",
-    #                 "/home/fkistner/pepgm/resources/Strains/beaudette_CK.fasta",
-    #                 "/home/fkistner/pepgm/resources/Strains/avian_M41.fasta"]
+    elif strain == "avian":
+        ListofTaxa = ["avian infectious bronchitis virus (strain Beaudette US)",
+                      "avian infectious bronchitis virus (strain Beaudette)",
+                      "avian infectious bronchitis virus (strain Beaudette CK)",
+                      "avian infectious bronchitis virus (strain Beaudette M41)"]
+        ListofFastas = [f"{resources_basepath}/beaudette_US.fasta",
+                        f"{resources_basepath}/avian_beaudette.fasta",
+                        f"{resources_basepath}/beaudette_CK.fasta",
+                        f"{resources_basepath}/avian_M41.fasta"]
 
-    # graphpath = '/home/fkistner/pepgm/results/sars2/refseqViral_PepGM_graph.graphml'
-    # outmax = '/home/fkistner/pepgm/results/plots/sars2_peptidome_sim_MAX.png'
-    # taxonresults = '/home/fkistner/pepgm/results/sars2/PepGm_Results.csv'
+    print(strain)
+
+    if strain == "cowpox014913":
+        graphpath = f'{results_basepath}/{strain}/human_refseqViral_PepGM_graph.graphml'
+    else:
+        graphpath = f'/home/fkistner/pepgm/results/{strain}/refseqViral_PepGM_graph.graphml'
+    outmax = f'/home/fkistner/pepgm/results/plots/{strain}_peptidome_sim_MAX.png'
+    taxonresults = f'/home/fkistner/pepgm/results/{strain}/PepGm_Results.csv'
 
     Taxa = GetNhighestTaxa(taxonresults, 15)
     PeptiDict = GetPeptidesperTaxon(graphpath, Taxa)
@@ -199,14 +213,17 @@ if __name__ == "main":
     matrix = np.triu(np.ones_like(SimMax))
     np.fill_diagonal(matrix, 0)
     ax1 = sbn.heatmap(SimMax, yticklabels=TaxonList1, xticklabels=ListofTaxa, cmap="YlGnBu",
-                      annot=[[round(n, 2) for n in inner_list] for inner_list in SimMax])
+                      annot=[[round(n, 5) for n in inner_list] for inner_list in SimMax])
     # Rotate x-axis labels
     ax1.set_xticklabels(ax1.get_xticklabels(), rotation=45, ha="right")
     plt.tight_layout()
     plt.savefig(outmax, dpi=600)
     plt.close()
+    print("I am done.")
 
 # ax1 = sbn.heatmap(SimMin, xticklabels = TaxonList, yticklabels = TaxonList,cmap="YlGnBu")
 # plt.tight_layout()
 # plt.savefig(outmin)
 # plt.close()
+
+# %%

@@ -7,7 +7,7 @@ TaxidMapping: 'taxidMapping/'
 
 
 #Name of folder for the PepGM run in the results folder
-ExperimentName: 'SIHUMIx_all_bacteria'
+ExperimentName: 'SIHUMIx_CT_Underflow'
 
 #parameters for SearchGUI Search
 searchengines: '-xtandem'
@@ -58,7 +58,7 @@ ScientificHostName: '"homo sapiens"'
 
 #UnipeptQueryParameters
 TaxaNumber: 30
-targetTaxa: 2   #comma separated taxa to be included in Unipept query 
+targetTaxa: 207244,816,1678,572511,1485,561,1578   #comma separated taxa to be included in Unipept query 
 FDR: 0.005
 
 
@@ -68,7 +68,7 @@ TaxaInProteinCount: 15 #how many taxa should appear in the protein counting barp
 sourceDB: 'all[FILT]' #choose from entrez query DBs to filter the protein DB with 
 #swissprot[filter]' = only swissprot proteins, refseq[filter] = know refseq proteins, all[filter]', etc: https://www.ncbi.nlm.nih.gov/books/NBK49540/
 
-Alpha: [0.01,0.05,0.1,0.2,0.4,0.6] #increments of parameter alpha to use for the grid earch
-Beta: [0.01,0.05,0.1,0.2,0.4,0.5,0.7] #range of parameter beta to use for the grid search
-prior: [0.1,0.3,0.5]
+Alpha: [0.1,0.4,0.6,0.8,0.9] #increments of parameter alpha to use for the grid earch
+Beta: [0.01,0.05,0.1,0.2,0.4] #range of parameter beta to use for the grid search
+prior: [0.3,0.5]
 

@@ -169,7 +169,7 @@ class TaxonGraph(nx.Graph):
             # Find entries matching the query (only swissprot registered proteins for now)
             entrezQuery = sourceDB +' AND txid%s[ORGN]'%(ncbiTaxId) # AND 
             searchResultHandle = Entrez.esearch(db=entrezDbName, term=entrezQuery, retmax = 1000)
-            print(entrezQuery)
+            #print(entrezQuery)
             searchResult = Entrez.read(searchResultHandle)
             searchResultHandle.close()
 

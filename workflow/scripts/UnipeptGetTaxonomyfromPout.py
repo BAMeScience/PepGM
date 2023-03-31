@@ -87,7 +87,7 @@ def PepListNoMissedCleavages(peptide):
     return peptides
 
 
-def generatePostRequestChunks(peptides,TargetTaxa,chunksize=20):
+def generatePostRequestChunks(peptides,TargetTaxa,chunksize=200):
     '''
     Generates POST requests (json) queryong a chunk of peptides from petide list and target taxon
     :param peptides: list of peptides to query in Unipept

@@ -152,7 +152,7 @@ class ConvolutionTree:
 class Messages():
     ''' 
     Class holding all messages and beliefs.
-    Functions execute loopy residual belief propagation
+    Functions execute loopy residual belief propagation with zero look ahead
     '''
 
     #class that holds the messages of itereation t and iteration t+1 as dictionaries
@@ -170,7 +170,10 @@ class Messages():
         self.InitialBeliefs = {}
         self.CurrentBeliefs = {}
         self.CurrentBeliefsNew = {}
+        self.queue = {}
+        self.priorities = {}
         self.category = CTGraphIn.category
+        self.TotalResiduals = {}
         #TODO check if I truly need all three of msg new, msglog and msg. chech if i need both fullresidual and fullresidual new, 
     
         
@@ -197,7 +200,7 @@ class Messages():
             self.Msg[(EndName, StartName)] = self.Msg[(StartName, EndName)]
             
             if 'MessageLength' in data:
-                self.MsgNew[(StartName, EndName)] = np.zeros(data['MessageLength'])
+                self.MsgNew[(StartName, EndName)] = np.ones(data['MessageLength'])
             else:
                 self.MsgNew[(StartName, EndName)] = np.array([0,0])
             
@@ -234,6 +237,9 @@ class Messages():
              OutMessageLog = lognormalize(np.asarray([np.sum([np.log(NodeBelief[0]),np.sum(IncomingMessages[:,0])]),np.sum([np.log(NodeBelief[1]),np.sum(IncomingMessages[:,1])])]))
              if np.isnan(np.sum(OutMessageLog))==True:
                 stoppoint = 3
+             if not np.all(OutMessageLog):
+                OutMessageLog[OutMessageLog==0] = 1e-30
+                stoppoint = 5
              return OutMessageLog
 
     
@@ -258,18 +264,27 @@ class Messages():
          if self.Graph.nodes[NodeIN]['category'] == 'Convolution Tree':
                 #handles empty & messages with only one value
                 IncomingMessages.append([1.,1.]) 
-                IncomingMessages = np.asarray(np.log(IncomingMessages)).reshape(len(IncomingMessages),2)#np.asarray(IncomingMessages).reshape(len(IncomingMessages),2)
-                OutMessages = lognormalize(np.add(np.log(NodeBelief),[np.sum(IncomingMessages[:,0]),np.sum(IncomingMessages[:,1])]))#normalize(np.multiply(NodeBelief,[np.prod(IncomingMessages[:,0]),np.prod(IncomingMessages[:,1])]))
+                IncomingMessages = np.asarray(IncomingMessages).reshape(len(IncomingMessages),2)#np.asarray(np.log(IncomingMessages)).reshape(len(IncomingMessages),2)
+                OutMessages = normalize(np.multiply(NodeBelief,[np.prod(IncomingMessages[:,0]),np.prod(IncomingMessages[:,1])]))#lognormalize(np.add(np.log(NodeBelief),[np.sum(IncomingMessages[:,0]),np.sum(IncomingMessages[:,1])]))#
                 #self.CurrentBeliefsNew[NodeOUT] = OutMessages
+                
                 
             
                 return np.add(OutMessages[:,0],OutMessages[:,1])    
          else:
                 if  np.asarray(IncomingMessages[0]).shape[0] > 2:
-                    #log domain to avoid underflow
-                    IncomingMessages = np.asarray(np.log(IncomingMessages)).reshape(IncomingMessages[0].shape[0],1)
-                    OutMessages = lognormalize(NodeBelief*IncomingMessages)
-                    return [np.sum(OutMessages[0,:]),np.sum(OutMessages[1,:])] 
+                    IncomingMessagesShaped = np.asarray(IncomingMessages).reshape(IncomingMessages[0].shape[0],1)
+                    #OutMessages = normalize(NodeBelief*IncomingMessagesShaped)
+                    IncomingMessagesLog = np.log(np.asarray(IncomingMessages).reshape(IncomingMessages[0].shape[0],1))
+                    LogBelief = np.log(NodeBelief)
+                    OutMessagesLog = lognormalize(np.add(LogBelief,IncomingMessagesLog))
+                    #if not np.all([np.sum(OutMessages[0,:]),np.sum(OutMessages[1,:])]):
+                    #    stoopoint = 4
+                    if not np.all(OutMessagesLog):
+                        OutMessagesLog[OutMessagesLog == 0] = 1e-30
+                        stooptpoint = 5
+                    
+                    return [np.sum(OutMessagesLog[0,:]),np.sum(OutMessagesLog[1,:])] 
                 else :
                     IncomingMessages.append([1.,1.])
                     IncomingMessages = np.asarray(IncomingMessages).reshape(len(IncomingMessages),2)
@@ -312,9 +327,16 @@ class Messages():
 
             for protein in range(len(ProtList)):
               self.MsgNew[Node,ProtList[protein]] = CT.MessageToVariable(protein)
-    
+              if not np.all(self.MsgNew[Node,ProtList[protein]]):
+                  self.MsgNew[Node,ProtList[protein]][self.MsgNew[Node,ProtList[protein]]==0] = 1e-30
+                  stop = 3
+                  
             for pep in peptides:
              self.MsgNew[Node,pep] = CT.MessageToSharedLikelihood()
+             if not np.all(self.MsgNew[Node,pep]):
+                 self.MsgNew[Node,pep][self.MsgNew[Node,pep]==0] = 1e-30
+                 stopp = 5
+
         
         else:
             for protein in range(len(ProtList)):
@@ -342,9 +364,66 @@ class Messages():
     def ComputeResidual(self,NodeIN,NodeOUT):
         Msg1 = self.MsgNew[NodeIN,NodeOUT]
         Msg2 = self.Msg[NodeIN,NodeOUT]
+        print(Msg1,Msg2)
         if len(self.MsgNew[NodeIN,NodeOUT]) != len(self.Msg[NodeIN,NodeOUT]):
             Msg2 = [1]*len(self.MsgNew[NodeIN,NodeOUT])
         return np.sum(np.abs(np.subtract(Msg1,Msg2)))  
+    
+
+    
+    def ComputeInfinityNormResidual(self,StartName,EndName):
+        Msg1 = self.Msg[StartName,EndName]
+        Msg2 = self.MsgLog[StartName,EndName]
+        if len(self.MsgLog[StartName,EndName]) != len(self.Msg[StartName,EndName]):
+            Msg2 = [1]*len(self.Msg[StartName,EndName])
+        check = np.max(np.abs(np.log(np.divide(Msg1,Msg2)))) 
+        pos = 0
+        for i in Msg1:
+            if i == 0:
+                Msg1[pos] == 1e-40
+            pos += 1
+                
+        return np.max(np.abs(np.log(np.divide(Msg1,Msg2)))) 
+
+ 
+
+   #approximate residual with zero look-ahead
+    def ComputeZeroLookAheadResidual(self,StartName,EndName):
+
+        NodeINneighbors = [nodes for nodes in self.Graph.neighbors(StartName)]
+        NodeINneighbors.remove(EndName)
+        ApproximateResidual = sum([self.FullResidual[(neighbors,StartName)] for neighbors in NodeINneighbors])
+        return ApproximateResidual
+
+    def ComputeTotalResiduals(self,StartName,EndName,CurrentResidual):
+
+        for startNeighbors in self.Graph.neighbors(StartName):
+            if startNeighbors != EndName:
+                self.TotalResiduals[((startNeighbors,StartName),(StartName,EndName))] = 0 
+
+        for EndNeighbors in self.Graph.neighbors(EndName):
+            if EndNeighbors != StartName:
+                check = self.TotalResiduals[((StartName,EndName),(EndName,EndNeighbors))]
+                self.TotalResiduals[((StartName,EndName),(EndName,EndNeighbors))] = self.TotalResiduals[((StartName,EndName),(EndName,EndNeighbors))]+ CurrentResidual
+            
+    
+    def ComputePriority(self, StartName, EndName):
+        
+        self.priorities[(StartName,EndName)] = 0
+
+        for EndNeighbors in self.Graph.neighbors(EndName):
+            if EndNeighbors != StartName:
+                check = np.sum([self.TotalResiduals[(SumRun,EndName),(EndName,EndNeighbors)] for SumRun in self.Graph.neighbors(EndName) if SumRun != EndNeighbors])
+                self.priorities[EndName,EndNeighbors] = np.sum([self.TotalResiduals[(SumRun,EndName),(EndName,EndNeighbors)] for SumRun in self.Graph.neighbors(EndName) if SumRun != EndNeighbors])
+
+        #for startNeighbors in self.Graph.neighbors(StartName):
+        #    if startNeighbors != EndName:
+        #        self.priorities[startNeighbors,EndName] = np.sum([self.TotalResiduals[(SumRun,EndName),(EndName,EndNeighbors)] for SumRun in self.Graph.neighbors(EndName) if SumRun != EndNeighbors])
+        
+        
+             
+
+
 
     #computes new message for a given edge (startname,endname) in the direction startname->endname
     def SingleEdgeDirectionUpdate(self,StartName,EndName):
@@ -390,16 +469,14 @@ class Messages():
                 self.SingleEdgeDirectionUpdate(StartName, EndName)
             
         
-        for edge in self.Graph.edges():
-            #compute all residuals of the messages in this loop
-            StartName, EndName = edge[1], edge[0]
-            self.FullResidual[(StartName, EndName)] = self.ComputeResidual(StartName, EndName)
+        #for edge in self.Graph.edges():
+        #    #compute all residuals of the messages in this loop
+        #    StartName, EndName = edge[1], edge[0]
+        #    self.FullResidual[(StartName, EndName)] = self.ComputeResidual(StartName, EndName)
 
-            StartName, EndName = edge[0], edge[1]
-            self.FullResidual[(StartName, EndName)] = self.ComputeResidual(StartName, EndName)
+        #    StartName, EndName = edge[0], edge[1]
+        #    self.FullResidual[(StartName, EndName)] = self.ComputeResidual(StartName, EndName)
                 
-                
-
     def updateResidualMessage(self,Residual):
 
         '''
@@ -410,21 +487,23 @@ class Messages():
         self.MaxVal = max(Residual, key = Residual.get)
         self.Msg[self.MaxVal] = self.MsgNew[self.MaxVal]
         return Residual[self.MaxVal]
-
-    
     
 
-    def LoopyLoop(self,maxLoops, tolerance,local = False):
+    def getPriorityMessage(self,PriorityVector):
+
+        self.Maxval = max(PriorityVector, key = PriorityVector.get)
+        return max(PriorityVector, key = PriorityVector.get)
+
+
+   
+    def ZeroLookAheadLoopyLoop(self,maxLoops,tolerance,local=False):
         '''
-        Run the loopy belief propagation algorithm
+        Run the zero-look-ahead belief propagation algorithm.
         :param maxLoops: int, maximum number of iterations in case of non-convergence
         :param tolerance: float, toleance for convergence check
         :param local: Bool, parameter passed to Computed Update function
         '''
         
-        if not isinstance(local,bool):
-            raise TypeError("localloops needs to be boolean")
-
         k = 0
         MaxResidual = 100
 
@@ -439,18 +518,56 @@ class Messages():
                 k += 1
                 end_t = time.time()
                 print( "time per loop" , k, " ", end_t-start_t)
+        
+            #now start with the residual message passing
+            
+            #compute all residuals after 5 runs once (=initialize the residual/priorities vectors)
+
+            if k == 5 :
+                for edge in self.Graph.edges():
+                    #compute all residuals of the messages in this loop
+                    StartName, EndName = edge[1], edge[0]
+                    self.FullResidual[(StartName, EndName)] = self.ComputeInfinityNormResidual(StartName, EndName)
+
+                    #initialize the total residual to 0
+                    for End2 in self.Graph.neighbors(EndName):
+
+                        self.TotalResiduals[((StartName,EndName),(EndName,End2))] = 0
+                        self.TotalResiduals[((End2,EndName),(EndName,StartName))] = 0
+
+
+                    StartName, EndName = edge[0], edge[1]
+                    self.FullResidual[(StartName, EndName)] = self.ComputeInfinityNormResidual(StartName, EndName)
+            
+                    #set the priority vector once with copy of the previously calculated residuals
+                    self.priorities = self.FullResidual.copy()
+
+                    #initialize the total residual to 0
+                    for End2 in self.Graph.neighbors(EndName):
+
+                        self.TotalResiduals[((StartName,EndName),(EndName,End2))] = 0
+                        self.TotalResiduals[((End2,EndName),(EndName,StartName))] = 0
 
             
-            #now start with the residual message passing
+
+            #actual zero-look-ahad-BP part
             start_t = time.time()
-            self.ComputeUpdate(localloops = local)
-            MaxResidual = self.updateResidualMessage(self.FullResidual)
+            #print(self.getPriorityMessage(self.priorities))
+            PriorityMessage = self.getPriorityMessage(self.priorities)
+            MaxResidual = self.priorities[PriorityMessage]
+            self.SingleEdgeDirectionUpdate(PriorityMessage[0],PriorityMessage[1])
+            PriorityResidual = self.ComputeInfinityNormResidual(PriorityMessage[0],PriorityMessage[1])
+            self.MsgLog.update(self.Msg)
+            self.Msg.update(self.MsgNew)
+            self.ComputeTotalResiduals(PriorityMessage[0],PriorityMessage[1],PriorityResidual)
+            self.ComputePriority(PriorityMessage[0],PriorityMessage[1])
+            
             end_t = time.time()
             print( "time per loop" , k, " ", end_t-start_t, "residual max", MaxResidual)
         
             k += 1
-        
-        #when converged, multiply in all messages to each variable to get the posteriors
+
+        #marginalize once the model has converged
         for Variable in self.Graph.nodes():
 
             if self.Graph.nodes[Variable]['category'] == self.category or self.Graph.nodes[Variable]['category'] == 'peptide':
@@ -465,7 +582,6 @@ class Messages():
                 LoggedVariableMarginal = lognormalize(np.asarray([np.sum([np.log(self.InitialBeliefs[Variable][0]),np.sum(IncomingMessages[:,0])]),np.sum([np.log(self.InitialBeliefs[Variable][1]),np.sum(IncomingMessages[:,1])])]))
 
                 self.CurrentBeliefs[Variable] = LoggedVariableMarginal
-
 
     def DetectOscillations():
         pass
@@ -499,7 +615,7 @@ def CalibrateAllSubgraphs(ListOfCTFactorGraphs, MaxIterations, Tolerance,local =
 
             NodeDict.update(dict(Graph.nodes( data = 'category')))
             InitializedMessageObject = Messages(Graph)
-            InitializedMessageObject.LoopyLoop(MaxIterations,Tolerance,local)
+            InitializedMessageObject.ZeroLookAheadLoopyLoop(MaxIterations,Tolerance,local)
             ResultsList.append(InitializedMessageObject.CurrentBeliefs)
             ResultsDict.update(InitializedMessageObject.CurrentBeliefs)
 
@@ -553,12 +669,3 @@ if __name__== '__main__':
  Resultlist,Resultsdict,Nodetypes = CalibrateAllSubgraphs(CTFactorgraphs,max_iter,tol)
  save = SaveResultsToCsv(Resultsdict,Nodetypes,out)
  #VisualizeResults(Nodetypes,Resultsdict,'taxon',Taxongraph)
-
-
-
-
-
-
-    
-
-

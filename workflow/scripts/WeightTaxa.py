@@ -4,6 +4,13 @@ import json
 import pandas as pd
 
 
+def is_gzipped_file(filename):
+    """ Check if input is gzipped."""
+    with open(filename, 'rb') as f:
+        head = f.read(2)
+    return head == b'\x1f\x8b'
+
+
 def init_argparser():
     """Init argument parser."""
     parser = argparse.ArgumentParser()
@@ -12,14 +19,14 @@ def init_argparser():
     parser.add_argument('--NumberOfTaxa', type=int, required=True, help='number of taxa to include in the output')
     parser.add_argument('--out', type=str, required=True, help='path to csv out file')
     parser.add_argument('--UnipeptPeptides', type=str, required=True, help='path to Unipept response .json file')
-    parser.add_argument('--ProteomeSizePerTaxID', type=str, required=True, help='path to proteome size per taxID file')
+    parser.add_argument('--PeptidomeSize', type=str, required=True, help='path to proteome size per taxID file')
 
     args = parser.parse_args()
 
     return args
 
 
-def GetProteinCount(proteins_per_taxon):
+def GetPeptideCountPerTaxID(proteins_per_taxon):
     """
     Convert tab-separated taxon-protein counts to a dictionary.
     Parameters
@@ -30,16 +37,18 @@ def GetProteinCount(proteins_per_taxon):
     """
     protein_counts_per_taxid = {}
 
-    # this tsv was previously created
-    with open(proteins_per_taxon, 'r') as f:
+    with open(proteins_per_taxon, 'rb') as f:
         for line in f:
-            taxid, count = line.strip().split('\t')
+            # The file is encoded
+            line_str = line.decode('utf-8').strip()
+            # First column represents the TaxID, the second the count of peptides that are associated with that TaxID
+            taxid, count = map(int, line_str.split('\t'))
             protein_counts_per_taxid[taxid] = int(count)
 
     return protein_counts_per_taxid
 
 
-def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, ProteinsPerTaxon, chunks=True, N=1):
+def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=True, N=1):
     """
     Weight inferred taxa based on their (1) degeneracy and (2) their proteome size.
     Parameters
@@ -50,7 +59,7 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, ProteinsPerTaxon, chunks=
         Dictionary that contains peptide to score & number of PSMs map
     MaxTax: int
         Maximum number of taxons to include in the graphical model
-    ProteinsPerTaxon: str
+    PeptidesPerTaxon: str
         Path to the file that contains the size of the proteome per taxID (tab-separated)
     chunks: bool
         Allow memory-efficient reading of large json files
@@ -103,8 +112,10 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, ProteinsPerTaxon, chunks=
     # This file was previously prepared by filtering a generic accession 2 taxid mapping file
     # to swissprot (i.e., reviewed) proteins only
 
-    ProteomeSize = GetProteinCount(ProteinsPerTaxon)
-    TaxIDWeights["proteome_size"] = TaxIDWeights['taxa'].astype(str).map(ProteomeSize)
+    PeptidomeSize = GetPeptideCountPerTaxID(PeptidesPerTaxon)
+    # Map peptidome size and remove NAs
+    TaxIDWeights = TaxIDWeights[TaxIDWeights['taxa'].isin(PeptidomeSize.keys())].assign(
+        proteome_size=lambda x: x['taxa'].map(PeptidomeSize))
 
     # Since large proteomes tend to have more detectable peptides,
     # we adjust the weight by dividing by the size of the proteome i.e.,
@@ -124,6 +135,5 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, ProteinsPerTaxon, chunks=
 
 if __name__ == '__main__':
     args = init_argparser()
-    DF = WeightTaxa(args.UnipeptResponseFile, args.UnipeptPeptides, args.NumberOfTaxa,
-                    args.ProteomeSizePerTaxID)
+    DF = WeightTaxa(args.UnipeptResponseFile, args.UnipeptPeptides, args.NumberOfTaxa, args.PeptidomeSize)
     DF.to_csv(args.out)

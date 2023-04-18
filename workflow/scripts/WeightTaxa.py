@@ -1,90 +1,139 @@
-import numpy as np
-from ete3 import NCBITaxa
-from csv import reader
 import argparse
-import pandas as pd
 import json
-import os.path
 
-parser = argparse.ArgumentParser()
-
-parser.add_argument('--UnipeptResponseFile', type = str, required = True, help = 'path to Unipept response .json file')
-parser.add_argument('--NumberOfTaxa', type = int, required = True, help = 'number of taxa to include in the output' )
-parser.add_argument('--out', type = str, required = True, help = 'path to csv out file')
-parser.add_argument('--UnipeptPeptides', type = str, required = True, help = 'path to Unipept response .json file')
+import pandas as pd
 
 
-args = parser.parse_args()
+def is_gzipped_file(filename):
+    """ Check if input is gzipped."""
+    with open(filename, 'rb') as f:
+        head = f.read(2)
+    return head == b'\x1f\x8b'
 
-def WeightAllTaxaFromJson(JsonPath,PeptScoreDict,MaxTax,chunks = True):
-    '''
-    Takes Unipept response Json and returns a dataframe with peptide sequence, corresponding taxon, corresponding FAs, number of psms and peptide score filtered by PSM-weighted taxa
-    :param JsonPath: str, path toUnipept response JSON file
-    :param PeptScoreDict: dict, dictionary {peptide:[peptide_score,#psms]}
-    :param MaxTax: int, maximum number of taxa to include
-    :return: pandas dataframe including all petide-taxa links where the taxon weight was above the median taxon weight or where max. MaxTax taxa were present
-    '''
 
-    with open(PeptScoreDict,'r') as file:
+def init_argparser():
+    """Init argument parser."""
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--UnipeptResponseFile', type=str, required=True, help='path to Unipept response .json file')
+    parser.add_argument('--NumberOfTaxa', type=int, required=True, help='number of taxa to include in the output')
+    parser.add_argument('--out', type=str, required=True, help='path to csv out file')
+    parser.add_argument('--UnipeptPeptides', type=str, required=True, help='path to Unipept response .json file')
+    parser.add_argument('--PeptidomeSize', type=str, required=True, help='path to proteome size per taxID file')
+
+    args = parser.parse_args()
+
+    return args
+
+
+def GetPeptideCountPerTaxID(proteins_per_taxon):
+    """
+    Convert tab-separated taxon-protein counts to a dictionary.
+    Parameters
+    ----------
+    proteins_per_taxon: str,
+        Path to file that contains the counts.
+
+    """
+    protein_counts_per_taxid = {}
+
+    with open(proteins_per_taxon, 'rb') as f:
+        for line in f:
+            # The file is encoded
+            line_str = line.decode('utf-8').strip()
+            # First column represents the TaxID, the second the count of peptides that are associated with that TaxID
+            taxid, count = map(int, line_str.split('\t'))
+            protein_counts_per_taxid[taxid] = int(count)
+
+    return protein_counts_per_taxid
+
+
+def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=True, N=1):
+    """
+    Weight inferred taxa based on their (1) degeneracy and (2) their proteome size.
+    Parameters
+    ----------
+    UnipeptResponse: str
+        Path to Unipept response json file
+    PeptScoreDict: dict
+        Dictionary that contains peptide to score & number of PSMs map
+    MaxTax: int
+        Maximum number of taxons to include in the graphical model
+    PeptidesPerTaxon: str
+        Path to the file that contains the size of the proteome per taxID (tab-separated)
+    chunks: bool
+        Allow memory-efficient reading of large json files
+    N: int
+        tbd
+
+    Returns
+    -------
+    dataframe
+        Top scoring taxa
+
+    """
+    with open(PeptScoreDict, 'r') as file:
         PeptScoreDictload = json.load(file)
 
     if chunks:
-        with open(JsonPath,'r') as file:
-            UnipeptDict = {"peptides":[]}
+        with open(UnipeptResponse, 'r') as file:
+            UnipeptDict = {"peptides": []}
             for line in file:
                 try:
                     print()
                     UnipeptDict["peptides"].extend(json.loads(line)["peptides"])
-                except KeyError:
-                    UnipeptDict["peptides"]=[json.loads(line)["peptides"]]
+                except:
+                    # TODO: Pieter fixes internal server error
+                    # in the meantime, we work with the incomplete mapping
+                    # UnipeptDict["peptides"] = [json.loads(line)["peptides"]]
+                    print()
+                    continue
 
-    
     else:
-        with open(JsonPath,'r') as file:
+        with open(UnipeptResponse, 'r') as file:
             UnipeptDict = json.load(file)
 
+    # Convert a JSON object into a Pandas DataFrame
+    # record_path Parameter is used to specify the path to the nested list or dictionary that you want to normalize
+    UnipeptFrame = pd.json_normalize(UnipeptDict, record_path=['peptides'])
+    # Merge psm_score and number of psms
+    UnipeptFrame = pd.concat([UnipeptFrame,
+                              pd.json_normalize(UnipeptFrame['sequence'].map(PeptScoreDictload))], axis=1)
+    # Score the degeneracy of a taxa, i.e.,
+    # how conserved a peptide sequence is between taxa.
+    # Divide the number of PSMs of a peptide by the number of taxa the peptide is associated with
+    UnipeptFrame['weight'] = UnipeptFrame['psms'].div([len(element) for element in UnipeptFrame['taxa']])
+    UnipeptFrame = UnipeptFrame.explode('taxa', ignore_index=True)
 
-    UnipeptFrame = pd.json_normalize(UnipeptDict,record_path = ['peptides'])
-    UnipeptFrame['psms_score']= UnipeptFrame['sequence'].map(PeptScoreDictload)
-    UnipeptFrame = pd.concat([UnipeptFrame.drop('psms_score',axis=1),pd.json_normalize(UnipeptFrame['psms_score'])],axis = 1)
-    UnipeptFrame['weight']= UnipeptFrame['psms'].div([len(element) for element in UnipeptFrame['taxa']])
-    UnipeptFrame = UnipeptFrame.explode('taxa',ignore_index = True)
+    # Sum up the weights of a taxon and sort by weight
+    TaxIDWeights = UnipeptFrame.groupby('taxa')['weight'].sum().reset_index().sort_values(by=['weight'],
+                                                                                          ascending=False)
+    # Retrieve the proteome size per taxid as a dictionary
+    # This file was previously prepared by filtering a generic accession 2 taxid mapping file
+    # to swissprot (i.e., reviewed) proteins only
 
-    UnipeptFrameTaxaWeights = UnipeptFrame.groupby('taxa')['weight'].sum().reset_index()
-    UnipeptFrameTaxaWeights = UnipeptFrameTaxaWeights.sort_values(by=['weight'], ascending=False)
-    UnipeptFrameTaxaWeights.to_csv('/home/tholstei/repos/PepGM_all/PepGM/results/Xtandem_rescore_decoy_test_full_Uniprot/CAMPI_SIHUMIx/fullweightframe.csv')
-    threshold = UnipeptFrameTaxaWeights.weight.median()
-    TopTaxa = UnipeptFrameTaxaWeights.loc[UnipeptFrameTaxaWeights["weight"] >= threshold]
+    PeptidomeSize = GetPeptideCountPerTaxID(PeptidesPerTaxon)
+    # Map peptidome size and remove NAs
+    TaxIDWeights = TaxIDWeights[TaxIDWeights['taxa'].isin(PeptidomeSize.keys())].assign(
+        proteome_size=lambda x: x['taxa'].map(PeptidomeSize))
 
-    if len(TopTaxa.taxa)<50:
+    # Since large proteomes tend to have more detectable peptides,
+    # we adjust the weight by dividing by the size of the proteome i.e.,
+    # the number of proteins that are associated with a taxon
+    TaxIDWeights["scaled_weight"] = TaxIDWeights["weight"] / (TaxIDWeights["proteome_size"]) ** N
+
+    # Filter to taxa with a weight greater than the median weight
+    # However, if len > 50, take the top 50 taxa
+    TopTaxa = TaxIDWeights.loc[TaxIDWeights["scaled_weight"] >= TaxIDWeights.scaled_weight.median()]
+
+    if len(TopTaxa.taxa) < 50:
         return UnipeptFrame[UnipeptFrame['taxa'].isin(TopTaxa.taxa)]
     else:
-        return UnipeptFrame[UnipeptFrame['taxa'].isin(TopTaxa.taxa[0:MaxTax])]
-   
+        TopTaxaSorted = TopTaxa.sort_values(by="scaled_weight", ascending=False)
+        return UnipeptFrame[UnipeptFrame['taxa'].isin(TopTaxaSorted.taxa[0:MaxTax])]
 
 
-
-
-#get peptides, spsms and score from pout file into dicitonary shape
-#careful: the ms2rescore 'score' is the posterior error probability!!
-
-
-
-#format and return dataframe with weighted taxa
-DF = WeightAllTaxaFromJson(args.UnipeptResponseFile,args.UnipeptPeptides,args.NumberOfTaxa)
-
-DF.to_csv(args.out)
-
-
-
-
-
-
-
-if __name__=='__main__':
-
-    InputFile = '/home/tholstei/repos/PepGM_all/PepGM/results/SIHUMIx_no_subspecies/CAMPI_SIHUMIx/UnipeptResponse.json'
-    DF = WeightAllTaxaFromJson(InputFile,'/home/tholstei/repos/PepGM_all/PepGM/results/SIHUMIx_no_subspecies/CAMPI_SIHUMIx/UnipeptPeptides.json',300)
-    DF.to_csv('/home/tholstei/repos/PepGM_all/PepGM/results/SIHUMIx_no_subspecies/CAMPI_SIHUMIx/differentGraphs300.csv')
-
-
+if __name__ == '__main__':
+    args = init_argparser()
+    DF = WeightTaxa(args.UnipeptResponseFile, args.UnipeptPeptides, args.NumberOfTaxa, args.PeptidomeSize)
+    DF.to_csv(args.out)

@@ -132,6 +132,9 @@ def WeightTaxa(UnipeptResponse, PeptScoreDict, MaxTax, PeptidesPerTaxon, chunks=
         TopTaxaSorted = TopTaxa.sort_values(by="scaled_weight", ascending=False)
         return UnipeptFrame[UnipeptFrame['taxa'].isin(TopTaxaSorted.taxa[0:MaxTax])]
 
+args = init_argparser()
+DF = WeightTaxa(args.UnipeptResponseFile, args.UnipeptPeptides, args.NumberOfTaxa, args.PeptidomeSize)
+DF.to_csv(args.out)
 
 if __name__ == '__main__':
     args = init_argparser()

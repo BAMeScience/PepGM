@@ -10,8 +10,8 @@ rule UnipeptQuery:
     output: 
           ResultsDir + 'UnipeptResponse.json',
           ResultsDir + 'UnipeptPeptides.json'
-    conda: 'envs/graphenv.yml'   
-    shell: "python3 workflow/scripts/UnipeptGetTaxonomyfromPout.py --UnipeptResponseFile {output[0]} --pep_out {output[1]} --TaxonomyQuery {params.targetTaxa} --NumberOfTaxa {params.NumberofTaxa} --FDR {params.FDR} --PoutFile {input} " 
+    conda: 'envs/Unipeptquery.yml'   
+    shell: "python3 workflow/scripts/UnipeptGetTaxonomyfromPout.py --UnipeptResponseFile {output[0]} --pep_out {output[1]} --TaxonomyQuery {params.targetTaxa} --NumberOfTaxa {params.NumberofTaxa} --FDR {params.FDR} --PoutFile {input} --logfile {log}" 
 
 rule ParseToUnipeptCSV:
     input: 
@@ -22,4 +22,4 @@ rule ParseToUnipeptCSV:
     log: ResultsDir + 'ParsetoCSV.log'
     output: ResultsDir + 'GraphDataframe.csv'
     conda: 'envs/graphenv.yml' 
-    shell: "python3 workflow/scripts/WeightTaxa.py --UnipeptResponseFile {input[0]} --UnipeptPeptides {input[1]} --out {output} --NumberOfTaxa {params.NumberofTaxa}" 
+    shell: "python3 workflow/scripts/WeightTaxa.py --UnipeptResponseFile {input[0]} --UnipeptPeptides {input[1]} --out {output} --NumberOfTaxa {params.NumberofTaxa} --PeptidomeSize /resources/taxa_peptidome_size.tsv" 

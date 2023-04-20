@@ -7,7 +7,7 @@ TaxidMapping: 'taxidMapping/'
 
 
 #Name of folder for the PepGM run in the results folder
-ExperimentName: 'SIHUMIx_CT_Underflow'
+ExperimentName: 'CAMPI3'
 
 #parameters for SearchGUI Search
 searchengines: '-xtandem'
@@ -51,14 +51,14 @@ FDR: 0.01
 
 #sample specific parameters
 SpectraFileType: '.mgf' #'.mgf' or '.mzML'
-SampleName: 'CAMPI_SIHUMIx'  #needs to be the name of your spectrum file and the folder where you have that file
+SampleName: 'CAMPI3_low_complexity'  #needs to be the name of your spectrum file and the folder where you have that file
 ReferenceDBName: 'SIHUMI_DB1UNIPROT'
 HostName: 'human'
 ScientificHostName: '"homo sapiens"'
 
 #UnipeptQueryParameters
 TaxaNumber: 30
-targetTaxa: 207244,816,1678,572511,1485,561,1578   #comma separated taxa to be included in Unipept query 
+targetTaxa: 2   #comma separated taxa to be included in Unipept query 
 FDR: 0.005
 
 

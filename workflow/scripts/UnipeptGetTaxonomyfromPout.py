@@ -1,13 +1,10 @@
-#from https://gitlab.com/rki_bioinformatics/gnomo/-/blob/master/scripts/unipept-get-peptinfo.py
-
-
 import requests
 import json
-import re
 import re
 import os.path
 from ete3 import NCBITaxa
 import argparse
+import logging
 
 ncbi = NCBITaxa()
 
@@ -19,6 +16,7 @@ parser.add_argument('--NumberOfTaxa', type = int, required = True, help = 'numbe
 parser.add_argument('--FDR', type = float, required = True, help = 'min peptide score for the peptide to be included in the search')
 parser.add_argument('--PoutFile', type = str, required = True, help = 'path to percolator(ms2rescore) Pout file')
 parser.add_argument('--pep_out', type = str, required = True, help = 'path to csv out file')
+parser.add_argument('--logfile', type = str, required = True, help ='path to logfile of failed unipeptquery attempts')
 
 
 args = parser.parse_args()
@@ -87,7 +85,7 @@ def PepListNoMissedCleavages(peptide):
     return peptides
 
 
-def generatePostRequestChunks(peptides,TargetTaxa,chunksize=200):
+def generatePostRequestChunks(peptides,TargetTaxa,chunksize=20):
     '''
     Generates POST requests (json) queryong a chunk of peptides from petide list and target taxon
     :param peptides: list of peptides to query in Unipept
@@ -108,21 +106,48 @@ def generatePostRequestChunks(peptides,TargetTaxa,chunksize=200):
 
 
 
-def PostInfoFromUnipeptChunks(request_json, out_file):
+def PostInfoFromUnipeptChunks(request_json, out_file, failed_requests_file):
     """
     Send all requests, get for each peptide the phylum, family, genus and collection of EC-numbers
     :param request_list: list of Get Requests
     :param result_file: csv file with Unipept info (phylum, family, genus and collection of EC-numbers)
     :return: None
     """
+
+    logging.basicConfig(filename= failed_requests_file+'.log', level=logging.INFO)
     
     url = "http://api.unipept.ugent.be/mpa/pept2filtered.json"
-    print('now querying Unipept')
-
+    print('now querying Unipept in '+str(len(request_json))+' chunks')
+    
+    
+    #try Unipept query in chunks
+    failed_requests = {}
     for chunk in request_json:
-        request = requests.post(url,json.dumps(chunk),headers={'content-type':'application/json'}, timeout = None)    
-        with open(out_file, 'a') as f_out:
-            print(request.text,file=f_out)
+        try:
+
+            request = requests.post(url,json.dumps(chunk),headers={'content-type':'application/json'}, timeout = None) 
+            request.raise_for_status()
+
+            with open(out_file, 'a') as f_out:
+                print(request.text,file=f_out)
+        
+        except requests.exceptions.RequestException as e:
+
+            logging.error(f'Request {chunk} failed with error {e}')
+            failed_requests[json.dumps(chunk)] = e
+
+    #retry failed requests        
+    for chunk,error in failed_requests.items():
+        try: 
+            request = requests.post(url,chunk,headers={'content-type':'application/json'}, timeout = None) 
+            request.raise_for_status()
+            with open(out_file, 'a') as f_out:
+                print(request.text,file=f_out)
+        
+        except:
+            logging.error(f'Retry request to {url} failed with error: {e}')
+
+
 
 def generatePostRequest(peptides,TargetTaxa):
     '''
@@ -172,7 +197,7 @@ with open(args.pep_out, 'a') as f_out:
 
 #get and save Info from Unipept if the response file doesn't exist yet
 request = generatePostRequestChunks(list(UnipeptPeptides.keys()),[int(item) for item in args.TaxonomyQuery.split(',')])    
-save = PostInfoFromUnipeptChunks(request,args.UnipeptResponseFile)
+save = PostInfoFromUnipeptChunks(request,args.UnipeptResponseFile,args.logfile)
 
 
 #if __name__=='__main__':

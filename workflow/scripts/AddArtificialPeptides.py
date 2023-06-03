@@ -23,12 +23,16 @@ args = parser.parse_args()
 
 ###generate tuples of peptides with variable length to add
 
-peptides = args.artificial_pep_number*tuple(('ArtificialPep',{'InitialBelief_0': 0.2
-                                            'InitialBelief_1': 0.8, 'category': 'peptide'}))
+peptides = []
+
+for n in range(int(args.artificial_pep_number)):
+    peptides.extend([tuple(('ArtificialPep'+str(n),{'InitialBelief_0': 0.1, 'InitialBelief_1': 0.9, 'category': 'peptide'}))])
+
 
 CTFactorgraph = CTFactorGraph(args.GraphMLPath)
-CTFactorgraph.AddArtificialPeptides(peptides,'Taxid')
-CTFactorgraph.AddCTNodes()
+CTFactorgraph.AddArtificialPeptides(peptides,'10304')
+nx.write_graphml(CTFactorgraph,'check'+str(args.artificial_pep_number)+'.graphml')
+#CTFactorgraph.AddCTNodes()
 CTFactorgraph.FillInFactors(args.alpha,args.beta)
 CTFactorgraph.FillInPriors(args.prior)
 

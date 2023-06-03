@@ -8,13 +8,17 @@ include: WorkflowPath + '/rules/protGM.smk'
 
 
 
-rule all:
-    input:
-        expand(ResultsDir + SampleName + '/Prior{Prior}/' + ReferenceDBName + '_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha=AlphaRange,beta=BetaRange,Prior=prior),
-        ResultsDir + SampleName + '/paramcheck.png',
+#rule all:
+#    input:
+#        expand(ResultsDir + SampleName + '/Prior{Prior}/' + ReferenceDBName + '_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha=AlphaRange,beta=BetaRange,Prior=prior),
+#        ResultsDir + SampleName + '/paramcheck.png',
 
 #          DataDirectory + SampleName + '/' + firstTarget +'_proteinCount.png'
 
+rule all:
+    input:
+        expand([ResultsDir + SampleName + '/NArtPeps{N}/Prior{Prior}/{DBname}_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',ResultsDir + SampleName + '/NArtPeps{N}/Prior{Prior}/' + ReferenceDBName + '_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png'],alpha=AlphaRange,beta=BetaRange,Prior=prior,N=[1,10,100,200,400,500,600],DBname = 'refseqViral'),
+        expand(ResultsDir + SampleName + '/NArtPeps{N}/paramcheck.png',N=[1,10,100,200,400,500,600])
 
 rule getTargets:
     input:
@@ -110,10 +114,7 @@ rule CountProteinsInJson:
     conda: 'envs/graphenv.yml'
     shell: 'python3 workflow/scripts/CountProteins.py --ResultsFile {input} --out {output}'
 
-#rule all:
-#    input:
-#        expand(ResultsDir + SampleName + '/NArtPeps{N}/Prior{Prior}/' + ReferenceDBName + '_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha=AlphaRange,beta=BetaRange,Prior=prior,N=[1,10,100,200,400,500,600]),
-#        ResultsDir + SampleName + '/NArtPeps{N}/paramcheck.png',
+
 
 rule RunPepGMWithArtificialPeptides:
     input: PepGMtoUse(ProteinGM)
@@ -124,7 +125,7 @@ rule RunPepGMWithArtificialPeptides:
         hostname=HostName,
         DBname=ReferenceDBName,
     log: ResultsDir + SampleName + '/NArtPeps{N}/Prior{Prior}/log/{DBname}_a{alpha}_b{beta}_pepGM.log'
-    shell: 'python3  workflow/scripts/Paper_scripts/AddArtificialPeptides.py ----artificial_pep_number {wildcards.N} --GraphMLPath {input} --prior {wildcards.Prior} --alpha {wildcards.alpha} --beta {wildcards.beta} --out {output} &>> {log}'
+    shell: 'python3  workflow/scripts/AddArtificialPeptides.py --artificial_pep_number {wildcards.N} --GraphMLPath {input} --prior {wildcards.Prior} --alpha {wildcards.alpha} --beta {wildcards.beta} --out {output} &>> {log}'
 
 rule BarPlotResultsArtificialPeptides:
     input: ResultsDir + SampleName + '/NArtPeps{N}/Prior{Prior}/{DBname}_PepGM_Results_a{alpha}_b{beta}_p{Prior}.csv'
@@ -136,13 +137,13 @@ rule BarPlotResultsArtificialPeptides:
 
 
 rule FindBestParametersArtificialPeptides:
-    input: ResultsDir + SampleName + '/' + ReferenceDBName + '_mapped_taxids_weights.csv',
-        expand(ResultsDir + SampleName + '/NArtPeps{N}/Prior{Prior}/' + ReferenceDBName + '_PepGM_Results_a{alpha}_b{beta}_p{Prior}.png',alpha=AlphaRange,beta=BetaRange,Prior=prior)
+    input: ResultsDir + SampleName + '/' + ReferenceDBName + '_mapped_taxids_weights.csv'
     output: ResultsDir + SampleName + '/NArtPeps{N}/paramcheck.png',
             ResultsDir + SampleName + '/NArtPeps{N}/PhyloTreeView.png'
     conda: 'envs/graphenv.yml'
     log: ResultsDir + SampleName + '/NArtPeps{N}/paramcheck.log'
-    params: Results=ResultsDir + SampleName,
+    params: Results=ResultsDir + SampleName+'/NArtPeps{N}',
         host=ScientificHostName,
         DB=ReferenceDBName
+
     shell: 'python3 workflow/scripts/SearchAnalysisOutputFormatter.py --weights {input[0]} --refdb {params.DB} --host {params.host} --results {params.Results} --out {output[0]} &>> {log}'

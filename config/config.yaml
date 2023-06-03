@@ -1,18 +1,18 @@
 APIkey: 'cbd119d8a7d988bc27f5b0a722a7c861f408'
 APImail: 'tanja.holstein@bam.de'
-ExperimentName: 'ProteinGM'
-SampleName: 'cowpox03013'
+ExperimentName: 'Artificial_peptides_slowloop2'
+SampleName: 'hhv1'
 HostName: 'human'
 ReferenceDBName: 'refseqViral'
 ScientificHostName: '"homo sapiens"'
 FilterSpectra: False
 AddHostandCrapToDB: True
-ProteinGM: True
+ProteinGM: False
 
-SamplePath: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD003013_Cowpox_BR/PXD003013_Cowpox_BR.mgf' # replace  path
-ParametersFile: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD003013_Cowpox_BR/PXD003013_Cowpox_BR.par' # replace path
+SamplePath: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/PXD005104_Herpessimplex_1.mgf' # replace  path
+ParametersFile: '/home/tholstei/repos/PepGM_all/PepGM/resources/SampleData/PXD005104_Herpessimplex_1/PXD005104_Herpessimplex_1.par' # replace path
 DataDir: 'resources/SampleData/'
-DatabaseDir: 'resources/Database/'
+DatabaseDir: 'resources/Databases/'
 PeptideShaker: '/home/tholstei/repos/PepGM_all/bin/PeptideShaker-2.2.9/PeptideShaker-2.2.9.jar' # replace path
 SearchGUI: '/home/tholstei/repos/PepGM_all/bin/SearchGUI-4.1.14/SearchGUI-4.1.14.jar' # replace path
 ResourcesDir: 'resources/'

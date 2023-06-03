@@ -344,7 +344,7 @@ class Messages():
     def ComputeResidual(self,NodeIN,NodeOUT):
         Msg1 = self.MsgNew[NodeIN,NodeOUT]
         Msg2 = self.Msg[NodeIN,NodeOUT]
-        print(Msg1,Msg2)
+        #print(Msg1,Msg2)
         if len(self.MsgNew[NodeIN,NodeOUT]) != len(self.Msg[NodeIN,NodeOUT]):
             Msg2 = [1]*len(self.MsgNew[NodeIN,NodeOUT])
         return np.sum(np.abs(np.subtract(Msg1,Msg2)))  
@@ -441,13 +441,13 @@ class Messages():
                 self.SingleEdgeDirectionUpdate(StartName, EndName)
             
         
-        #for edge in self.Graph.edges():
-        #    #compute all residuals of the messages in this loop
-        #    StartName, EndName = edge[1], edge[0]
-        #    self.FullResidual[(StartName, EndName)] = self.ComputeResidual(StartName, EndName)
+        for edge in self.Graph.edges():
+            #compute all residuals of the messages in this loop
+            StartName, EndName = edge[1], edge[0]
+            self.FullResidual[(StartName, EndName)] = self.ComputeResidual(StartName, EndName)
 
-        #    StartName, EndName = edge[0], edge[1]
-        #    self.FullResidual[(StartName, EndName)] = self.ComputeResidual(StartName, EndName)
+            StartName, EndName = edge[0], edge[1]
+            self.FullResidual[(StartName, EndName)] = self.ComputeResidual(StartName, EndName)
                 
     def updateResidualMessage(self,Residual):
 
@@ -587,7 +587,7 @@ class Messages():
             self.ComputePriority(PriorityMessage[0],PriorityMessage[1])
             
             end_t = time.time()
-            print( "time per loop" , k, " ", end_t-start_t, "residual max", MaxResidual)
+            #print( "time per loop" , k, " ", end_t-start_t, "residual max", MaxResidual)
         
             k += 1
 
@@ -638,7 +638,8 @@ def CalibrateAllSubgraphs(ListOfCTFactorGraphs, MaxIterations, Tolerance,local =
 
             NodeDict.update(dict(Graph.nodes( data = 'category')))
             InitializedMessageObject = Messages(Graph)
-            InitializedMessageObject.ZeroLookAheadLoopyLoop(MaxIterations,Tolerance,local)
+            InitializedMessageObject.LoopyLoop(MaxIterations,Tolerance,local)
+            #InitializedMessageObject.ZeroLookAheadLoopyLoop(MaxIterations,Tolerance,local)
             ResultsList.append(InitializedMessageObject.CurrentBeliefs)
             ResultsDict.update(InitializedMessageObject.CurrentBeliefs)
 

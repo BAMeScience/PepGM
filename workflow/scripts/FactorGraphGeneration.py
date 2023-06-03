@@ -369,6 +369,8 @@ class TaxonGraph(nx.Graph):
                 # conserves peptide graph structure, score will come from DB search engines anyways
                 self.add_nodes_from(pep_nodes)
                 self.add_edges_from(taxon_pep_edges)
+    
+    
 
 
 
@@ -454,19 +456,7 @@ class FactorGraph(nx.Graph):
 
 
 
-    def AddArtificialPeptides(self,PepTuples,Taxid):
-        '''
-        Add the peptides given in PepTaxonTuples into the graph. This function was created to be able to artificially add peptides to the
-        graph that were not detected during the database search and evaluate their effects on sear results. 
-        During 'nornaml' pepGM use, it should not be called.
-        :input PepTuples: list of tuples with (peptide_to_add,{'InitialBelief_0': int,
-                                    'InitialBelief_1': int, 'category': 'peptide})
-        :input Taxid: taxid the artificial peptides will be added to
-        :out: none
-        '''        
-        taxon_pep_edges = tuple((Taxid, pep[0]) for pep in PepTuples)
-        self.add_nodes_from(PepTuples)
-        self.add_edges_from(taxon_pep_edges)
+
 
 
         
@@ -557,8 +547,38 @@ class CTFactorGraph(FactorGraph):
             self.add_edges_from(ListOfEdgeAddList[i])
             self.remove_edges_from(ListOfEdgeRemoveList[i])
  
+    def AddArtificialPeptides(self,PepTuples,Taxid):
+        '''
+        Add the peptides given in PepTaxonTuples into the graph. This function was created to be able to artificially add peptides to the
+        graph that were not detected during the database search and evaluate their effects on sear results. 
+        During 'nornaml' pepGM use, it should not be called.
+        :input PepTuples: list of tuples with (peptide_to_add,{'InitialBelief_0': int,
+                                    'InitialBelief_1': int, 'category': 'peptide})
+        :input Taxid: taxid the artificial peptides will be added to
+        :out: none
+        '''        
+        taxon_pep_edges = tuple((Taxid, pep[0]) for pep in PepTuples)
+        proxyGraph = nx.Graph()
+        
+        proxyGraph.add_nodes_from(PepTuples)
+        self.add_nodes_from(PepTuples)
+        proxyGraph.add_edges_from(taxon_pep_edges)
+        nx.set_node_attributes(proxyGraph,{Taxid:'taxon'},name='category')
 
+
+        nodelist = list(proxyGraph.nodes(data=True)).copy()
+
+        #add the CPDs
+        for node in nodelist:                   
+            #create noisy OR cpd per peptide
+            if node[1]['category']=='peptide':                        
+                degree = proxyGraph.degree(node[0])                                  
+                neighbors = list(proxyGraph.neighbors(node[0]))
+                self.add_node(node[0]+' CPD', category = 'factor',ParentNumber = degree)
+                self.add_edges_from([(node[0]+' CPD',x) for x in neighbors])
+                self.add_edge(node[0]+' CPD',node[0])
     
+
     def SaveToGraphML(self,Filename):
         nx.write_graphml(self,Filename)
 

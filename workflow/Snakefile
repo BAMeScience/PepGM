@@ -1,6 +1,7 @@
 #configuration
 WorkflowPath = os.path.dirname(os.path.realpath(workflow.snakefile))
 include: WorkflowPath + '/rules/config.smk'
+# TODO: Add spectral library snakefile
 include: WorkflowPath + '/rules/searchgui+pepshaker.smk'
 include: WorkflowPath + '/rules/buildDatabase.smk'
 include: WorkflowPath + '/rules/filterHostCrap.smk'

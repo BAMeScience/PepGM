@@ -3,7 +3,7 @@ APImail: 'tanja.holstein@bam.de'
 ExperimentName: 'ProteinGM'
 SampleName: 'cowpox03013'
 HostName: 'human'
-ReferenceDBName: 'refseqViral'
+ReferenceDBName: 'RefSeqViral'
 ScientificHostName: '"homo sapiens"'
 FilterSpectra: False
 AddHostandCrapToDB: True
@@ -26,4 +26,3 @@ TaxaInPlot: 15
 Alpha: [0.01,0.05,0.10,0.20,0.40,0.60]
 Beta: [0.01,0.05,0.10,0.20,0.40,0.50,0.70]
 prior: [0.10,0.30,0.50]
-

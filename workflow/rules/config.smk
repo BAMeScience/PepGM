@@ -38,3 +38,4 @@ TaxaInPlot = config['TaxaInPlot']
 AlphaRange = config['Alpha']
 BetaRange = config['Beta']
 prior = config['prior']
+chunk_size = 100000
